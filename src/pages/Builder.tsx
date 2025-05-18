@@ -54,17 +54,13 @@ type CertificationItem = {
 };
 
 // Define a discriminated union type for CV sections
-type CVSectionData = {
-  id: string;
-  title: string;
-} & (
-  | { type: 'about'; content: AboutContent }
-  | { type: 'experience'; content: ExperienceItem[] }
-  | { type: 'education'; content: EducationItem[] }
-  | { type: 'skills'; content: SkillItem[] }
-  | { type: 'projects'; content: ProjectItem[] }
-  | { type: 'certifications'; content: CertificationItem[] }
-);
+type CVSectionData = 
+  | { id: string; title: string; type: 'about'; content: AboutContent }
+  | { id: string; title: string; type: 'experience'; content: ExperienceItem[] }
+  | { id: string; title: string; type: 'education'; content: EducationItem[] }
+  | { id: string; title: string; type: 'skills'; content: SkillItem[] }
+  | { id: string; title: string; type: 'projects'; content: ProjectItem[] }
+  | { id: string; title: string; type: 'certifications'; content: CertificationItem[] };
 
 // Template thumbnails
 const templates = [
@@ -360,16 +356,14 @@ const Builder = () => {
   
   const handleInputChange = (sectionId: string, field: string, value: string) => {
     const updatedSections = sections.map(section => {
-      if (section.id === sectionId) {
-        if (section.type === 'about') {
-          return {
-            ...section,
-            content: {
-              ...section.content,
-              [field]: value
-            }
-          };
-        }
+      if (section.id === sectionId && section.type === 'about') {
+        return {
+          ...section,
+          content: {
+            ...section.content,
+            [field]: value
+          }
+        } as typeof section;
       }
       return section;
     });
@@ -385,14 +379,39 @@ const Builder = () => {
   const handleArrayItemChange = (sectionId: string, itemId: string, field: string, value: string) => {
     const updatedSections = sections.map(section => {
       if (section.id === sectionId) {
-        if (section.type === 'experience' || section.type === 'education' || section.type === 'projects' || section.type === 'certifications') {
+        if (section.type === 'experience') {
           return {
             ...section,
-            content: section.content.map((item: any) => 
+            content: section.content.map(item => 
               item.id === itemId ? { ...item, [field]: value } : item
             )
-          };
-        } else if (section.type === 'skills') {
+          } as typeof section;
+        } 
+        else if (section.type === 'education') {
+          return {
+            ...section,
+            content: section.content.map(item => 
+              item.id === itemId ? { ...item, [field]: value } : item
+            )
+          } as typeof section;
+        }
+        else if (section.type === 'projects') {
+          return {
+            ...section,
+            content: section.content.map(item => 
+              item.id === itemId ? { ...item, [field]: value } : item
+            )
+          } as typeof section;
+        }
+        else if (section.type === 'certifications') {
+          return {
+            ...section,
+            content: section.content.map(item => 
+              item.id === itemId ? { ...item, [field]: value } : item
+            )
+          } as typeof section;
+        }
+        else if (section.type === 'skills') {
           const index = parseInt(itemId);
           if (!isNaN(index)) {
             const updatedContent = [...section.content];
@@ -400,7 +419,7 @@ const Builder = () => {
             return {
               ...section,
               content: updatedContent
-            };
+            } as typeof section;
           }
         }
       }
@@ -434,7 +453,7 @@ const Builder = () => {
                 description: 'Describe your responsibilities and achievements...'
               }
             ]
-          };
+          } as typeof s;
         } else if (s.type === 'education') {
           return {
             ...s,
@@ -448,12 +467,12 @@ const Builder = () => {
                 description: 'Describe your studies and achievements...'
               }
             ]
-          };
+          } as typeof s;
         } else if (s.type === 'skills') {
           return {
             ...s,
             content: [...s.content, 'New Skill']
-          };
+          } as typeof s;
         } else if (s.type === 'projects') {
           return {
             ...s,
@@ -467,7 +486,7 @@ const Builder = () => {
                 link: ''
               }
             ]
-          };
+          } as typeof s;
         } else if (s.type === 'certifications') {
           return {
             ...s,
@@ -481,7 +500,7 @@ const Builder = () => {
                 description: 'Description of certification...'
               }
             ]
-          };
+          } as typeof s;
         }
       }
       return s;
@@ -500,7 +519,7 @@ const Builder = () => {
     if (!section) return;
     
     if ((section.type === 'experience' || section.type === 'education' || section.type === 'projects' || section.type === 'certifications') && 
-        Array.isArray(section.content) && section.content.length <= 1) {
+        section.content.length <= 1) {
       toast({
         title: "Cannot Remove",
         description: "You must keep at least one item in this section.",
@@ -511,11 +530,26 @@ const Builder = () => {
     
     const updatedSections = sections.map(s => {
       if (s.id === sectionId) {
-        if (s.type === 'experience' || s.type === 'education' || s.type === 'projects' || s.type === 'certifications') {
+        if (s.type === 'experience') {
           return {
             ...s,
-            content: s.content.filter((item: any) => item.id !== itemId)
-          };
+            content: s.content.filter(item => item.id !== itemId)
+          } as typeof s;
+        } else if (s.type === 'education') {
+          return {
+            ...s,
+            content: s.content.filter(item => item.id !== itemId)
+          } as typeof s;
+        } else if (s.type === 'projects') {
+          return {
+            ...s,
+            content: s.content.filter(item => item.id !== itemId)
+          } as typeof s;
+        } else if (s.type === 'certifications') {
+          return {
+            ...s,
+            content: s.content.filter(item => item.id !== itemId)
+          } as typeof s;
         } else if (s.type === 'skills') {
           const index = parseInt(itemId);
           if (!isNaN(index)) {
@@ -524,7 +558,7 @@ const Builder = () => {
             return {
               ...s,
               content: updatedContent
-            };
+            } as typeof s;
           }
         }
       }
@@ -552,32 +586,32 @@ const Builder = () => {
   };
 
   // Type guard to check if section is about section
-  const isAboutSection = (section: CVSectionData): section is CVSectionData & { type: 'about'; content: AboutContent } => {
+  const isAboutSection = (section: CVSectionData): section is { id: string; title: string; type: 'about'; content: AboutContent } => {
     return section.type === 'about';
   };
   
   // Type guard to check if section is experience section
-  const isExperienceSection = (section: CVSectionData): section is CVSectionData & { type: 'experience'; content: ExperienceItem[] } => {
+  const isExperienceSection = (section: CVSectionData): section is { id: string; title: string; type: 'experience'; content: ExperienceItem[] } => {
     return section.type === 'experience';
   };
   
   // Type guard to check if section is education section
-  const isEducationSection = (section: CVSectionData): section is CVSectionData & { type: 'education'; content: EducationItem[] } => {
+  const isEducationSection = (section: CVSectionData): section is { id: string; title: string; type: 'education'; content: EducationItem[] } => {
     return section.type === 'education';
   };
   
   // Type guard to check if section is skills section
-  const isSkillsSection = (section: CVSectionData): section is CVSectionData & { type: 'skills'; content: string[] } => {
+  const isSkillsSection = (section: CVSectionData): section is { id: string; title: string; type: 'skills'; content: string[] } => {
     return section.type === 'skills';
   };
   
   // Type guard to check if section is projects section
-  const isProjectsSection = (section: CVSectionData): section is CVSectionData & { type: 'projects'; content: ProjectItem[] } => {
+  const isProjectsSection = (section: CVSectionData): section is { id: string; title: string; type: 'projects'; content: ProjectItem[] } => {
     return section.type === 'projects';
   };
   
   // Type guard to check if section is certifications section
-  const isCertificationsSection = (section: CVSectionData): section is CVSectionData & { type: 'certifications'; content: CertificationItem[] } => {
+  const isCertificationsSection = (section: CVSectionData): section is { id: string; title: string; type: 'certifications'; content: CertificationItem[] } => {
     return section.type === 'certifications';
   };
 
