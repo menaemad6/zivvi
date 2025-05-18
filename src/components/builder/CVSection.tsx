@@ -6,6 +6,7 @@ interface CVSectionProps {
   title: string;
   onEdit: () => void;
   onDelete: () => void;
+  onDragStart?: (e: React.DragEvent) => void;
   children: React.ReactNode;
 }
 
@@ -17,11 +18,12 @@ const DragHandleIcon = () => (
   </svg>
 );
 
-export const CVSection: React.FC<CVSectionProps> = ({ title, onEdit, onDelete, children }) => {
+export const CVSection: React.FC<CVSectionProps> = ({ title, onEdit, onDelete, onDragStart, children }) => {
   return (
     <div 
-      className="p-4 mb-4 border rounded-lg bg-white animate-fade-in"
-      draggable
+      className="p-4 mb-4 border rounded-lg bg-white animate-fade-in transition-all duration-200 hover:shadow-md"
+      draggable={!!onDragStart}
+      onDragStart={onDragStart}
     >
       <div className="flex items-center justify-between mb-3 border-b pb-2">
         <div className="flex items-center gap-2">
