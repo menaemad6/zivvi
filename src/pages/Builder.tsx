@@ -7,6 +7,45 @@ import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { toast } from "sonner";
 
+// Define proper TypeScript types for different section contents
+type AboutContent = {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+  location: string;
+  summary: string;
+};
+
+type ExperienceItem = {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  description: string;
+};
+
+type EducationItem = {
+  id: string;
+  institution: string;
+  degree: string;
+  period: string;
+  description: string;
+};
+
+// Define a discriminated union type for CV sections
+type CVSectionData = {
+  id: string;
+  title: string;
+} & (
+  | { type: 'about'; content: AboutContent }
+  | { type: 'experience'; content: ExperienceItem[] }
+  | { type: 'education'; content: EducationItem[] }
+  | { type: 'skills'; content: string[] }
+  | { type: 'projects'; content: any[] }
+  | { type: 'certifications'; content: any[] }
+);
+
 // Template thumbnails
 const templates = [
   { id: 'classic', name: 'Classic' },
@@ -66,7 +105,7 @@ const DownloadIcon = () => (
 );
 
 // Sample CV sections
-const initialSections = [
+const initialSections: CVSectionData[] = [
   {
     id: '1',
     type: 'about',
@@ -126,7 +165,7 @@ const initialSections = [
 
 const Builder = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('modern');
-  const [sections, setSections] = useState(initialSections);
+  const [sections, setSections] = useState<CVSectionData[]>(initialSections);
   
   const handleDragStart = (e: React.DragEvent, sectionType: string) => {
     e.dataTransfer.setData("sectionType", sectionType);
@@ -149,6 +188,21 @@ const Builder = () => {
     classic: "font-serif",
     modern: "font-sans",
     minimal: "font-sans tracking-wide",
+  };
+
+  // Type guard to check if section is about section
+  const isAboutSection = (section: CVSectionData): section is CVSectionData & { type: 'about'; content: AboutContent } => {
+    return section.type === 'about';
+  };
+  
+  // Type guard to check if section is experience section
+  const isExperienceSection = (section: CVSectionData): section is CVSectionData & { type: 'experience'; content: ExperienceItem[] } => {
+    return section.type === 'experience';
+  };
+  
+  // Type guard to check if section is education section
+  const isEducationSection = (section: CVSectionData): section is CVSectionData & { type: 'education'; content: EducationItem[] } => {
+    return section.type === 'education';
   };
 
   return (
@@ -248,7 +302,7 @@ const Builder = () => {
                   });
                 }}
               >
-                {section.type === 'about' && (
+                {isAboutSection(section) && (
                   <div className="space-y-3">
                     <div className="space-y-1">
                       <input 
@@ -279,9 +333,9 @@ const Builder = () => {
                   </div>
                 )}
 
-                {section.type === 'experience' && (
+                {isExperienceSection(section) && (
                   <div className="space-y-4">
-                    {section.content.map((exp: any) => (
+                    {section.content.map((exp) => (
                       <div key={exp.id} className="border-b pb-3 last:border-b-0">
                         <div className="flex justify-between">
                           <input 
@@ -313,9 +367,9 @@ const Builder = () => {
                   </div>
                 )}
 
-                {section.type === 'education' && (
+                {isEducationSection(section) && (
                   <div className="space-y-4">
-                    {section.content.map((edu: any) => (
+                    {section.content.map((edu) => (
                       <div key={edu.id} className="border-b pb-3 last:border-b-0">
                         <div className="flex justify-between">
                           <input 
@@ -362,7 +416,7 @@ const Builder = () => {
                 <div key={section.id} className="mb-6">
                   <h3 className="font-bold text-lg border-b pb-1 mb-3">{section.title}</h3>
                   
-                  {section.type === 'about' && (
+                  {isAboutSection(section) && (
                     <div className="space-y-2">
                       <div>
                         <div className="text-xl font-bold">{section.content.name}</div>
@@ -375,9 +429,9 @@ const Builder = () => {
                     </div>
                   )}
 
-                  {section.type === 'experience' && (
+                  {isExperienceSection(section) && (
                     <div className="space-y-3">
-                      {section.content.map((exp: any) => (
+                      {section.content.map((exp) => (
                         <div key={exp.id}>
                           <div className="flex justify-between">
                             <span className="font-medium text-sm">{exp.company}</span>
@@ -390,9 +444,9 @@ const Builder = () => {
                     </div>
                   )}
 
-                  {section.type === 'education' && (
+                  {isEducationSection(section) && (
                     <div className="space-y-3">
-                      {section.content.map((edu: any) => (
+                      {section.content.map((edu) => (
                         <div key={edu.id}>
                           <div className="flex justify-between">
                             <span className="font-medium text-sm">{edu.institution}</span>
