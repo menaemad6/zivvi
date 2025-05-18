@@ -1,7 +1,8 @@
 
 // Gemini API configuration
 const API_KEY = "AIzaSyCPq1M1m4GNyHBwnEILA874_Td9mxtRd8s";
-const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+// const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 /**
  * Interface for Gemini API response
