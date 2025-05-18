@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Builder from "./pages/Builder";
+import Preview from "./pages/Preview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/builder/:id" element={<Builder />} />
           <Route path="/builder/new" element={<Builder />} />
+          <Route path="/preview" element={<Preview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

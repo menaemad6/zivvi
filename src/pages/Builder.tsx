@@ -6,8 +6,9 @@ import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
-import { PlusCircle, Download, Check, X, ArrowLeft, Sparkles } from 'lucide-react';
+import { PlusCircle, Download, ArrowLeft, Sparkles, Eye, FilePdf } from 'lucide-react';
 import { AIAssistDialog } from '@/components/builder/AIAssistDialog';
+import { useNavigate } from 'react-router-dom';
 
 // Define proper TypeScript types for different section contents
 type AboutContent = {
@@ -62,11 +63,14 @@ type CVSectionData =
   | { id: string; title: string; type: 'projects'; content: ProjectItem[] }
   | { id: string; title: string; type: 'certifications'; content: CertificationItem[] };
 
-// Template thumbnails
+// Template thumbnails - Updated with more options
 const templates = [
-  { id: 'classic', name: 'Classic' },
-  { id: 'modern', name: 'Modern' },
-  { id: 'minimal', name: 'Minimal' },
+  { id: 'classic', name: 'Classic', description: 'Traditional layout with a professional look' },
+  { id: 'modern', name: 'Modern', description: 'Contemporary design with clean lines' },
+  { id: 'minimal', name: 'Minimal', description: 'Simple and elegant with focus on content' },
+  { id: 'creative', name: 'Creative', description: 'Bold design for creative professionals' },
+  { id: 'executive', name: 'Executive', description: 'Sophisticated layout for senior roles' },
+  { id: 'technical', name: 'Technical', description: 'Specialized for tech professionals' },
 ];
 
 // Icons for the sidebar sections
@@ -171,6 +175,7 @@ const initialSections: CVSectionData[] = [
 ];
 
 const Builder = () => {
+  const navigate = useNavigate();
   const [selectedTemplate, setSelectedTemplate] = useState<string>('modern');
   const [sections, setSections] = useState<CVSectionData[]>(initialSections);
   const [editedSections, setEditedSections] = useState<Record<string, any>>({});
@@ -764,11 +769,14 @@ const Builder = () => {
     return section.type === 'certifications';
   };
 
-  // Template specific classes
+  // Template specific classes - updated with new templates
   const templateStyles = {
     classic: "font-serif",
     modern: "font-sans",
     minimal: "font-sans tracking-wide",
+    creative: "font-sans text-primary",
+    executive: "font-serif tracking-tight",
+    technical: "font-mono",
   };
 
   return (
@@ -812,9 +820,9 @@ const Builder = () => {
               </Select>
             </div>
             
-            <Button onClick={handleDownload} className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Download PDF
+            <Button variant="outline" onClick={handlePreview} className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              Preview
             </Button>
           </div>
         </div>
@@ -1207,7 +1215,7 @@ const Builder = () => {
           </div>
         </div>
 
-        {/* Preview pane */}
+        {/* Preview pane - updated with new template styles */}
         <div className="hidden xl:block w-[450px] bg-muted/30 border-l p-8">
           <div className="sticky top-24">
             <h3 className="font-semibold mb-2">Preview</h3>
