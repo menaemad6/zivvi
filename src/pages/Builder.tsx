@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,7 +6,8 @@ import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
-import { PlusCircle, Download, Check, X, ArrowLeft } from 'lucide-react';
+import { PlusCircle, Download, Check, X, ArrowLeft, Sparkles } from 'lucide-react';
+import { AIAssistDialog } from '@/components/builder/AIAssistDialog';
 
 // Define proper TypeScript types for different section contents
 type AboutContent = {
@@ -178,6 +178,7 @@ const Builder = () => {
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [dragOverSection, setDragOverSection] = useState<string | null>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
   
   // Function to create a new section based on the type
   const createNewSection = (sectionType: string): CVSectionData | null => {
@@ -585,6 +586,154 @@ const Builder = () => {
     });
   };
 
+  // Handle AI-generated data
+  const handleAIGeneratedData = (sectionType: string, data: any) => {
+    switch (sectionType) {
+      case 'about': {
+        // Find the existing about section or create a new one
+        const aboutSectionIndex = sections.findIndex(s => s.type === 'about');
+        
+        if (aboutSectionIndex >= 0) {
+          // Update existing about section
+          const updatedSections = [...sections];
+          const section = updatedSections[aboutSectionIndex];
+          
+          if (section.type === 'about') { // Type guard
+            updatedSections[aboutSectionIndex] = {
+              ...section,
+              content: {
+                ...section.content,
+                ...data
+              }
+            };
+            setSections(updatedSections);
+          }
+        } else {
+          // Create and add new about section
+          const newSection = createNewSection('about');
+          if (newSection && newSection.type === 'about') {
+            newSection.content = {
+              ...newSection.content,
+              ...data
+            };
+            setSections([...sections, newSection]);
+          }
+        }
+        break;
+      }
+      
+      case 'experience': {
+        // Find existing experience section or create new one
+        const experienceSectionIndex = sections.findIndex(s => s.type === 'experience');
+        
+        if (experienceSectionIndex >= 0) {
+          // Update existing experience section
+          const updatedSections = [...sections];
+          const section = updatedSections[experienceSectionIndex];
+          
+          if (section.type === 'experience') { // Type guard
+            // Add IDs to the items if they don't have them
+            const processedData = Array.isArray(data) ? data.map(item => ({
+              ...item,
+              id: item.id || uuidv4()
+            })) : [];
+            
+            updatedSections[experienceSectionIndex] = {
+              ...section,
+              content: processedData
+            };
+            setSections(updatedSections);
+          }
+        } else {
+          // Create and add new experience section
+          const newSection = createNewSection('experience');
+          if (newSection && newSection.type === 'experience') {
+            // Add IDs to the items if they don't have them
+            const processedData = Array.isArray(data) ? data.map(item => ({
+              ...item,
+              id: item.id || uuidv4()
+            })) : [];
+            
+            newSection.content = processedData;
+            setSections([...sections, newSection]);
+          }
+        }
+        break;
+      }
+      
+      case 'education': {
+        // Find existing education section or create new one
+        const educationSectionIndex = sections.findIndex(s => s.type === 'education');
+        
+        if (educationSectionIndex >= 0) {
+          // Update existing education section
+          const updatedSections = [...sections];
+          const section = updatedSections[educationSectionIndex];
+          
+          if (section.type === 'education') { // Type guard
+            // Add IDs to the items if they don't have them
+            const processedData = Array.isArray(data) ? data.map(item => ({
+              ...item,
+              id: item.id || uuidv4()
+            })) : [];
+            
+            updatedSections[educationSectionIndex] = {
+              ...section,
+              content: processedData
+            };
+            setSections(updatedSections);
+          }
+        } else {
+          // Create and add new education section
+          const newSection = createNewSection('education');
+          if (newSection && newSection.type === 'education') {
+            // Add IDs to the items if they don't have them
+            const processedData = Array.isArray(data) ? data.map(item => ({
+              ...item,
+              id: item.id || uuidv4()
+            })) : [];
+            
+            newSection.content = processedData;
+            setSections([...sections, newSection]);
+          }
+        }
+        break;
+      }
+      
+      case 'skills': {
+        // Find existing skills section or create new one
+        const skillsSectionIndex = sections.findIndex(s => s.type === 'skills');
+        
+        if (skillsSectionIndex >= 0) {
+          // Update existing skills section
+          const updatedSections = [...sections];
+          const section = updatedSections[skillsSectionIndex];
+          
+          if (section.type === 'skills') { // Type guard
+            updatedSections[skillsSectionIndex] = {
+              ...section,
+              content: Array.isArray(data) ? data : []
+            };
+            setSections(updatedSections);
+          }
+        } else {
+          // Create and add new skills section
+          const newSection = createNewSection('skills');
+          if (newSection && newSection.type === 'skills') {
+            newSection.content = Array.isArray(data) ? data : [];
+            setSections([...sections, newSection]);
+          }
+        }
+        break;
+      }
+    }
+    
+    toast({
+      title: "AI Content Generated",
+      description: `Your ${sectionType} information has been added to your CV.`
+    });
+  };
+
   // Type guard to check if section is about section
   const isAboutSection = (section: CVSectionData): section is { id: string; title: string; type: 'about'; content: AboutContent } => {
     return section.type === 'about';
@@ -639,6 +788,14 @@ const Builder = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => setAiDialogOpen(true)}
+            >
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              AI Assist
+            </Button>
             <div>
               <Label htmlFor="template" className="mr-2 text-sm">Template</Label>
               <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
@@ -1151,6 +1308,13 @@ const Builder = () => {
           </div>
         </div>
       </div>
+      
+      {/* AI Assistant Dialog */}
+      <AIAssistDialog 
+        open={aiDialogOpen}
+        setOpen={setAiDialogOpen}
+        onAIDataGenerated={handleAIGeneratedData}
+      />
     </div>
   );
 };
