@@ -6,7 +6,7 @@ import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
-import { PlusCircle, Download, ArrowLeft, Sparkles, Eye, FilePdf } from 'lucide-react';
+import { PlusCircle, Download, ArrowLeft, Sparkles, Eye, FileText, X } from 'lucide-react';
 import { AIAssistDialog } from '@/components/builder/AIAssistDialog';
 import { useNavigate } from 'react-router-dom';
 
@@ -583,6 +583,16 @@ const Builder = () => {
       title: "CV Generated",
       description: "Your CV has been generated as a PDF and is ready to download.",
     });
+  };
+  
+  const handlePreview = () => {
+    // Save current CV data to localStorage for the preview page
+    const cvData = {
+      sections,
+      template: selectedTemplate
+    };
+    localStorage.setItem('cvData', JSON.stringify(cvData));
+    navigate('/preview');
   };
   
   const handleAutoSave = () => {

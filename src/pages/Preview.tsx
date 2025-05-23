@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, FilePdf, LayoutTemplate, Edit, Share, Maximize2 } from 'lucide-react';
+import { ArrowLeft, Download, FileText, LayoutTemplate, Edit, Share, Maximize2 } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 
 // Define types for CV data
@@ -224,8 +223,8 @@ const Preview = () => {
                   onClick={handleDownload}
                   className="flex items-center gap-2"
                 >
-                  <FilePdf className="h-4 w-4" />
-                  Download PDF
+                  <FileText className="h-4 w-4" />
+                  Download CV
                 </Button>
               </div>
             </div>
