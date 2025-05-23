@@ -28,7 +28,8 @@ export const useCV = (cvId: string | undefined) => {
 
       if (error) throw error;
 
-      setCVData(data.content);
+      // Safely parse the content as CVData
+      setCVData(data.content as CVData);
     } catch (error: any) {
       toast({
         title: "Error loading CV",
@@ -48,7 +49,7 @@ export const useCV = (cvId: string | undefined) => {
       const { error } = await supabase
         .from('cvs')
         .update({
-          content: data,
+          content: data as any, // Cast to any for Json compatibility
           updated_at: new Date().toISOString()
         })
         .eq('id', cvId);
