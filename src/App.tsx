@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Builder from "./pages/Builder";
+import Templates from "./pages/Templates";
 import Preview from "./pages/Preview";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/templates" element={<Templates />} />
             <Route path="/builder/:id" element={<Builder />} />
             <Route path="/builder/new" element={<Builder />} />
             <Route path="/preview" element={<Preview />} />
