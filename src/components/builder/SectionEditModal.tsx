@@ -70,6 +70,7 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   };
 
   const addExperienceItem = () => {
+    const currentExperience = Array.isArray(formData) ? formData : [];
     const newItem = {
       id: Date.now().toString(),
       title: '',
@@ -78,10 +79,11 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
       endDate: '',
       description: ''
     };
-    setFormData([...formData, newItem]);
+    setFormData([...currentExperience, newItem]);
   };
 
   const addEducationItem = () => {
+    const currentEducation = Array.isArray(formData) ? formData : [];
     const newItem = {
       id: Date.now().toString(),
       degree: '',
@@ -89,7 +91,7 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
       startDate: '',
       endDate: ''
     };
-    setFormData([...formData, newItem]);
+    setFormData([...currentEducation, newItem]);
   };
 
   const addSkill = () => {
@@ -98,6 +100,7 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   };
 
   const addProjectItem = () => {
+    const currentProjects = Array.isArray(formData) ? formData : [];
     const newItem = {
       id: Date.now().toString(),
       name: '',
@@ -107,10 +110,11 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
       startDate: '',
       endDate: ''
     };
-    setFormData([...formData, newItem]);
+    setFormData([...currentProjects, newItem]);
   };
 
   const addReferenceItem = () => {
+    const currentReferences = Array.isArray(formData) ? formData : [];
     const newItem = {
       id: Date.now().toString(),
       name: '',
@@ -119,17 +123,19 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
       email: '',
       phone: ''
     };
-    setFormData([...formData, newItem]);
+    setFormData([...currentReferences, newItem]);
   };
 
   const updateExperienceItem = (index: number, field: string, value: string) => {
-    const updated = [...formData];
+    const currentExperience = Array.isArray(formData) ? formData : [];
+    const updated = [...currentExperience];
     updated[index] = { ...updated[index], [field]: value };
     setFormData(updated);
   };
 
   const updateEducationItem = (index: number, field: string, value: string) => {
-    const updated = [...formData];
+    const currentEducation = Array.isArray(formData) ? formData : [];
+    const updated = [...currentEducation];
     updated[index] = { ...updated[index], [field]: value };
     setFormData(updated);
   };
@@ -142,13 +148,15 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   };
 
   const updateProjectItem = (index: number, field: string, value: string) => {
-    const updated = [...formData];
+    const currentProjects = Array.isArray(formData) ? formData : [];
+    const updated = [...currentProjects];
     updated[index] = { ...updated[index], [field]: value };
     setFormData(updated);
   };
 
   const updateReferenceItem = (index: number, field: string, value: string) => {
-    const updated = [...formData];
+    const currentReferences = Array.isArray(formData) ? formData : [];
+    const updated = [...currentReferences];
     updated[index] = { ...updated[index], [field]: value };
     setFormData(updated);
   };
@@ -211,72 +219,76 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     </div>
   );
 
-  const renderExperienceForm = () => (
-    <div className="space-y-6">
-      {formData.map((exp: any, index: number) => (
-        <div key={exp.id || index} className="border rounded-lg p-4 space-y-3">
-          <div className="flex justify-between items-center">
-            <h4 className="font-medium">Experience {index + 1}</h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(index)}
-              className="text-red-500 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+  const renderExperienceForm = () => {
+    const experienceArray = Array.isArray(formData) ? formData : [];
+    
+    return (
+      <div className="space-y-6">
+        {experienceArray.map((exp: any, index: number) => (
+          <div key={exp.id || index} className="border rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <h4 className="font-medium">Experience {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeItem(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Job Title</Label>
+                <Input
+                  value={exp.title || ''}
+                  onChange={(e) => updateExperienceItem(index, 'title', e.target.value)}
+                  placeholder="Job title"
+                />
+              </div>
+              <div>
+                <Label>Company</Label>
+                <Input
+                  value={exp.company || ''}
+                  onChange={(e) => updateExperienceItem(index, 'company', e.target.value)}
+                  placeholder="Company name"
+                />
+              </div>
+              <div>
+                <Label>Start Date</Label>
+                <Input
+                  value={exp.startDate || ''}
+                  onChange={(e) => updateExperienceItem(index, 'startDate', e.target.value)}
+                  placeholder="MM/YYYY"
+                />
+              </div>
+              <div>
+                <Label>End Date</Label>
+                <Input
+                  value={exp.endDate || ''}
+                  onChange={(e) => updateExperienceItem(index, 'endDate', e.target.value)}
+                  placeholder="MM/YYYY or Present"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                value={exp.description || ''}
+                onChange={(e) => updateExperienceItem(index, 'description', e.target.value)}
+                placeholder="Describe your role and achievements"
+                rows={3}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Job Title</Label>
-              <Input
-                value={exp.title || ''}
-                onChange={(e) => updateExperienceItem(index, 'title', e.target.value)}
-                placeholder="Job title"
-              />
-            </div>
-            <div>
-              <Label>Company</Label>
-              <Input
-                value={exp.company || ''}
-                onChange={(e) => updateExperienceItem(index, 'company', e.target.value)}
-                placeholder="Company name"
-              />
-            </div>
-            <div>
-              <Label>Start Date</Label>
-              <Input
-                value={exp.startDate || ''}
-                onChange={(e) => updateExperienceItem(index, 'startDate', e.target.value)}
-                placeholder="MM/YYYY"
-              />
-            </div>
-            <div>
-              <Label>End Date</Label>
-              <Input
-                value={exp.endDate || ''}
-                onChange={(e) => updateExperienceItem(index, 'endDate', e.target.value)}
-                placeholder="MM/YYYY or Present"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Description</Label>
-            <Textarea
-              value={exp.description || ''}
-              onChange={(e) => updateExperienceItem(index, 'description', e.target.value)}
-              placeholder="Describe your role and achievements"
-              rows={3}
-            />
-          </div>
-        </div>
-      ))}
-      <Button onClick={addExperienceItem} variant="outline" className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
-        Add Experience
-      </Button>
-    </div>
-  );
+        ))}
+        <Button onClick={addExperienceItem} variant="outline" className="w-full">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Experience
+        </Button>
+      </div>
+    );
+  };
 
   const renderEducationForm = () => {
     const educationArray = Array.isArray(formData) ? formData : [];
