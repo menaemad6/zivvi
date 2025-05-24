@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Trash2, Share2 } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -33,6 +33,9 @@ const Builder = () => {
     sectionType: '',
     sectionTitle: ''
   });
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [undoStack, setUndoStack] = useState<CVData[]>([]);
+  const [redoStack, setRedoStack] = useState<CVData[]>([]);
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -174,25 +177,76 @@ const Builder = () => {
   const templateStyle = getTemplateStyles(currentTemplate);
   const currentTemplateInfo = cvTemplates.find(t => t.id === currentTemplate);
 
+  const saveToHistory = (data: CVData) => {
+    setUndoStack(prev => [...prev.slice(-9), data]);
+    setRedoStack([]);
+  };
+
+  const handleUndo = () => {
+    if (undoStack.length > 0 && cvData) {
+      const previousState = undoStack[undoStack.length - 1];
+      setRedoStack(prev => [cvData, ...prev.slice(0, 9)]);
+      setUndoStack(prev => prev.slice(0, -1));
+      setCVData(previousState);
+    }
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack[0];
+      if (cvData) {
+        setUndoStack(prev => [...prev.slice(-9), cvData]);
+      }
+      setRedoStack(prev => prev.slice(1));
+      setCVData(nextState);
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent, sectionId: string) => {
     setDraggedSection(sectionId);
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, index?: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    if (typeof index === 'number') {
+      setDragOverIndex(index);
+    }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex?: number) => {
     e.preventDefault();
-    if (draggedSection && !cvSections.includes(draggedSection)) {
-      setCVSections([...cvSections, draggedSection]);
+    setDragOverIndex(null);
+    
+    if (!draggedSection) return;
+
+    if (typeof targetIndex === 'number') {
+      // Reordering existing sections
+      const currentIndex = cvSections.indexOf(draggedSection);
+      if (currentIndex !== -1) {
+        const newSections = [...cvSections];
+        newSections.splice(currentIndex, 1);
+        newSections.splice(targetIndex, 0, draggedSection);
+        setCVSections(newSections);
+      }
+    } else {
+      // Adding new section from sidebar
+      if (!cvSections.includes(draggedSection)) {
+        setCVSections([...cvSections, draggedSection]);
+      }
     }
     setDraggedSection(null);
   };
 
   const handleSectionEdit = (sectionId: string) => {
+    if (cvData) {
+      saveToHistory(cvData);
+    }
     const section = availableSections.find(s => s.id === sectionId);
     if (section) {
       setEditModal({
@@ -204,22 +258,18 @@ const Builder = () => {
   };
 
   const handleSectionDelete = (sectionId: string) => {
+    if (cvData) {
+      saveToHistory(cvData);
+    }
     setCVSections(cvSections.filter(id => id !== sectionId));
   };
 
-  const handleSectionReorder = (e: React.DragEvent, sectionId: string) => {
-    e.preventDefault();
-    if (draggedSection && draggedSection !== sectionId) {
-      const newSections = [...cvSections];
-      const draggedIndex = newSections.indexOf(draggedSection);
-      const targetIndex = newSections.indexOf(sectionId);
-      
-      newSections.splice(draggedIndex, 1);
-      newSections.splice(targetIndex, 0, draggedSection);
-      
-      setCVSections(newSections);
+  const handleDuplicateSection = (sectionId: string) => {
+    if (cvData) {
+      saveToHistory(cvData);
     }
-    setDraggedSection(null);
+    const newSectionId = `${sectionId}_${Date.now()}`;
+    setCVSections([...cvSections, newSectionId]);
   };
 
   const handleSave = async () => {
@@ -270,7 +320,9 @@ const Builder = () => {
   };
 
   const renderSectionContent = (sectionId: string) => {
-    switch (sectionId) {
+    const baseId = sectionId.split('_')[0]; // Handle duplicated sections
+    
+    switch (baseId) {
       case 'personalInfo':
         return (
           <div className="space-y-2">
@@ -334,6 +386,43 @@ const Builder = () => {
             )}
           </div>
         );
+      case 'projects':
+        return (
+          <div className="space-y-3">
+            {cvData.projects && cvData.projects.length > 0 ? (
+              cvData.projects.map((project) => (
+                <div key={project.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
+                  <p className={`font-medium ${templateStyle.accentColor}`}>{project.name}</p>
+                  <p className="text-xs text-gray-500">{project.startDate} - {project.endDate || 'Present'}</p>
+                  {project.technologies && (
+                    <p className="text-sm text-gray-600">{project.technologies}</p>
+                  )}
+                  {project.description && (
+                    <p className="text-sm text-gray-700 mt-1">{project.description}</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No projects added yet</p>
+            )}
+          </div>
+        );
+      case 'references':
+        return (
+          <div className="space-y-3">
+            {cvData.references && cvData.references.length > 0 ? (
+              cvData.references.map((reference) => (
+                <div key={reference.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
+                  <p className={`font-medium ${templateStyle.accentColor}`}>{reference.name}</p>
+                  <p className="text-sm text-gray-600">{reference.position} at {reference.company}</p>
+                  <p className="text-xs text-gray-500">{reference.email}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No references added yet</p>
+            )}
+          </div>
+        );
       default:
         return <p className="text-sm text-gray-500">Click edit to add content</p>;
     }
@@ -374,7 +463,25 @@ const Builder = () => {
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                onClick={handleUndo}
+                disabled={undoStack.length === 0}
+                size="sm"
+              >
+                <Undo className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={handleRedo}
+                disabled={redoStack.length === 0}
+                size="sm"
+              >
+                <Redo className="h-4 w-4" />
+              </Button>
+              
               <Button 
                 variant="outline"
                 onClick={handlePreview}
@@ -382,6 +489,14 @@ const Builder = () => {
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="hover:shadow-lg transition-all duration-200"
+              >
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
               </Button>
               
               <Button 
@@ -419,7 +534,7 @@ const Builder = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {availableSections
-                  .filter(section => !cvSections.includes(section.id))
+                  .filter(section => !cvSections.some(s => s.split('_')[0] === section.id))
                   .map((section) => (
                     <div key={section.id} className="group">
                       <SidebarSection
@@ -433,7 +548,7 @@ const Builder = () => {
                     </div>
                   ))}
                 
-                {availableSections.filter(section => !cvSections.includes(section.id)).length === 0 && (
+                {availableSections.filter(section => !cvSections.some(s => s.split('_')[0] === section.id)).length === 0 && (
                   <div className="text-center py-4">
                     <Award className="h-8 w-8 mx-auto text-gray-300 mb-2" />
                     <p className="text-sm text-gray-500">All sections added!</p>
@@ -464,22 +579,37 @@ const Builder = () => {
               <CardContent className="p-6">
                 <div 
                   className="min-h-[600px] space-y-4 p-6 border-2 border-dashed border-gray-200 rounded-xl bg-white/40 backdrop-blur-sm transition-all duration-300 hover:border-gray-300"
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
+                  onDragOver={(e) => handleDragOver(e)}
+                  onDrop={(e) => handleDrop(e)}
+                  onDragLeave={handleDragLeave}
                 >
                   {cvSections.map((sectionId, index) => {
-                    const section = availableSections.find(s => s.id === sectionId);
-                    return section ? (
-                      <CVSection
-                        key={sectionId}
-                        title={section.title}
-                        onEdit={() => handleSectionEdit(sectionId)}
-                        onDelete={() => handleSectionDelete(sectionId)}
-                        onDragStart={(e) => handleDragStart(e, sectionId)}
-                      >
-                        {renderSectionContent(sectionId)}
-                      </CVSection>
-                    ) : null;
+                    const baseId = sectionId.split('_')[0];
+                    const section = availableSections.find(s => s.id === baseId);
+                    const isDragOver = dragOverIndex === index;
+                    
+                    return (
+                      <div key={sectionId}>
+                        {isDragOver && draggedSection && (
+                          <div className="h-2 bg-blue-400 rounded-full mb-4 animate-pulse" />
+                        )}
+                        {section ? (
+                          <div
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDrop={(e) => handleDrop(e, index)}
+                          >
+                            <CVSection
+                              title={section.title}
+                              onEdit={() => handleSectionEdit(baseId)}
+                              onDelete={() => handleSectionDelete(sectionId)}
+                              onDragStart={(e) => handleDragStart(e, sectionId)}
+                            >
+                              {renderSectionContent(sectionId)}
+                            </CVSection>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
                   })}
                   
                   {cvSections.length === 0 && (
@@ -519,7 +649,8 @@ const Builder = () => {
               <CardContent className="p-4">
                 <div className="bg-white rounded-xl shadow-inner min-h-[600px] p-8 space-y-6 border overflow-hidden">
                   {cvSections.map((sectionId, index) => {
-                    const section = availableSections.find(s => s.id === sectionId);
+                    const baseId = sectionId.split('_')[0];
+                    const section = availableSections.find(s => s.id === baseId);
                     return section ? (
                       <div key={sectionId} className="animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
                         <h3 className={`font-semibold text-sm uppercase tracking-wide ${templateStyle.accentColor} mb-3 border-b ${templateStyle.borderColor} pb-2`}>

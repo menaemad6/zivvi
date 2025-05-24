@@ -71,5 +71,40 @@ export const cvTemplates: CVTemplate[] = [
     description: 'Dynamic and energetic design with orange accents for entrepreneurs',
     thumbnail: '/placeholder.svg',
     category: 'modern'
+  },
+  {
+    id: 'freelancer',
+    name: 'Freelancer Pro',
+    description: 'Flexible design showcasing diverse skills and portfolio work',
+    thumbnail: '/placeholder.svg',
+    category: 'creative'
+  },
+  {
+    id: 'finance',
+    name: 'Finance Expert',
+    description: 'Conservative professional design with emphasis on achievements',
+    thumbnail: '/placeholder.svg',
+    category: 'classic'
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare Professional',
+    description: 'Clean medical-themed design with trust-building elements',
+    thumbnail: '/placeholder.svg',
+    category: 'minimal'
+  },
+  {
+    id: 'sales',
+    name: 'Sales Champion',
+    description: 'Results-focused design highlighting achievements and metrics',
+    thumbnail: '/placeholder.svg',
+    category: 'modern'
+  },
+  {
+    id: 'designer',
+    name: 'Design Master',
+    description: 'Visually striking layout perfect for showcasing design skills',
+    thumbnail: '/placeholder.svg',
+    category: 'creative'
   }
 ];

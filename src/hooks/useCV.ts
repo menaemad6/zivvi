@@ -43,7 +43,9 @@ export const useCV = (cvId: string | undefined) => {
           },
           experience: Array.isArray(parsedData.experience) ? parsedData.experience : [],
           education: Array.isArray(parsedData.education) ? parsedData.education : [],
-          skills: Array.isArray(parsedData.skills) ? parsedData.skills : []
+          skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
+          projects: Array.isArray(parsedData.projects) ? parsedData.projects : [],
+          references: Array.isArray(parsedData.references) ? parsedData.references : []
         };
         setCVData(cvData);
       } else {
@@ -58,7 +60,9 @@ export const useCV = (cvId: string | undefined) => {
           },
           experience: [],
           education: [],
-          skills: []
+          skills: [],
+          projects: [],
+          references: []
         });
       }
     } catch (error: any) {

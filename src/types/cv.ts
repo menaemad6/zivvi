@@ -31,4 +31,21 @@ export interface CVData {
     endDate: string;
   }>;
   skills: string[];
+  projects: Array<{
+    id: string;
+    name: string;
+    description: string;
+    technologies: string;
+    link: string;
+    startDate: string;
+    endDate: string;
+  }>;
+  references: Array<{
+    id: string;
+    name: string;
+    position: string;
+    company: string;
+    email: string;
+    phone: string;
+  }>;
 }
