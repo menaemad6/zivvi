@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Save, X } from 'lucide-react';
+import { Plus, Trash2, Save, X, GripVertical } from 'lucide-react';
 import { CVData } from '@/types/cv';
 
 interface SectionEditModalProps {
@@ -24,9 +25,10 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   cvData,
   onSave
 }) => {
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<any>([]);
 
   useEffect(() => {
+    console.log('Setting form data for section:', sectionType, cvData);
     if (sectionType === 'personalInfo') {
       setFormData(cvData.personalInfo || {
         fullName: '',
@@ -49,22 +51,24 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   }, [sectionType, cvData, isOpen]);
 
   const handleSave = () => {
+    console.log('Saving form data:', formData, 'for section:', sectionType);
     const updatedCVData = { ...cvData };
     
     if (sectionType === 'personalInfo') {
       updatedCVData.personalInfo = formData;
     } else if (sectionType === 'experience') {
-      updatedCVData.experience = formData;
+      updatedCVData.experience = Array.isArray(formData) ? formData : [];
     } else if (sectionType === 'education') {
-      updatedCVData.education = formData;
+      updatedCVData.education = Array.isArray(formData) ? formData : [];
     } else if (sectionType === 'skills') {
-      updatedCVData.skills = formData;
+      updatedCVData.skills = Array.isArray(formData) ? formData : [];
     } else if (sectionType === 'projects') {
-      updatedCVData.projects = formData;
+      updatedCVData.projects = Array.isArray(formData) ? formData : [];
     } else if (sectionType === 'references') {
-      updatedCVData.references = formData;
+      updatedCVData.references = Array.isArray(formData) ? formData : [];
     }
     
+    console.log('Updated CV data:', updatedCVData);
     onSave(updatedCVData);
     onClose();
   };
@@ -225,9 +229,12 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     return (
       <div className="space-y-6">
         {experienceArray.map((exp: any, index: number) => (
-          <div key={exp.id || index} className="border rounded-lg p-4 space-y-3">
+          <div key={exp.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
             <div className="flex justify-between items-center">
-              <h4 className="font-medium">Experience {index + 1}</h4>
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-gray-400" />
+                <h4 className="font-medium">Experience {index + 1}</h4>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -296,9 +303,12 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     return (
       <div className="space-y-6">
         {educationArray.map((edu: any, index: number) => (
-          <div key={edu.id || index} className="border rounded-lg p-4 space-y-3">
+          <div key={edu.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
             <div className="flex justify-between items-center">
-              <h4 className="font-medium">Education {index + 1}</h4>
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-gray-400" />
+                <h4 className="font-medium">Education {index + 1}</h4>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -358,7 +368,8 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     return (
       <div className="space-y-4">
         {skillsArray.map((skill: string, index: number) => (
-          <div key={index} className="flex gap-2">
+          <div key={index} className="flex gap-2 items-center">
+            <GripVertical className="h-4 w-4 text-gray-400" />
             <Input
               value={skill || ''}
               onChange={(e) => updateSkill(index, e.target.value)}
@@ -389,9 +400,12 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     return (
       <div className="space-y-6">
         {projectsArray.map((project: any, index: number) => (
-          <div key={project.id || index} className="border rounded-lg p-4 space-y-3">
+          <div key={project.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
             <div className="flex justify-between items-center">
-              <h4 className="font-medium">Project {index + 1}</h4>
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-gray-400" />
+                <h4 className="font-medium">Project {index + 1}</h4>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -468,9 +482,12 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     return (
       <div className="space-y-6">
         {referencesArray.map((reference: any, index: number) => (
-          <div key={reference.id || index} className="border rounded-lg p-4 space-y-3">
+          <div key={reference.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
             <div className="flex justify-between items-center">
-              <h4 className="font-medium">Reference {index + 1}</h4>
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-gray-400" />
+                <h4 className="font-medium">Reference {index + 1}</h4>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"

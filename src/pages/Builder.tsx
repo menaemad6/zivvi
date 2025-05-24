@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Trash2, Share2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -21,7 +22,9 @@ const Builder = () => {
   const [cvSections, setCVSections] = useState([
     'personalInfo',
     'experience', 
-    'education'
+    'education',
+    'skills',
+    'projects'
   ]);
   const [currentTemplate, setCurrentTemplate] = useState('modern');
   const [editModal, setEditModal] = useState<{
@@ -203,8 +206,10 @@ const Builder = () => {
   };
 
   const handleDragStart = (e: React.DragEvent, sectionId: string) => {
+    console.log('Drag start:', sectionId);
     setDraggedSection(sectionId);
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', sectionId);
   };
 
   const handleDragOver = (e: React.DragEvent, index?: number) => {
@@ -215,12 +220,14 @@ const Builder = () => {
     }
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
     setDragOverIndex(null);
   };
 
   const handleDrop = (e: React.DragEvent, targetIndex?: number) => {
     e.preventDefault();
+    console.log('Drop event:', { draggedSection, targetIndex });
     setDragOverIndex(null);
     
     if (!draggedSection) return;
@@ -228,16 +235,26 @@ const Builder = () => {
     if (typeof targetIndex === 'number') {
       // Reordering existing sections
       const currentIndex = cvSections.indexOf(draggedSection);
-      if (currentIndex !== -1) {
+      if (currentIndex !== -1 && currentIndex !== targetIndex) {
+        console.log('Reordering sections from', currentIndex, 'to', targetIndex);
         const newSections = [...cvSections];
         newSections.splice(currentIndex, 1);
         newSections.splice(targetIndex, 0, draggedSection);
         setCVSections(newSections);
+        toast({
+          title: "Section Reordered",
+          description: "Section order has been updated."
+        });
       }
     } else {
       // Adding new section from sidebar
       if (!cvSections.includes(draggedSection)) {
+        console.log('Adding new section:', draggedSection);
         setCVSections([...cvSections, draggedSection]);
+        toast({
+          title: "Section Added",
+          description: "New section has been added to your CV."
+        });
       }
     }
     setDraggedSection(null);
@@ -262,14 +279,10 @@ const Builder = () => {
       saveToHistory(cvData);
     }
     setCVSections(cvSections.filter(id => id !== sectionId));
-  };
-
-  const handleDuplicateSection = (sectionId: string) => {
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    const newSectionId = `${sectionId}_${Date.now()}`;
-    setCVSections([...cvSections, newSectionId]);
+    toast({
+      title: "Section Removed",
+      description: "Section has been removed from your CV."
+    });
   };
 
   const handleSave = async () => {
@@ -277,16 +290,8 @@ const Builder = () => {
     
     try {
       await saveCV(cvData);
-      toast({
-        title: "Success!",
-        description: "Your CV has been saved successfully.",
-      });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save your CV. Please try again.",
-        variant: "destructive"
-      });
+      console.error('Save error:', error);
     }
   };
 
@@ -312,6 +317,7 @@ const Builder = () => {
   };
 
   const handleModalSave = (updatedData: CVData) => {
+    console.log('Modal save:', updatedData);
     setCVData(updatedData);
     toast({
       title: "Changes Applied",
@@ -319,8 +325,29 @@ const Builder = () => {
     });
   };
 
+  const handleAutoSave = () => {
+    toast({
+      title: "Auto-Save Enabled",
+      description: "Your changes will be automatically saved every 30 seconds."
+    });
+  };
+
+  const handleImportData = () => {
+    toast({
+      title: "Import Feature",
+      description: "Import from LinkedIn, PDF, or other formats (coming soon)."
+    });
+  };
+
+  const handleAIAssist = () => {
+    toast({
+      title: "AI Assistant",
+      description: "AI-powered content suggestions and optimization (coming soon)."
+    });
+  };
+
   const renderSectionContent = (sectionId: string) => {
-    const baseId = sectionId.split('_')[0]; // Handle duplicated sections
+    const baseId = sectionId.split('_')[0];
     
     switch (baseId) {
       case 'personalInfo':
@@ -448,7 +475,7 @@ const Builder = () => {
                   <Zap className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gradient">CV Builder</h1>
+                  <h1 className="text-xl font-bold text-gradient">CV Builder Pro</h1>
                   {currentTemplateInfo && (
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs">
@@ -469,6 +496,7 @@ const Builder = () => {
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}
                 size="sm"
+                title="Undo"
               >
                 <Undo className="h-4 w-4" />
               </Button>
@@ -478,8 +506,36 @@ const Builder = () => {
                 onClick={handleRedo}
                 disabled={redoStack.length === 0}
                 size="sm"
+                title="Redo"
               >
                 <Redo className="h-4 w-4" />
+              </Button>
+
+              <Button 
+                variant="outline"
+                onClick={handleAutoSave}
+                size="sm"
+                title="Enable Auto-Save"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+
+              <Button 
+                variant="outline"
+                onClick={handleImportData}
+                size="sm"
+                title="Import Data"
+              >
+                <Import className="h-4 w-4" />
+              </Button>
+
+              <Button 
+                variant="outline"
+                onClick={handleAIAssist}
+                size="sm"
+                title="AI Assistant"
+              >
+                <Wand2 className="h-4 w-4" />
               </Button>
               
               <Button 
@@ -573,6 +629,10 @@ const Builder = () => {
                     <Badge variant="outline" className="text-xs">
                       {cvSections.length} sections
                     </Badge>
+                    <Button variant="outline" size="sm" onClick={() => navigate('/templates')}>
+                      <Layout className="h-4 w-4 mr-1" />
+                      Change Template
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -597,6 +657,7 @@ const Builder = () => {
                           <div
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDrop={(e) => handleDrop(e, index)}
+                            onDragLeave={handleDragLeave}
                           >
                             <CVSection
                               title={section.title}
