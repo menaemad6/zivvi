@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -296,7 +295,7 @@ const Builder = () => {
   };
 
   const handlePreview = () => {
-    if (!cvData || !id) {
+    if (!cvData) {
       toast({
         title: "Error",
         description: "Cannot preview CV. Please save your changes first.",
@@ -305,15 +304,20 @@ const Builder = () => {
       return;
     }
     
-    // Save CV data to localStorage for preview
+    // Save CV data to localStorage for preview with CV ID
     localStorage.setItem('previewCVData', JSON.stringify({
       cvData,
       template: currentTemplate,
-      sections: cvSections
+      sections: cvSections,
+      cvId: id !== 'new' ? id : undefined
     }));
     
     // Navigate to preview page
-    navigate('/preview');
+    if (id && id !== 'new') {
+      navigate(`/preview/${id}`);
+    } else {
+      navigate('/preview');
+    }
   };
 
   const handleModalSave = (updatedData: CVData) => {
