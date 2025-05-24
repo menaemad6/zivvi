@@ -233,63 +233,67 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     </div>
   );
 
-  const renderEducationForm = () => (
-    <div className="space-y-6">
-      {formData.map((edu: any, index: number) => (
-        <div key={edu.id || index} className="border rounded-lg p-4 space-y-3">
-          <div className="flex justify-between items-center">
-            <h4 className="font-medium">Education {index + 1}</h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(index)}
-              className="text-red-500 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+  const renderEducationForm = () => {
+    const educationArray = Array.isArray(formData) ? formData : [];
+    
+    return (
+      <div className="space-y-6">
+        {educationArray.map((edu: any, index: number) => (
+          <div key={edu.id || index} className="border rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <h4 className="font-medium">Education {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeItem(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Degree</Label>
+                <Input
+                  value={edu.degree || ''}
+                  onChange={(e) => updateEducationItem(index, 'degree', e.target.value)}
+                  placeholder="Degree name"
+                />
+              </div>
+              <div>
+                <Label>School</Label>
+                <Input
+                  value={edu.school || ''}
+                  onChange={(e) => updateEducationItem(index, 'school', e.target.value)}
+                  placeholder="School/University name"
+                />
+              </div>
+              <div>
+                <Label>Start Date</Label>
+                <Input
+                  value={edu.startDate || ''}
+                  onChange={(e) => updateEducationItem(index, 'startDate', e.target.value)}
+                  placeholder="MM/YYYY"
+                />
+              </div>
+              <div>
+                <Label>End Date</Label>
+                <Input
+                  value={edu.endDate || ''}
+                  onChange={(e) => updateEducationItem(index, 'endDate', e.target.value)}
+                  placeholder="MM/YYYY"
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Degree</Label>
-              <Input
-                value={edu.degree || ''}
-                onChange={(e) => updateEducationItem(index, 'degree', e.target.value)}
-                placeholder="Degree name"
-              />
-            </div>
-            <div>
-              <Label>School</Label>
-              <Input
-                value={edu.school || ''}
-                onChange={(e) => updateEducationItem(index, 'school', e.target.value)}
-                placeholder="School/University name"
-              />
-            </div>
-            <div>
-              <Label>Start Date</Label>
-              <Input
-                value={edu.startDate || ''}
-                onChange={(e) => updateEducationItem(index, 'startDate', e.target.value)}
-                placeholder="MM/YYYY"
-              />
-            </div>
-            <div>
-              <Label>End Date</Label>
-              <Input
-                value={edu.endDate || ''}
-                onChange={(e) => updateEducationItem(index, 'endDate', e.target.value)}
-                placeholder="MM/YYYY"
-              />
-            </div>
-          </div>
-        </div>
-      ))}
-      <Button onClick={addEducationItem} variant="outline" className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
-        Add Education
-      </Button>
-    </div>
-  );
+        ))}
+        <Button onClick={addEducationItem} variant="outline" className="w-full">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Education
+        </Button>
+      </div>
+    );
+  };
 
   const renderSkillsForm = () => {
     const skillsArray = Array.isArray(formData) ? formData : [];
