@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -29,13 +28,19 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
 
   useEffect(() => {
     if (sectionType === 'personalInfo') {
-      setFormData(cvData.personalInfo);
+      setFormData(cvData.personalInfo || {
+        fullName: '',
+        email: '',
+        phone: '',
+        location: '',
+        summary: ''
+      });
     } else if (sectionType === 'experience') {
-      setFormData(cvData.experience);
+      setFormData(Array.isArray(cvData.experience) ? cvData.experience : []);
     } else if (sectionType === 'education') {
-      setFormData(cvData.education);
+      setFormData(Array.isArray(cvData.education) ? cvData.education : []);
     } else if (sectionType === 'skills') {
-      setFormData(cvData.skills);
+      setFormData(Array.isArray(cvData.skills) ? cvData.skills : []);
     }
   }, [sectionType, cvData, isOpen]);
 
@@ -80,7 +85,8 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   };
 
   const addSkill = () => {
-    setFormData([...formData, '']);
+    const currentSkills = Array.isArray(formData) ? formData : [];
+    setFormData([...currentSkills, '']);
   };
 
   const updateExperienceItem = (index: number, field: string, value: string) => {
@@ -96,13 +102,15 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
   };
 
   const updateSkill = (index: number, value: string) => {
-    const updated = [...formData];
+    const currentSkills = Array.isArray(formData) ? formData : [];
+    const updated = [...currentSkills];
     updated[index] = value;
     setFormData(updated);
   };
 
   const removeItem = (index: number) => {
-    const updated = formData.filter((_: any, i: number) => i !== index);
+    const currentData = Array.isArray(formData) ? formData : [];
+    const updated = currentData.filter((_: any, i: number) => i !== index);
     setFormData(updated);
   };
 
@@ -283,32 +291,36 @@ export const SectionEditModal: React.FC<SectionEditModalProps> = ({
     </div>
   );
 
-  const renderSkillsForm = () => (
-    <div className="space-y-4">
-      {formData.map((skill: string, index: number) => (
-        <div key={index} className="flex gap-2">
-          <Input
-            value={skill}
-            onChange={(e) => updateSkill(index, e.target.value)}
-            placeholder="Enter a skill"
-            className="flex-1"
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => removeItem(index)}
-            className="text-red-500 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
-      <Button onClick={addSkill} variant="outline" className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
-        Add Skill
-      </Button>
-    </div>
-  );
+  const renderSkillsForm = () => {
+    const skillsArray = Array.isArray(formData) ? formData : [];
+    
+    return (
+      <div className="space-y-4">
+        {skillsArray.map((skill: string, index: number) => (
+          <div key={index} className="flex gap-2">
+            <Input
+              value={skill || ''}
+              onChange={(e) => updateSkill(index, e.target.value)}
+              placeholder="Enter a skill"
+              className="flex-1"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => removeItem(index)}
+              className="text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        <Button onClick={addSkill} variant="outline" className="w-full">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Skill
+        </Button>
+      </div>
+    );
+  };
 
   const renderForm = () => {
     switch (sectionType) {
