@@ -5,43 +5,71 @@ export const cvTemplates: CVTemplate[] = [
   {
     id: 'modern',
     name: 'Modern Professional',
-    description: 'Clean and modern design perfect for tech professionals',
+    description: 'Clean and modern design with blue accents, perfect for tech professionals',
     thumbnail: '/placeholder.svg',
     category: 'modern'
   },
   {
     id: 'classic',
     name: 'Classic Business',
-    description: 'Traditional format ideal for corporate environments',
+    description: 'Traditional corporate format with serif fonts, ideal for business environments',
     thumbnail: '/placeholder.svg',
     category: 'classic'
   },
   {
     id: 'creative',
     name: 'Creative Portfolio',
-    description: 'Bold design for creative professionals and designers',
+    description: 'Bold purple design with unique layouts for creative professionals',
     thumbnail: '/placeholder.svg',
     category: 'creative'
   },
   {
     id: 'minimal',
     name: 'Minimal Clean',
-    description: 'Simple and elegant with focus on content',
+    description: 'Ultra-clean design with lots of white space and subtle typography',
     thumbnail: '/placeholder.svg',
     category: 'minimal'
   },
   {
     id: 'executive',
     name: 'Executive Suite',
-    description: 'Professional template for senior executives',
+    description: 'Sophisticated dark theme with gold accents for senior executives',
     thumbnail: '/placeholder.svg',
     category: 'modern'
   },
   {
     id: 'academic',
     name: 'Academic Scholar',
-    description: 'Perfect for researchers and academics',
+    description: 'Traditional academic format with structured sections for researchers',
     thumbnail: '/placeholder.svg',
     category: 'classic'
+  },
+  {
+    id: 'tech',
+    name: 'Tech Innovator',
+    description: 'Modern tech-focused design with green accents and clean code aesthetics',
+    thumbnail: '/placeholder.svg',
+    category: 'modern'
+  },
+  {
+    id: 'artistic',
+    name: 'Artistic Vision',
+    description: 'Vibrant and expressive design with colorful elements for artists',
+    thumbnail: '/placeholder.svg',
+    category: 'creative'
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate Elite',
+    description: 'Professional navy blue design with structured layout for corporate roles',
+    thumbnail: '/placeholder.svg',
+    category: 'classic'
+  },
+  {
+    id: 'startup',
+    name: 'Startup Spirit',
+    description: 'Dynamic and energetic design with orange accents for entrepreneurs',
+    thumbnail: '/placeholder.svg',
+    category: 'modern'
   }
 ];
