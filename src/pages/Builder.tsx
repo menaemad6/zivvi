@@ -8,6 +8,7 @@ import { CVData } from '@/types/cv';
 import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
+import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -23,6 +24,15 @@ const Builder = () => {
     'education'
   ]);
   const [currentTemplate, setCurrentTemplate] = useState('modern');
+  const [editModal, setEditModal] = useState<{
+    isOpen: boolean;
+    sectionType: string;
+    sectionTitle: string;
+  }>({
+    isOpen: false,
+    sectionType: '',
+    sectionTitle: ''
+  });
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -183,8 +193,14 @@ const Builder = () => {
   };
 
   const handleSectionEdit = (sectionId: string) => {
-    console.log('Edit section:', sectionId);
-    // TODO: Open edit modal for the section
+    const section = availableSections.find(s => s.id === sectionId);
+    if (section) {
+      setEditModal({
+        isOpen: true,
+        sectionType: sectionId,
+        sectionTitle: section.title
+      });
+    }
   };
 
   const handleSectionDelete = (sectionId: string) => {
@@ -206,8 +222,51 @@ const Builder = () => {
     setDraggedSection(null);
   };
 
-  const handleSave = () => {
-    saveCV(cvData);
+  const handleSave = async () => {
+    if (!cvData) return;
+    
+    try {
+      await saveCV(cvData);
+      toast({
+        title: "Success!",
+        description: "Your CV has been saved successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save your CV. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePreview = () => {
+    if (!cvData || !id) {
+      toast({
+        title: "Error",
+        description: "Cannot preview CV. Please save your changes first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Save CV data to localStorage for preview
+    localStorage.setItem('previewCVData', JSON.stringify({
+      cvData,
+      template: currentTemplate,
+      sections: cvSections
+    }));
+    
+    // Navigate to preview page
+    navigate('/preview');
+  };
+
+  const handleModalSave = (updatedData: CVData) => {
+    setCVData(updatedData);
+    toast({
+      title: "Changes Applied",
+      description: "Section updated successfully. Don't forget to save your CV!",
+    });
   };
 
   const renderSectionContent = (sectionId: string) => {
@@ -219,6 +278,9 @@ const Builder = () => {
             <p className="text-sm text-gray-600">{cvData.personalInfo.email}</p>
             <p className="text-sm text-gray-600">{cvData.personalInfo.phone}</p>
             <p className="text-sm text-gray-600">{cvData.personalInfo.location}</p>
+            {cvData.personalInfo.summary && (
+              <p className="text-sm text-gray-700 mt-2">{cvData.personalInfo.summary}</p>
+            )}
           </div>
         );
       case 'experience':
@@ -230,6 +292,9 @@ const Builder = () => {
                   <p className={`font-medium ${templateStyle.accentColor}`}>{exp.title}</p>
                   <p className="text-sm text-gray-600">{exp.company}</p>
                   <p className="text-xs text-gray-500">{exp.startDate} - {exp.endDate || 'Present'}</p>
+                  {exp.description && (
+                    <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
+                  )}
                 </div>
               ))
             ) : (
@@ -250,6 +315,22 @@ const Builder = () => {
               ))
             ) : (
               <p className="text-sm text-gray-500">No education added yet</p>
+            )}
+          </div>
+        );
+      case 'skills':
+        return (
+          <div className="space-y-2">
+            {cvData.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {cvData.skills.map((skill, index) => (
+                  <span key={index} className={`px-2 py-1 text-xs rounded-full bg-gray-100 ${templateStyle.accentColor}`}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No skills added yet</p>
             )}
           </div>
         );
@@ -296,7 +377,7 @@ const Builder = () => {
             <div className="flex items-center gap-3">
               <Button 
                 variant="outline"
-                onClick={() => navigate('/preview')}
+                onClick={handlePreview}
                 className="hover:shadow-lg transition-all duration-200"
               >
                 <Eye className="h-4 w-4 mr-2" />
@@ -312,7 +393,7 @@ const Builder = () => {
               </Button>
               
               <Button 
-                onClick={() => saveCV(cvData)} 
+                onClick={handleSave} 
                 disabled={isSaving} 
                 className={`${templateStyle.buttonColor} hover:shadow-lg transition-all duration-200 text-white`}
               >
@@ -462,6 +543,16 @@ const Builder = () => {
           </div>
         </div>
       </div>
+
+      {/* Section Edit Modal */}
+      <SectionEditModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ ...editModal, isOpen: false })}
+        sectionType={editModal.sectionType}
+        sectionTitle={editModal.sectionTitle}
+        cvData={cvData}
+        onSave={handleModalSave}
+      />
     </div>
   );
 };
