@@ -28,8 +28,39 @@ export const useCV = (cvId: string | undefined) => {
 
       if (error) throw error;
 
-      // Safely parse the content as CVData
-      setCVData(data.content as CVData);
+      // Safely parse and validate the content as CVData
+      const content = data.content as unknown;
+      if (content && typeof content === 'object' && content !== null) {
+        const parsedData = content as CVData;
+        // Ensure the data has the required structure
+        const cvData: CVData = {
+          personalInfo: parsedData.personalInfo || {
+            fullName: '',
+            email: '',
+            phone: '',
+            location: '',
+            summary: ''
+          },
+          experience: Array.isArray(parsedData.experience) ? parsedData.experience : [],
+          education: Array.isArray(parsedData.education) ? parsedData.education : [],
+          skills: Array.isArray(parsedData.skills) ? parsedData.skills : []
+        };
+        setCVData(cvData);
+      } else {
+        // Create default structure if content is invalid
+        setCVData({
+          personalInfo: {
+            fullName: '',
+            email: '',
+            phone: '',
+            location: '',
+            summary: ''
+          },
+          experience: [],
+          education: [],
+          skills: []
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Error loading CV",
