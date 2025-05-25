@@ -13,7 +13,9 @@ export type Database = {
         Row: {
           content: Json
           created_at: string
+          description: string | null
           id: string
+          name: string | null
           template: string
           thumbnail_url: string | null
           title: string
@@ -23,7 +25,9 @@ export type Database = {
         Insert: {
           content?: Json
           created_at?: string
+          description?: string | null
           id?: string
+          name?: string | null
           template?: string
           thumbnail_url?: string | null
           title: string
@@ -33,7 +37,9 @@ export type Database = {
         Update: {
           content?: Json
           created_at?: string
+          description?: string | null
           id?: string
+          name?: string | null
           template?: string
           thumbnail_url?: string | null
           title?: string

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -72,7 +71,10 @@ const Builder = () => {
 
       if (error) throw error;
       if (data) {
-        setCVMetadata({ name: data.name || '', description: data.description || '' });
+        setCVMetadata({ 
+          name: data.name || '', 
+          description: data.description || '' 
+        });
       }
     } catch (error) {
       console.error('Error fetching CV metadata:', error);
