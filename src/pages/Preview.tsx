@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -129,9 +130,9 @@ const Preview = () => {
                 Share
               </Button>
               
-              {cvId && (
+              {id && id !== 'new' && (
                 <Button 
-                  onClick={() => navigate(`/builder/${cvId}`)}
+                  onClick={() => navigate(`/builder/${id}`)}
                   className="bg-gradient-to-r from-primary to-secondary hover:shadow-lg transition-all duration-200 text-white"
                 >
                   <Palette className="h-4 w-4 mr-2" />
