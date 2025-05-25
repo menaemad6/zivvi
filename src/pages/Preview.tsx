@@ -50,7 +50,6 @@ const Preview = () => {
 
       if (error) throw error;
 
-      // Safely convert the content to CVData type
       const cvData = data.content as unknown as CVData;
       setPreviewData({
         cvData,
@@ -59,7 +58,6 @@ const Preview = () => {
         cvId: id
       });
 
-      // Check if current user is the owner
       if (user && data.user_id === user.id) {
         setIsOwner(true);
       } else {
@@ -99,69 +97,6 @@ const Preview = () => {
     }
   };
   
-  // Template specific layouts and styles
-  const getTemplateLayout = (templateId: string) => {
-    const layouts = {
-      modern: {
-        layout: 'single-column',
-        headerStyle: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6 rounded-t-lg',
-        sectionStyle: 'border-l-4 border-blue-500 pl-4 mb-6',
-        containerStyle: 'max-w-4xl mx-auto bg-white shadow-2xl rounded-lg overflow-hidden'
-      },
-      classic: {
-        layout: 'two-column',
-        headerStyle: 'border-b-4 border-gray-700 pb-4 mb-6',
-        sectionStyle: 'border-b border-gray-200 pb-4 mb-6',
-        containerStyle: 'max-w-5xl mx-auto bg-white shadow-lg border'
-      },
-      creative: {
-        layout: 'asymmetric',
-        headerStyle: 'bg-gradient-to-br from-purple-600 to-pink-600 text-white p-8 rounded-tl-3xl rounded-br-3xl',
-        sectionStyle: 'bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg mb-4 border-l-4 border-purple-500',
-        containerStyle: 'max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden'
-      },
-      minimal: {
-        layout: 'clean',
-        headerStyle: 'border-b border-gray-200 pb-6 mb-8',
-        sectionStyle: 'mb-8',
-        containerStyle: 'max-w-3xl mx-auto bg-white shadow-sm border border-gray-100 rounded-lg'
-      },
-      executive: {
-        layout: 'executive',
-        headerStyle: 'bg-gradient-to-r from-slate-900 to-black text-yellow-400 p-8',
-        sectionStyle: 'border-l-8 border-yellow-400 pl-6 mb-8 bg-slate-50 p-4',
-        containerStyle: 'max-w-5xl mx-auto bg-white shadow-2xl border-t-8 border-yellow-400'
-      },
-      tech: {
-        layout: 'tech-grid',
-        headerStyle: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-6 font-mono',
-        sectionStyle: 'border border-emerald-200 rounded-lg p-4 mb-4 bg-emerald-50',
-        containerStyle: 'max-w-4xl mx-auto bg-white shadow-lg rounded-lg border-2 border-emerald-200'
-      },
-      artistic: {
-        layout: 'creative-flow',
-        headerStyle: 'bg-gradient-to-br from-orange-500 to-red-500 text-white p-8 rounded-full mx-8 mt-8 text-center',
-        sectionStyle: 'bg-gradient-to-r from-orange-100 to-red-100 p-6 rounded-full mb-6 mx-4',
-        containerStyle: 'max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden'
-      },
-      corporate: {
-        layout: 'corporate-formal',
-        headerStyle: 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white p-6 border-b-4 border-gold-400',
-        sectionStyle: 'border-b-2 border-indigo-100 pb-6 mb-6 pl-8',
-        containerStyle: 'max-w-5xl mx-auto bg-white shadow-lg border-4 border-indigo-600'
-      },
-      startup: {
-        layout: 'dynamic',
-        headerStyle: 'bg-gradient-to-r from-orange-500 to-amber-500 text-white p-6 transform -skew-y-1',
-        sectionStyle: 'transform hover:scale-105 transition-transform bg-orange-50 p-4 rounded-lg mb-4 border-l-4 border-orange-500',
-        containerStyle: 'max-w-4xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden transform hover:scale-105 transition-transform'
-      }
-    };
-    
-    return layouts[templateId as keyof typeof layouts] || layouts.modern;
-  };
-
-  // Handle PDF download with real functionality
   const handleDownload = async () => {
     if (!previewData) return;
     
@@ -265,7 +200,373 @@ const Preview = () => {
       navigate(-1);
     }
   };
-  
+
+  const renderTemplateContent = (template: string, cvData: CVData) => {
+    switch (template) {
+      case 'modern':
+        return (
+          <div className="bg-white shadow-2xl rounded-lg overflow-hidden max-w-4xl mx-auto">
+            {/* Header with diagonal split */}
+            <div className="relative bg-gradient-to-br from-blue-500 to-cyan-500 text-white p-8 overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full transform translate-x-16 -translate-y-16"></div>
+              <h1 className="text-4xl font-bold mb-2">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+              <p className="text-xl opacity-90">{cvData.personalInfo.email} • {cvData.personalInfo.phone}</p>
+              {cvData.personalInfo.summary && <p className="mt-4 text-lg">{cvData.personalInfo.summary}</p>}
+            </div>
+            
+            <div className="grid grid-cols-3 gap-8 p-8">
+              <div className="col-span-2 space-y-6">
+                {/* Experience */}
+                <section>
+                  <h2 className="text-2xl font-bold text-blue-600 border-b-2 border-blue-200 pb-2 mb-4">Experience</h2>
+                  {cvData.experience.map((exp) => (
+                    <div key={exp.id} className="mb-6 pl-4 border-l-4 border-blue-500">
+                      <h3 className="font-semibold text-lg">{exp.title}</h3>
+                      <p className="text-blue-600 font-medium">{exp.company}</p>
+                      <p className="text-sm text-gray-500">{exp.startDate} - {exp.endDate || 'Present'}</p>
+                      {exp.description && <p className="mt-2 text-gray-700">{exp.description}</p>}
+                    </div>
+                  ))}
+                </section>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Skills in circular badges */}
+                <section>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Skills</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {cvData.skills.map((skill, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+                
+                {/* Education */}
+                <section>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Education</h2>
+                  {cvData.education.map((edu) => (
+                    <div key={edu.id} className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <h3 className="font-semibold">{edu.degree}</h3>
+                      <p className="text-blue-600">{edu.school}</p>
+                      <p className="text-sm text-gray-500">{edu.startDate} - {edu.endDate}</p>
+                    </div>
+                  ))}
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'classic':
+        return (
+          <div className="bg-white shadow-lg border max-w-5xl mx-auto">
+            {/* Traditional header */}
+            <div className="border-b-4 border-gray-700 p-6 text-center">
+              <h1 className="text-3xl font-serif font-bold text-gray-800 mb-2">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+              <p className="text-gray-600">{cvData.personalInfo.email} | {cvData.personalInfo.phone} | {cvData.personalInfo.location}</p>
+              {cvData.personalInfo.summary && (
+                <p className="mt-4 text-gray-700 max-w-3xl mx-auto">{cvData.personalInfo.summary}</p>
+              )}
+            </div>
+            
+            {/* Two column layout */}
+            <div className="grid grid-cols-4 gap-0">
+              <div className="col-span-3 p-6 space-y-6">
+                {/* Professional Experience */}
+                <section>
+                  <h2 className="text-xl font-serif font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">
+                    Professional Experience
+                  </h2>
+                  {cvData.experience.map((exp) => (
+                    <div key={exp.id} className="mb-6">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-serif font-semibold text-lg">{exp.title}</h3>
+                          <p className="font-medium text-gray-700">{exp.company}</p>
+                        </div>
+                        <span className="text-sm text-gray-600 font-medium">
+                          {exp.startDate} - {exp.endDate || 'Present'}
+                        </span>
+                      </div>
+                      {exp.description && <p className="text-gray-700 leading-relaxed">{exp.description}</p>}
+                    </div>
+                  ))}
+                </section>
+
+                {/* Projects */}
+                {cvData.projects && cvData.projects.length > 0 && (
+                  <section>
+                    <h2 className="text-xl font-serif font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">
+                      Projects
+                    </h2>
+                    {cvData.projects.map((project) => (
+                      <div key={project.id} className="mb-4">
+                        <h3 className="font-serif font-semibold">{project.name}</h3>
+                        {project.description && <p className="text-gray-700">{project.description}</p>}
+                        {project.technologies && <p className="text-sm text-gray-600 italic">Technologies: {project.technologies}</p>}
+                      </div>
+                    ))}
+                  </section>
+                )}
+              </div>
+              
+              <div className="bg-gray-50 p-6 space-y-6">
+                {/* Education */}
+                <section>
+                  <h2 className="text-lg font-serif font-bold text-gray-800 border-b border-gray-400 pb-2 mb-4 uppercase tracking-wide">
+                    Education
+                  </h2>
+                  {cvData.education.map((edu) => (
+                    <div key={edu.id} className="mb-4">
+                      <h3 className="font-serif font-semibold text-sm">{edu.degree}</h3>
+                      <p className="text-gray-700 text-sm">{edu.school}</p>
+                      <p className="text-xs text-gray-600">{edu.startDate} - {edu.endDate}</p>
+                    </div>
+                  ))}
+                </section>
+                
+                {/* Skills */}
+                <section>
+                  <h2 className="text-lg font-serif font-bold text-gray-800 border-b border-gray-400 pb-2 mb-4 uppercase tracking-wide">
+                    Skills
+                  </h2>
+                  <div className="space-y-2">
+                    {cvData.skills.map((skill, index) => (
+                      <div key={index} className="text-sm text-gray-700 border-l-2 border-gray-400 pl-2">
+                        {skill}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'creative':
+        return (
+          <div className="bg-white shadow-2xl rounded-3xl overflow-hidden max-w-4xl mx-auto relative">
+            {/* Creative curved header */}
+            <div className="relative bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 text-white p-8 rounded-tl-3xl rounded-br-3xl mx-4 mt-4 mb-8">
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-white rounded-full"></div>
+              <div className="text-center">
+                <h1 className="text-4xl font-bold mb-2">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+                <div className="bg-white bg-opacity-20 rounded-full px-6 py-2 inline-block">
+                  <p className="text-lg">{cvData.personalInfo.email}</p>
+                </div>
+                {cvData.personalInfo.summary && (
+                  <p className="mt-6 text-lg bg-white bg-opacity-10 rounded-2xl p-4">{cvData.personalInfo.summary}</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Asymmetric grid layout */}
+            <div className="px-8 pb-8 space-y-8">
+              {/* Experience in creative cards */}
+              <section>
+                <h2 className="text-3xl font-bold text-purple-600 mb-6 text-center">My Journey</h2>
+                <div className="space-y-6">
+                  {cvData.experience.map((exp, index) => (
+                    <div key={exp.id} className={`transform ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'} hover:rotate-0 transition-transform`}>
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-8 border-purple-500 shadow-lg">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-xl font-bold text-purple-800">{exp.title}</h3>
+                            <p className="text-pink-600 font-semibold text-lg">{exp.company}</p>
+                          </div>
+                          <div className="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">
+                            {exp.startDate} - {exp.endDate || 'Present'}
+                          </div>
+                        </div>
+                        {exp.description && <p className="mt-4 text-gray-700">{exp.description}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Skills in creative bubbles */}
+              <section>
+                <h2 className="text-3xl font-bold text-pink-600 mb-6 text-center">Skills Universe</h2>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {cvData.skills.map((skill, index) => (
+                    <div key={index} className={`transform hover:scale-110 transition-transform ${index % 3 === 0 ? 'bg-purple-500' : index % 3 === 1 ? 'bg-pink-500' : 'bg-orange-500'} text-white px-6 py-3 rounded-full text-lg font-bold shadow-lg`}>
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Education in diamond shapes */}
+              <section>
+                <h2 className="text-3xl font-bold text-orange-600 mb-6 text-center">Learning Path</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {cvData.education.map((edu) => (
+                    <div key={edu.id} className="relative">
+                      <div className="bg-gradient-to-br from-orange-100 to-pink-100 p-6 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform shadow-lg">
+                        <h3 className="text-xl font-bold text-orange-800">{edu.degree}</h3>
+                        <p className="text-pink-700 font-semibold">{edu.school}</p>
+                        <p className="text-gray-600 mt-2">{edu.startDate} - {edu.endDate}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+          </div>
+        );
+
+      case 'minimal':
+        return (
+          <div className="bg-white shadow-sm border border-gray-100 rounded-lg max-w-3xl mx-auto">
+            {/* Ultra clean header */}
+            <div className="p-12 text-center border-b border-gray-100">
+              <h1 className="text-5xl font-light text-gray-900 mb-4 tracking-wide">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+              <p className="text-lg text-gray-600 mb-8">{cvData.personalInfo.email} • {cvData.personalInfo.phone}</p>
+              {cvData.personalInfo.summary && (
+                <p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed font-light">{cvData.personalInfo.summary}</p>
+              )}
+            </div>
+            
+            <div className="p-12 space-y-16">
+              {/* Experience */}
+              <section>
+                <h2 className="text-3xl font-light text-gray-900 mb-12 tracking-wide">Experience</h2>
+                <div className="space-y-12">
+                  {cvData.experience.map((exp) => (
+                    <div key={exp.id} className="grid grid-cols-4 gap-8">
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-widest">
+                          {exp.startDate} — {exp.endDate || 'Present'}
+                        </p>
+                      </div>
+                      <div className="col-span-3">
+                        <h3 className="text-2xl font-light text-gray-900 mb-2">{exp.title}</h3>
+                        <p className="text-lg text-gray-600 mb-4">{exp.company}</p>
+                        {exp.description && <p className="text-gray-700 leading-relaxed">{exp.description}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Education */}
+              <section>
+                <h2 className="text-3xl font-light text-gray-900 mb-12 tracking-wide">Education</h2>
+                <div className="space-y-8">
+                  {cvData.education.map((edu) => (
+                    <div key={edu.id} className="grid grid-cols-4 gap-8">
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-widest">
+                          {edu.startDate} — {edu.endDate}
+                        </p>
+                      </div>
+                      <div className="col-span-3">
+                        <h3 className="text-xl font-light text-gray-900">{edu.degree}</h3>
+                        <p className="text-lg text-gray-600">{edu.school}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Skills */}
+              <section>
+                <h2 className="text-3xl font-light text-gray-900 mb-12 tracking-wide">Skills</h2>
+                <div className="grid grid-cols-3 gap-4">
+                  {cvData.skills.map((skill, index) => (
+                    <div key={index} className="text-center py-4 border border-gray-200 rounded text-gray-700 font-light">
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+          </div>
+        );
+
+      case 'executive':
+        return (
+          <div className="bg-white shadow-2xl border-t-8 border-yellow-400 max-w-5xl mx-auto">
+            {/* Executive header with gold accents */}
+            <div className="bg-gradient-to-r from-slate-900 to-black text-yellow-400 p-8">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+                  <p className="text-xl text-yellow-300">{cvData.personalInfo.email} | {cvData.personalInfo.phone}</p>
+                </div>
+                <div className="w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <span className="text-3xl font-bold text-slate-900">CV</span>
+                </div>
+              </div>
+              {cvData.personalInfo.summary && (
+                <div className="mt-6 p-4 bg-slate-800 rounded border-l-4 border-yellow-400">
+                  <p className="text-lg text-white">{cvData.personalInfo.summary}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-8 space-y-8">
+              {/* Executive Experience */}
+              <section>
+                <h2 className="text-2xl font-bold text-slate-900 border-b-4 border-yellow-400 pb-2 mb-6">EXECUTIVE EXPERIENCE</h2>
+                {cvData.experience.map((exp) => (
+                  <div key={exp.id} className="border-l-8 border-yellow-400 pl-6 mb-8 bg-slate-50 p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900">{exp.title}</h3>
+                        <p className="text-lg font-semibold text-yellow-600">{exp.company}</p>
+                      </div>
+                      <div className="bg-yellow-400 text-slate-900 px-4 py-2 rounded font-bold">
+                        {exp.startDate} - {exp.endDate || 'Present'}
+                      </div>
+                    </div>
+                    {exp.description && <p className="text-slate-700 text-lg leading-relaxed">{exp.description}</p>}
+                  </div>
+                ))}
+              </section>
+
+              {/* Two column layout for other sections */}
+              <div className="grid grid-cols-2 gap-8">
+                <section>
+                  <h2 className="text-xl font-bold text-slate-900 border-b-2 border-yellow-400 pb-2 mb-4">EDUCATION</h2>
+                  {cvData.education.map((edu) => (
+                    <div key={edu.id} className="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+                      <h3 className="font-bold text-slate-900">{edu.degree}</h3>
+                      <p className="text-yellow-700 font-semibold">{edu.school}</p>
+                      <p className="text-slate-600">{edu.startDate} - {edu.endDate}</p>
+                    </div>
+                  ))}
+                </section>
+
+                <section>
+                  <h2 className="text-xl font-bold text-slate-900 border-b-2 border-yellow-400 pb-2 mb-4">CORE COMPETENCIES</h2>
+                  <div className="grid grid-cols-2 gap-2">
+                    {cvData.skills.map((skill, index) => (
+                      <div key={index} className="bg-slate-900 text-yellow-400 p-3 text-center font-bold text-sm">
+                        {skill}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="bg-white shadow-xl rounded-lg max-w-4xl mx-auto p-8">
+            <h1 className="text-3xl font-bold mb-4">{cvData.personalInfo.fullName || 'Your Name'}</h1>
+            <p className="text-gray-600 mb-6">{cvData.personalInfo.email} • {cvData.personalInfo.phone}</p>
+            {/* Basic fallback layout */}
+          </div>
+        );
+    }
+  };
+
   if (!previewData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -280,149 +581,7 @@ const Preview = () => {
     );
   }
   
-  const { cvData, template, sections } = previewData;
-  const templateLayout = getTemplateLayout(template);
-  
-  const renderSectionContent = (sectionId: string) => {
-    switch (sectionId) {
-      case 'personalInfo':
-        return (
-          <div className="space-y-3">
-            <div>
-              <div className={`text-3xl font-bold mb-2 ${template === 'creative' ? 'text-purple-600' : template === 'tech' ? 'text-emerald-600' : ''}`}>
-                {cvData.personalInfo.fullName || 'Your Name'}
-              </div>
-              <div className="text-lg text-muted-foreground">
-                {cvData.personalInfo.email} • {cvData.personalInfo.phone} • {cvData.personalInfo.location}
-              </div>
-            </div>
-            {cvData.personalInfo.summary && (
-              <p className="text-lg leading-relaxed">{cvData.personalInfo.summary}</p>
-            )}
-          </div>
-        );
-        
-      case 'experience':
-        return (
-          <div className="space-y-6">
-            {cvData.experience.map((exp) => (
-              <div key={exp.id} className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-xl font-semibold">{exp.title}</h4>
-                    <h5 className="text-lg font-medium text-primary">{exp.company}</h5>
-                  </div>
-                  <span className="text-sm text-muted-foreground bg-gray-100 px-3 py-1 rounded-full">
-                    {exp.startDate} - {exp.endDate || 'Present'}
-                  </span>
-                </div>
-                {exp.description && <p className="text-gray-700 leading-relaxed">{exp.description}</p>}
-              </div>
-            ))}
-          </div>
-        );
-        
-      case 'education':
-        return (
-          <div className="space-y-6">
-            {cvData.education.map((edu) => (
-              <div key={edu.id} className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-xl font-semibold">{edu.degree}</h4>
-                    <h5 className="text-lg font-medium text-primary">{edu.school}</h5>
-                  </div>
-                  <span className="text-sm text-muted-foreground bg-gray-100 px-3 py-1 rounded-full">
-                    {edu.startDate} - {edu.endDate}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-        
-      case 'skills':
-        return (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {cvData.skills.map((skill, index) => (
-              <span 
-                key={index} 
-                className={`text-center py-2 px-4 rounded-full text-sm font-medium ${
-                  template === 'creative' ? 'bg-purple-100 text-purple-800' : 
-                  template === 'tech' ? 'bg-emerald-100 text-emerald-800' : 
-                  template === 'executive' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        );
-
-      case 'projects':
-        return (
-          <div className="space-y-6">
-            {cvData.projects && cvData.projects.map((project) => (
-              <div key={project.id} className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-xl font-semibold">{project.name}</h4>
-                    {project.technologies && (
-                      <p className="text-sm text-primary font-medium">{project.technologies}</p>
-                    )}
-                  </div>
-                  <span className="text-sm text-muted-foreground bg-gray-100 px-3 py-1 rounded-full">
-                    {project.startDate} - {project.endDate || 'Present'}
-                  </span>
-                </div>
-                {project.description && (
-                  <p className="text-gray-700 leading-relaxed">{project.description}</p>
-                )}
-                {project.link && (
-                  <a href={project.link} target="_blank" rel="noopener noreferrer" 
-                     className="text-primary hover:underline text-sm">
-                    View Project →
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        );
-
-      case 'references':
-        return (
-          <div className="grid md:grid-cols-2 gap-6">
-            {cvData.references && cvData.references.map((reference) => (
-              <div key={reference.id} className="space-y-2 p-4 bg-gray-50 rounded-lg">
-                <h4 className="text-lg font-semibold">{reference.name}</h4>
-                <p className="text-primary font-medium">{reference.position}</p>
-                <p className="text-gray-600">{reference.company}</p>
-                <div className="text-sm text-gray-500">
-                  <p>{reference.email}</p>
-                  {reference.phone && <p>{reference.phone}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-        
-      default:
-        return null;
-    }
-  };
-
-  const getSectionTitle = (sectionId: string) => {
-    const titles = {
-      personalInfo: 'Personal Information',
-      experience: 'Work Experience',
-      education: 'Education',
-      skills: 'Skills',
-      projects: 'Projects',
-      references: 'References'
-    };
-    return titles[sectionId as keyof typeof titles] || sectionId;
-  };
+  const { cvData, template } = previewData;
 
   return (
     <div className={`min-h-screen flex flex-col bg-gray-50 ${isFullScreen ? 'p-0' : ''}`}>
@@ -448,47 +607,30 @@ const Preview = () => {
             </div>
             
             <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline" 
-                onClick={handleFullScreen}
-              >
+              <Button variant="outline" onClick={handleFullScreen}>
                 <Maximize2 className="h-4 w-4 mr-2" />
                 {isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'}
               </Button>
               
               {isOwner && (
-                <Button 
-                  variant="outline" 
-                  onClick={handleEdit}
-                >
+                <Button variant="outline" onClick={handleEdit}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit CV
                 </Button>
               )}
               
-              <Button 
-                variant="outline" 
-                onClick={handleShare}
-                disabled={!previewData?.cvId}
-              >
+              <Button variant="outline" onClick={handleShare} disabled={!previewData?.cvId}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
               
               <div className="flex items-center space-x-2">
-                <Button 
-                  variant="secondary" 
-                  onClick={() => setPageSize(pageSize === 'a4' ? 'letter' : 'a4')}
-                >
+                <Button variant="secondary" onClick={() => setPageSize(pageSize === 'a4' ? 'letter' : 'a4')}>
                   <LayoutTemplate className="h-4 w-4 mr-2" />
                   {pageSize === 'a4' ? 'A4' : 'Letter'}
                 </Button>
                 
-                <Button 
-                  variant="default" 
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                >
+                <Button variant="default" onClick={handleDownload} disabled={isDownloading}>
                   <Download className="h-4 w-4 mr-2" />
                   {isDownloading ? 'Generating...' : 'Download PDF'}
                 </Button>
@@ -500,54 +642,25 @@ const Preview = () => {
 
       {/* Main content area */}
       <div className={`${isFullScreen ? 'pt-0' : 'pt-20'} flex flex-col items-center justify-center flex-1 p-6`}>
-        <div 
-          id="cv-content"
-          className={`${templateLayout.containerStyle} ${pageSize === 'a4' ? 'w-[210mm] min-h-[297mm]' : 'w-[216mm] min-h-[279mm]'} p-8`}
-        >
-          {/* Header Section */}
-          <div className={templateLayout.headerStyle}>
-            {renderSectionContent('personalInfo')}
-          </div>
-
-          {/* Content Sections */}
-          <div className="p-8 space-y-8">
-            {sections.filter(s => s !== 'personalInfo').map((sectionId) => (
-              <div key={sectionId} className={templateLayout.sectionStyle}>
-                <h3 className="font-bold text-2xl mb-4 text-gray-800">
-                  {getSectionTitle(sectionId)}
-                </h3>
-                {renderSectionContent(sectionId)}
-              </div>
-            ))}
-          </div>
+        <div id="cv-content" className={`${pageSize === 'a4' ? 'w-[210mm] min-h-[297mm]' : 'w-[216mm] min-h-[279mm]'} p-8`}>
+          {renderTemplateContent(template, cvData)}
         </div>
         
         {/* Bottom actions */}
         <div className="mt-6 flex space-x-3">
           {isFullScreen && (
-            <Button 
-              variant="outline" 
-              onClick={handleFullScreen}
-            >
+            <Button variant="outline" onClick={handleFullScreen}>
               <Maximize2 className="h-4 w-4 mr-2" />
               Exit Fullscreen
             </Button>
           )}
           
-          <Button 
-            variant="default" 
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
+          <Button variant="default" onClick={handleDownload} disabled={isDownloading}>
             <Download className="h-4 w-4 mr-2" />
             {isDownloading ? 'Generating PDF...' : 'Download PDF'}
           </Button>
 
-          <Button 
-            variant="outline" 
-            onClick={handleShare}
-            disabled={!previewData?.cvId}
-          >
+          <Button variant="outline" onClick={handleShare} disabled={!previewData?.cvId}>
             <Share2 className="h-4 w-4 mr-2" />
             Share CV
           </Button>

@@ -31,6 +31,7 @@ const App = () => (
             <Route path="/builder/:id" element={<Builder />} />
             <Route path="/builder/new" element={<Builder />} />
             <Route path="/preview" element={<Preview />} />
+            <Route path="/preview/:id" element={<Preview />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
