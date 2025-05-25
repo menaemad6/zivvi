@@ -146,8 +146,8 @@ const Preview = () => {
 
       {/* CV Preview */}
       <div className="container mx-auto py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <Card className="shadow-2xl">
+        <div className="max-w-5xl mx-auto">
+          <Card className="shadow-2xl border-0">
             <CardContent className="p-0">
               <div id="cv-content" className="bg-white">
                 {cvData && sections ? (

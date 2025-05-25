@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,6 +27,7 @@ const Builder = () => {
     'skills',
     'projects'
   ]);
+  const [deletedSections, setDeletedSections] = useState<string[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState('modern');
   const [cvMetadata, setCVMetadata] = useState({ name: '', description: '' });
   const [editModal, setEditModal] = useState<{
@@ -48,6 +48,12 @@ const Builder = () => {
     if (cvData && id && id !== 'new') {
       fetchCVMetadata();
       fetchCVTemplate();
+      
+      // Load deleted sections from database
+      const content = cvData as any;
+      if (content._deletedSections) {
+        setDeletedSections(content._deletedSections);
+      }
     }
   }, [cvData, id]);
 
@@ -151,7 +157,7 @@ const Builder = () => {
     { id: 'skills', title: 'Skills', icon: <Award className="h-5 w-5" />, description: 'Technical and soft skills' },
     { id: 'projects', title: 'Projects', icon: <FileText className="h-5 w-5" />, description: 'Portfolio and projects' },
     { id: 'references', title: 'References', icon: <Users className="h-5 w-5" />, description: 'Professional references' }
-  ];
+  ].filter(section => !deletedSections.includes(section.id));
 
   const getTemplateStyles = (templateId: string) => {
     const styles = {
@@ -315,10 +321,21 @@ const Builder = () => {
     if (cvData) {
       saveToHistory(cvData);
     }
+    const baseId = sectionId.split('_')[0];
     setCVSections(cvSections.filter(id => id !== sectionId));
+    
+    // Add to deleted sections
+    const newDeletedSections = [...deletedSections, baseId];
+    setDeletedSections(newDeletedSections);
+    
+    // Save to database immediately
+    if (cvData) {
+      saveCV(cvData, newDeletedSections);
+    }
+    
     toast({
       title: "Section Removed",
-      description: "Section has been removed from your CV."
+      description: "Section has been permanently removed from your CV."
     });
   };
 
@@ -342,7 +359,7 @@ const Builder = () => {
     };
     
     try {
-      await saveCV(sanitizedData);
+      await saveCV(sanitizedData, deletedSections);
       setCVData(sanitizedData);
     } catch (error) {
       console.error('Save error:', error);

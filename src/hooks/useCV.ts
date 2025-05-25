@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CVData } from '@/types/cv';
 import { toast } from '@/hooks/use-toast';
 
-// Starter data for demonstration
+// Starter data for demonstration - now with empty projects
 const getStarterData = (): CVData => ({
   personalInfo: {
     fullName: 'John Doe',
@@ -52,26 +52,7 @@ const getStarterData = (): CVData => ({
     'PostgreSQL',
     'Git'
   ],
-  projects: [
-    {
-      id: '1',
-      name: 'E-commerce Platform',
-      description: 'Built a full-stack e-commerce platform with payment integration and real-time inventory management.',
-      technologies: 'React, Node.js, MongoDB, Stripe',
-      link: 'https://github.com/johndoe/ecommerce',
-      startDate: '03/2023',
-      endDate: '08/2023'
-    },
-    {
-      id: '2',
-      name: 'Task Management App',
-      description: 'Developed a collaborative task management application with real-time updates and team collaboration features.',
-      technologies: 'React, Firebase, Material-UI',
-      link: 'https://github.com/johndoe/taskapp',
-      startDate: '10/2022',
-      endDate: '02/2023'
-    }
-  ],
+  projects: [], // Empty by default
   references: [
     {
       id: '1',
@@ -129,7 +110,7 @@ export const useCV = (cvId: string | undefined) => {
           experience: Array.isArray(parsedData.experience) ? parsedData.experience : starterData.experience,
           education: Array.isArray(parsedData.education) ? parsedData.education : starterData.education,
           skills: Array.isArray(parsedData.skills) ? parsedData.skills : starterData.skills,
-          projects: Array.isArray(parsedData.projects) ? parsedData.projects : starterData.projects,
+          projects: Array.isArray(parsedData.projects) ? parsedData.projects : [], // Empty by default, don't use starter data
           references: Array.isArray(parsedData.references) ? parsedData.references : starterData.references
         };
         setCVData(cvData);
@@ -151,16 +132,23 @@ export const useCV = (cvId: string | undefined) => {
     }
   };
 
-  const saveCV = async (data: CVData) => {
+  const saveCV = async (data: CVData, deletedSections?: string[]) => {
     if (!cvId || cvId === 'new') return;
 
     try {
       setIsSaving(true);
       console.log('Saving CV data:', data);
+      
+      // Prepare the content with deleted sections info
+      const contentToSave = {
+        ...data,
+        _deletedSections: deletedSections || []
+      };
+      
       const { error } = await supabase
         .from('cvs')
         .update({
-          content: data as any, // Cast to any for Json compatibility
+          content: contentToSave as any, // Cast to any for Json compatibility
           updated_at: new Date().toISOString()
         })
         .eq('id', cvId);
