@@ -10,6 +10,7 @@ import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
+import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -323,8 +324,25 @@ const Builder = () => {
   const handleSave = async () => {
     if (!cvData) return;
     
+    // Ensure data integrity before saving
+    const sanitizedData: CVData = {
+      personalInfo: cvData.personalInfo || {
+        fullName: '',
+        email: '',
+        phone: '',
+        location: '',
+        summary: ''
+      },
+      experience: Array.isArray(cvData.experience) ? cvData.experience : [],
+      education: Array.isArray(cvData.education) ? cvData.education : [],
+      skills: Array.isArray(cvData.skills) ? cvData.skills : [],
+      projects: Array.isArray(cvData.projects) ? cvData.projects : [],
+      references: Array.isArray(cvData.references) ? cvData.references : []
+    };
+    
     try {
-      await saveCV(cvData);
+      await saveCV(sanitizedData);
+      setCVData(sanitizedData);
     } catch (error) {
       console.error('Save error:', error);
     }
@@ -358,152 +376,44 @@ const Builder = () => {
 
   const handleModalSave = (updatedData: CVData) => {
     console.log('Modal save:', updatedData);
-    setCVData(updatedData);
+    
+    // Ensure all array fields exist and are properly structured
+    const sanitizedData: CVData = {
+      personalInfo: updatedData.personalInfo || {
+        fullName: '',
+        email: '',
+        phone: '',
+        location: '',
+        summary: ''
+      },
+      experience: Array.isArray(updatedData.experience) ? updatedData.experience : [],
+      education: Array.isArray(updatedData.education) ? updatedData.education : [],
+      skills: Array.isArray(updatedData.skills) ? updatedData.skills : [],
+      projects: Array.isArray(updatedData.projects) ? updatedData.projects : [],
+      references: Array.isArray(updatedData.references) ? updatedData.references : []
+    };
+    
+    setCVData(sanitizedData);
     
     // Update localStorage immediately for preview sync
     if (id && id !== 'new') {
       localStorage.setItem('previewCVData', JSON.stringify({
-        cvData: updatedData,
+        cvData: sanitizedData,
         template: currentTemplate,
         sections: cvSections,
         cvId: id
       }));
     }
     
+    // Auto-save to database
+    if (sanitizedData) {
+      saveCV(sanitizedData);
+    }
+    
     toast({
       title: "Changes Applied",
-      description: "Section updated successfully. Don't forget to save your CV!",
+      description: "Section updated and saved successfully!",
     });
-  };
-
-  const handleAutoSave = () => {
-    toast({
-      title: "Auto-Save Enabled",
-      description: "Your changes will be automatically saved every 30 seconds."
-    });
-  };
-
-  const handleImportData = () => {
-    toast({
-      title: "Import Feature",
-      description: "Import from LinkedIn, PDF, or other formats (coming soon)."
-    });
-  };
-
-  const handleAIAssist = () => {
-    toast({
-      title: "AI Assistant",
-      description: "AI-powered content suggestions and optimization (coming soon)."
-    });
-  };
-
-  const renderSectionContent = (sectionId: string) => {
-    const baseId = sectionId.split('_')[0];
-    
-    switch (baseId) {
-      case 'personalInfo':
-        return (
-          <div className="space-y-2">
-            <p className={`font-medium ${templateStyle.accentColor}`}>{cvData.personalInfo.fullName || 'Your Name'}</p>
-            <p className="text-sm text-gray-600">{cvData.personalInfo.email}</p>
-            <p className="text-sm text-gray-600">{cvData.personalInfo.phone}</p>
-            <p className="text-sm text-gray-600">{cvData.personalInfo.location}</p>
-            {cvData.personalInfo.summary && (
-              <p className="text-sm text-gray-700 mt-2">{cvData.personalInfo.summary}</p>
-            )}
-          </div>
-        );
-      case 'experience':
-        return (
-          <div className="space-y-3">
-            {cvData.experience.length > 0 ? (
-              cvData.experience.map((exp) => (
-                <div key={exp.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
-                  <p className={`font-medium ${templateStyle.accentColor}`}>{exp.title}</p>
-                  <p className="text-sm text-gray-600">{exp.company}</p>
-                  <p className="text-xs text-gray-500">{exp.startDate} - {exp.endDate || 'Present'}</p>
-                  {exp.description && (
-                    <p className="text-sm text-gray-700 mt-1">{exp.description}</p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No experience added yet</p>
-            )}
-          </div>
-        );
-      case 'education':
-        return (
-          <div className="space-y-3">
-            {cvData.education.length > 0 ? (
-              cvData.education.map((edu) => (
-                <div key={edu.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
-                  <p className={`font-medium ${templateStyle.accentColor}`}>{edu.degree}</p>
-                  <p className="text-sm text-gray-600">{edu.school}</p>
-                  <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No education added yet</p>
-            )}
-          </div>
-        );
-      case 'skills':
-        return (
-          <div className="space-y-2">
-            {cvData.skills.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {cvData.skills.map((skill, index) => (
-                  <span key={index} className={`px-2 py-1 text-xs rounded-full bg-gray-100 ${templateStyle.accentColor}`}>
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No skills added yet</p>
-            )}
-          </div>
-        );
-      case 'projects':
-        return (
-          <div className="space-y-3">
-            {cvData.projects && cvData.projects.length > 0 ? (
-              cvData.projects.map((project) => (
-                <div key={project.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
-                  <p className={`font-medium ${templateStyle.accentColor}`}>{project.name}</p>
-                  <p className="text-xs text-gray-500">{project.startDate} - {project.endDate || 'Present'}</p>
-                  {project.technologies && (
-                    <p className="text-sm text-gray-600">{project.technologies}</p>
-                  )}
-                  {project.description && (
-                    <p className="text-sm text-gray-700 mt-1">{project.description}</p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No projects added yet</p>
-            )}
-          </div>
-        );
-      case 'references':
-        return (
-          <div className="space-y-3">
-            {cvData.references && cvData.references.length > 0 ? (
-              cvData.references.map((reference) => (
-                <div key={reference.id} className={`border-l-2 ${templateStyle.borderColor} pl-3`}>
-                  <p className={`font-medium ${templateStyle.accentColor}`}>{reference.name}</p>
-                  <p className="text-sm text-gray-600">{reference.position} at {reference.company}</p>
-                  <p className="text-xs text-gray-500">{reference.email}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No references added yet</p>
-            )}
-          </div>
-        );
-      default:
-        return <p className="text-sm text-gray-500">Click edit to add content</p>;
-    }
   };
 
   return (
@@ -759,21 +669,14 @@ const Builder = () => {
                 </div>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="bg-white rounded-xl shadow-inner min-h-[600px] p-8 space-y-6 border overflow-hidden">
-                  {cvSections.map((sectionId, index) => {
-                    const baseId = sectionId.split('_')[0];
-                    const section = availableSections.find(s => s.id === baseId);
-                    return section ? (
-                      <div key={sectionId} className="animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
-                        <h3 className={`font-semibold text-sm uppercase tracking-wide ${templateStyle.accentColor} mb-3 border-b ${templateStyle.borderColor} pb-2`}>
-                          {section.title}
-                        </h3>
-                        {renderSectionContent(sectionId)}
-                      </div>
-                    ) : null;
-                  })}
-                  
-                  {cvSections.length === 0 && (
+                <div className="bg-white rounded-xl shadow-inner min-h-[600px] overflow-hidden border">
+                  {cvData && cvSections.length > 0 ? (
+                    <CVTemplateRenderer
+                      cvData={cvData}
+                      templateId={currentTemplate}
+                      sections={cvSections}
+                    />
+                  ) : (
                     <div className="text-center text-gray-400 py-20">
                       <FileText className="h-16 w-16 mx-auto mb-4" />
                       <p className="text-lg font-medium mb-2">Your CV Preview</p>
@@ -809,6 +712,18 @@ const Builder = () => {
       )}
     </div>
   );
+
+  function handleImportData() {
+    throw new Error('Function not implemented.');
+  }
+
+  function handleAIAssist() {
+    throw new Error('Function not implemented.');
+  }
+
+  function renderSectionContent(sectionId: string): React.ReactNode {
+    throw new Error('Function not implemented.');
+  }
 };
 
 export default Builder;
