@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,8 @@ const Preview = () => {
 
       if (error) throw error;
 
-      const cvData = data.content as CVData;
+      // Safely convert the content to CVData type
+      const cvData = data.content as unknown as CVData;
       setPreviewData({
         cvData,
         template: data.template || 'modern',
