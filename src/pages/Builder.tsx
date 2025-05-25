@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText,
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
+import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
 import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -26,6 +28,7 @@ const Builder = () => {
     'projects'
   ]);
   const [currentTemplate, setCurrentTemplate] = useState('modern');
+  const [cvMetadata, setCVMetadata] = useState({ name: '', description: '' });
   const [editModal, setEditModal] = useState<{
     isOpen: boolean;
     sectionType: string;
@@ -35,15 +38,46 @@ const Builder = () => {
     sectionType: '',
     sectionTitle: ''
   });
+  const [settingsModal, setSettingsModal] = useState(false);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [undoStack, setUndoStack] = useState<CVData[]>([]);
   const [redoStack, setRedoStack] = useState<CVData[]>([]);
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
+      fetchCVMetadata();
       fetchCVTemplate();
     }
   }, [cvData, id]);
+
+  // Auto-save preview data whenever cvData changes
+  useEffect(() => {
+    if (cvData && id && id !== 'new') {
+      localStorage.setItem('previewCVData', JSON.stringify({
+        cvData,
+        template: currentTemplate,
+        sections: cvSections,
+        cvId: id
+      }));
+    }
+  }, [cvData, currentTemplate, cvSections, id]);
+
+  const fetchCVMetadata = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('cvs')
+        .select('name, description')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setCVMetadata({ name: data.name || '', description: data.description || '' });
+      }
+    } catch (error) {
+      console.error('Error fetching CV metadata:', error);
+    }
+  };
 
   const fetchCVTemplate = async () => {
     try {
@@ -323,6 +357,17 @@ const Builder = () => {
   const handleModalSave = (updatedData: CVData) => {
     console.log('Modal save:', updatedData);
     setCVData(updatedData);
+    
+    // Update localStorage immediately for preview sync
+    if (id && id !== 'new') {
+      localStorage.setItem('previewCVData', JSON.stringify({
+        cvData: updatedData,
+        template: currentTemplate,
+        sections: cvSections,
+        cvId: id
+      }));
+    }
+    
     toast({
       title: "Changes Applied",
       description: "Section updated successfully. Don't forget to save your CV!",
@@ -517,9 +562,9 @@ const Builder = () => {
 
               <Button 
                 variant="outline"
-                onClick={handleAutoSave}
+                onClick={() => setSettingsModal(true)}
                 size="sm"
-                title="Enable Auto-Save"
+                title="CV Settings"
               >
                 <Settings className="h-4 w-4" />
               </Button>
@@ -749,6 +794,17 @@ const Builder = () => {
         cvData={cvData}
         onSave={handleModalSave}
       />
+
+      {/* CV Settings Modal */}
+      {id && id !== 'new' && (
+        <CVSettingsModal
+          isOpen={settingsModal}
+          onClose={() => setSettingsModal(false)}
+          cvId={id}
+          currentName={cvMetadata.name}
+          currentDescription={cvMetadata.description}
+        />
+      )}
     </div>
   );
 };
