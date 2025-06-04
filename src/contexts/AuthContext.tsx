@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,28 +51,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(newSession);
         setUser(newSession?.user ?? null);
         setIsLoading(false);
-        
-        if (event === 'SIGNED_IN' && newSession?.user) {
-          // Check if user needs onboarding
-          setTimeout(async () => {
-            try {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('onboarding_completed')
-                .eq('id', newSession.user.id)
-                .single();
-              
-              if (!profile || !profile.onboarding_completed) {
-                navigate('/profile?data=true');
-              } else {
-                navigate('/dashboard');
-              }
-            } catch (error) {
-              console.error('Error checking profile:', error);
-              navigate('/dashboard');
-            }
-          }, 100);
-        }
       }
     );
 

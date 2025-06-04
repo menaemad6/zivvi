@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,10 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const { user, isLoading, signIn, signUp } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>(location.pathname === '/signup' ? 'signup' : 'login');
   
   // Form state
@@ -21,22 +22,34 @@ const Auth = () => {
   
   console.log('Auth page - user:', user?.id, 'isLoading:', isLoading);
   
-  // If user is already logged in, redirect to dashboard
-  if (user && !isLoading) {
-    console.log('User logged in, redirecting to dashboard');
-    return <Navigate to="/dashboard" />;
-  }
-  
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Handling sign up for:', email);
     await signUp(email, password, fullName);
+    // After sign up, Supabase requires email confirmation, so redirect to login (handled in signUp)
   };
   
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Handling sign in for:', email);
     await signIn(email, password);
+    // After sign in, check onboarding status
+    const {
+      data: { user: currentUser },
+      error: userError
+    } = await supabase.auth.getUser();
+    if (userError || !currentUser) {
+      navigate('/dashboard'); // fallback
+      return;
+    }
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', currentUser.id)
+      .single();
+    if (!profile || !profile.onboarding_completed) {
+      navigate('/profile?data=true');
+    } else {
+      navigate('/dashboard');
+    }
   };
   
   return (

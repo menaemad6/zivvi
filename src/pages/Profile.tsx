@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,9 +19,13 @@ const Profile = () => {
   console.log('Profile page - user:', user?.id, 'shouldShowOnboarding:', shouldShowOnboarding, 'profile:', profile);
 
   useEffect(() => {
-    if (shouldShowOnboarding && profile && !profile.onboarding_completed) {
-      console.log('Showing onboarding modal');
+    if (shouldShowOnboarding && profile && profile.onboarding_completed === false) {
       setShowOnboarding(true);
+    } else if (shouldShowOnboarding && profile && profile.onboarding_completed == null) {
+      // If onboarding_completed is null (not set), treat as not completed
+      setShowOnboarding(true);
+    } else {
+      setShowOnboarding(false);
     }
   }, [shouldShowOnboarding, profile]);
 
@@ -49,7 +52,7 @@ const Profile = () => {
     );
   }
 
-  const handleOnboardingComplete = async (data: any) => {
+  const handleOnboardingComplete = async (data: Record<string, unknown>) => {
     console.log('Onboarding completed with data:', data);
     await updateProfile({
       profile_data: data,
