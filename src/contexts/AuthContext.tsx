@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,12 +42,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
+      async (event, newSession) => {
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
         if (event === 'SIGNED_OUT') {
           cleanupAuthState();
+        }
+        
+        // Handle new user signup - redirect to profile with onboarding
+        if (event === 'SIGNED_IN' && newSession?.user) {
+          // Check if this is a new user by checking their profile
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('onboarding_completed')
+              .eq('id', newSession.user.id)
+              .single();
+            
+            // If no profile exists or onboarding not completed, redirect to profile
+            if (!profile || !profile.onboarding_completed) {
+              // Small delay to ensure navigation works properly
+              setTimeout(() => {
+                window.location.href = '/profile?data=true';
+              }, 100);
+            }
+          } catch (error) {
+            console.error('Error checking profile:', error);
+          }
         }
       }
     );
@@ -115,7 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) throw error;
       
-      navigate('/dashboard');
+      // Don't navigate here - let the auth state change handle it
     } catch (error: any) {
       toast({
         title: "Login failed",
