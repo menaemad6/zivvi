@@ -18,7 +18,20 @@ import { toast } from '@/hooks/use-toast';
 const Builder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { cvData, setCVData, isLoading, isSaving, saveCV } = useCV(id);
+  const { cvData, setCVData, isLoading, isSaving, cvExists, saveCV, updateCVMetadata } = useCV(id);
+  
+  // Check if CV exists and redirect if not
+  useEffect(() => {
+    if (cvExists === false) {
+      toast({
+        title: "CV Not Found",
+        description: "The requested CV could not be found or you don't have access to it.",
+        variant: "destructive"
+      });
+      navigate('/dashboard');
+    }
+  }, [cvExists, navigate]);
+
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [cvSections, setCVSections] = useState([
     'personalInfo',
@@ -51,8 +64,10 @@ const Builder = () => {
       
       // Load deleted sections from database
       const content = cvData as any;
-      if (content._deletedSections) {
+      if (content._deletedSections && Array.isArray(content._deletedSections)) {
         setDeletedSections(content._deletedSections);
+        // Filter out deleted sections from cvSections
+        setCVSections(prev => prev.filter(section => !content._deletedSections.includes(section)));
       }
     }
   }, [cvData, id]);
@@ -137,7 +152,7 @@ const Builder = () => {
     );
   }
 
-  if (!cvData) {
+  if (!cvData || cvExists === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
@@ -425,7 +440,7 @@ const Builder = () => {
     
     // Auto-save to database
     if (sanitizedData) {
-      saveCV(sanitizedData);
+      saveCV(sanitizedData, deletedSections);
     }
     
     toast({
@@ -867,6 +882,7 @@ const Builder = () => {
           cvId={id}
           currentName={cvMetadata.name}
           currentDescription={cvMetadata.description}
+          onUpdate={updateCVMetadata}
         />
       )}
     </div>

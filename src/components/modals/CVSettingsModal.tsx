@@ -16,34 +16,58 @@ interface CVSettingsModalProps {
   cvId: string;
   currentName: string;
   currentDescription: string;
+  onUpdate?: (name: string, description: string) => Promise<boolean>;
 }
 
-export const CVSettingsModal = ({ isOpen, onClose, cvId, currentName, currentDescription }: CVSettingsModalProps) => {
+export const CVSettingsModal = ({ 
+  isOpen, 
+  onClose, 
+  cvId, 
+  currentName, 
+  currentDescription, 
+  onUpdate 
+}: CVSettingsModalProps) => {
   const [name, setName] = useState(currentName);
   const [description, setDescription] = useState(currentDescription);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setName(currentName);
+      setDescription(currentDescription);
+    }
+  }, [isOpen, currentName, currentDescription]);
+
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('cvs')
-        .update({
-          name: name,
-          description: description,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', cvId);
+      if (onUpdate) {
+        const success = await onUpdate(name, description);
+        if (success) {
+          onClose();
+        }
+      } else {
+        // Fallback to direct Supabase call
+        const { error } = await supabase
+          .from('cvs')
+          .update({
+            name: name,
+            description: description,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', cvId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "CV Updated",
-        description: "Your CV details have been saved successfully."
-      });
-      onClose();
+        toast({
+          title: "CV Updated",
+          description: "Your CV details have been saved successfully."
+        });
+        onClose();
+      }
     } catch (error: any) {
       console.error('Error updating CV:', error);
       toast({

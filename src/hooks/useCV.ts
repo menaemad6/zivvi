@@ -7,83 +7,34 @@ import { toast } from '@/hooks/use-toast';
 // Starter data for demonstration - now with empty projects
 const getStarterData = (): CVData => ({
   personalInfo: {
-    fullName: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, NY',
-    summary: 'Experienced software developer with 5+ years in full-stack development, passionate about creating innovative solutions and leading technical teams.'
+    fullName: '',
+    email: '',
+    phone: '',
+    location: '',
+    summary: ''
   },
-  experience: [
-    {
-      id: '1',
-      title: 'Senior Software Engineer',
-      company: 'Tech Corp',
-      startDate: '01/2022',
-      endDate: 'Present',
-      description: 'Led development of microservices architecture, mentored junior developers, and improved system performance by 40%.'
-    },
-    {
-      id: '2',
-      title: 'Software Developer',
-      company: 'StartupXYZ',
-      startDate: '06/2020',
-      endDate: '12/2021',
-      description: 'Developed full-stack web applications using React and Node.js, collaborated with cross-functional teams.'
-    }
-  ],
-  education: [
-    {
-      id: '1',
-      degree: 'Bachelor of Computer Science',
-      school: 'University of Technology',
-      startDate: '09/2016',
-      endDate: '05/2020'
-    }
-  ],
-  skills: [
-    'JavaScript',
-    'TypeScript',
-    'React',
-    'Node.js',
-    'Python',
-    'AWS',
-    'Docker',
-    'MongoDB',
-    'PostgreSQL',
-    'Git'
-  ],
+  experience: [],
+  education: [],
+  skills: [],
   projects: [], // Empty by default
-  references: [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      position: 'Senior Engineering Manager',
-      company: 'Tech Corp',
-      email: 'sarah.johnson@techcorp.com',
-      phone: '+1 (555) 987-6543'
-    },
-    {
-      id: '2',
-      name: 'Mike Chen',
-      position: 'Lead Developer',
-      company: 'StartupXYZ',
-      email: 'mike.chen@startupxyz.com',
-      phone: '+1 (555) 456-7890'
-    }
-  ]
+  references: []
 });
 
 export const useCV = (cvId: string | undefined) => {
   const [cvData, setCVData] = useState<CVData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [cvExists, setCVExists] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (cvId && cvId !== 'new') {
       fetchCV();
-    } else {
+    } else if (cvId === 'new') {
       // Set starter data for new CVs
       setCVData(getStarterData());
+      setCVExists(true);
+      setIsLoading(false);
+    } else {
       setIsLoading(false);
     }
   }, [cvId]);
@@ -91,6 +42,32 @@ export const useCV = (cvId: string | undefined) => {
   const fetchCV = async () => {
     try {
       setIsLoading(true);
+      
+      // First check if CV exists and belongs to current user
+      const { data: cvCheck, error: checkError } = await supabase
+        .from('cvs')
+        .select('id, user_id')
+        .eq('id', cvId)
+        .single();
+
+      if (checkError || !cvCheck) {
+        setCVExists(false);
+        setIsLoading(false);
+        return;
+      }
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user || cvCheck.user_id !== user.id) {
+        setCVExists(false);
+        setIsLoading(false);
+        return;
+      }
+
+      setCVExists(true);
+
+      // Fetch full CV data
       const { data, error } = await supabase
         .from('cvs')
         .select('*')
@@ -107,11 +84,11 @@ export const useCV = (cvId: string | undefined) => {
         const starterData = getStarterData();
         const cvData: CVData = {
           personalInfo: parsedData.personalInfo || starterData.personalInfo,
-          experience: Array.isArray(parsedData.experience) ? parsedData.experience : starterData.experience,
-          education: Array.isArray(parsedData.education) ? parsedData.education : starterData.education,
-          skills: Array.isArray(parsedData.skills) ? parsedData.skills : starterData.skills,
-          projects: Array.isArray(parsedData.projects) ? parsedData.projects : [], // Empty by default, don't use starter data
-          references: Array.isArray(parsedData.references) ? parsedData.references : starterData.references
+          experience: Array.isArray(parsedData.experience) ? parsedData.experience : [],
+          education: Array.isArray(parsedData.education) ? parsedData.education : [],
+          skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
+          projects: Array.isArray(parsedData.projects) ? parsedData.projects : [],
+          references: Array.isArray(parsedData.references) ? parsedData.references : []
         };
         setCVData(cvData);
       } else {
@@ -120,11 +97,10 @@ export const useCV = (cvId: string | undefined) => {
       }
     } catch (error: any) {
       console.error('Error loading CV:', error);
-      // Set starter data on error
-      setCVData(getStarterData());
+      setCVExists(false);
       toast({
         title: "Error loading CV",
-        description: "Using starter data instead. " + error.message,
+        description: "CV not found or access denied.",
         variant: "destructive"
       });
     } finally {
@@ -172,11 +148,44 @@ export const useCV = (cvId: string | undefined) => {
     }
   };
 
+  const updateCVMetadata = async (name: string, description: string) => {
+    if (!cvId || cvId === 'new') return false;
+
+    try {
+      const { error } = await supabase
+        .from('cvs')
+        .update({
+          name: name,
+          description: description,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', cvId);
+
+      if (error) throw error;
+
+      toast({
+        title: "CV Updated",
+        description: "CV name and description updated successfully."
+      });
+      return true;
+    } catch (error: any) {
+      console.error('Error updating CV metadata:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update CV details.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
   return {
     cvData,
     setCVData,
     isLoading,
     isSaving,
-    saveCV
+    cvExists,
+    saveCV,
+    updateCVMetadata
   };
 };
