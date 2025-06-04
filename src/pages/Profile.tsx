@@ -17,14 +17,18 @@ const Profile = () => {
   
   const { profile, isLoading: profileLoading, updateProfile } = useProfile();
 
+  console.log('Profile page - user:', user?.id, 'shouldShowOnboarding:', shouldShowOnboarding, 'profile:', profile);
+
   useEffect(() => {
     if (shouldShowOnboarding && profile && !profile.onboarding_completed) {
+      console.log('Showing onboarding modal');
       setShowOnboarding(true);
     }
   }, [shouldShowOnboarding, profile]);
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
+    console.log('No user, redirecting to login');
     return <Navigate to="/login" />;
   }
 
@@ -46,6 +50,7 @@ const Profile = () => {
   }
 
   const handleOnboardingComplete = async (data: any) => {
+    console.log('Onboarding completed with data:', data);
     await updateProfile({
       profile_data: data,
       onboarding_completed: true,

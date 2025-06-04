@@ -22,117 +22,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Helper function to clean up auth state
-  const cleanupAuthState = () => {
-    try {
-      // Remove standard auth tokens
-      localStorage.removeItem('supabase.auth.token');
-      // Remove all Supabase auth keys from localStorage
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      // Remove from sessionStorage if it exists
-      if (typeof sessionStorage !== 'undefined') {
-        Object.keys(sessionStorage).forEach((key) => {
-          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-            sessionStorage.removeItem(key);
-          }
-        });
-      }
-    } catch (error) {
-      console.warn('Error cleaning up auth state:', error);
-    }
-  };
-
   useEffect(() => {
-    let mounted = true;
-
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        if (!mounted) return;
-
-        console.log('Auth state change:', event, newSession?.user?.id);
-        
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        
-        if (event === 'SIGNED_OUT') {
-          cleanupAuthState();
-          setIsLoading(false);
-        } else if (event === 'SIGNED_IN' && newSession?.user) {
-          // Check if this is a new user by checking their profile
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('onboarding_completed')
-              .eq('id', newSession.user.id)
-              .single();
-            
-            // If no profile exists or onboarding not completed, redirect to profile
-            if (!profile || !profile.onboarding_completed) {
-              // Small delay to ensure navigation works properly
-              setTimeout(() => {
-                if (mounted) {
-                  navigate('/profile?data=true');
-                }
-              }, 100);
-            } else {
-              // Navigate to dashboard for returning users
-              setTimeout(() => {
-                if (mounted) {
-                  navigate('/dashboard');
-                }
-              }, 100);
-            }
-          } catch (error) {
-            console.error('Error checking profile:', error);
-            // Default to dashboard if profile check fails
-            setTimeout(() => {
-              if (mounted) {
-                navigate('/dashboard');
-              }
-            }, 100);
-          }
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    const initializeAuth = async () => {
+    console.log('AuthProvider: Setting up auth listener');
+    
+    // Get initial session
+    const getInitialSession = async () => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
-          cleanupAuthState();
-        }
-        
-        if (mounted) {
+          console.error('Error getting initial session:', error);
+        } else {
+          console.log('Initial session:', currentSession?.user?.id || 'No session');
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
-          setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) {
-          cleanupAuthState();
-          setSession(null);
-          setUser(null);
-          setIsLoading(false);
-        }
+        console.error('Error in getInitialSession:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    initializeAuth();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, newSession) => {
+        console.log('Auth state change:', event, newSession?.user?.id || 'No user');
+        
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        setIsLoading(false);
+        
+        if (event === 'SIGNED_IN' && newSession?.user) {
+          // Check if user needs onboarding
+          setTimeout(async () => {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('onboarding_completed')
+                .eq('id', newSession.user.id)
+                .single();
+              
+              if (!profile || !profile.onboarding_completed) {
+                navigate('/profile?data=true');
+              } else {
+                navigate('/dashboard');
+              }
+            } catch (error) {
+              console.error('Error checking profile:', error);
+              navigate('/dashboard');
+            }
+          }, 100);
+        }
+      }
+    );
+
+    getInitialSession();
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);
@@ -140,11 +87,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       setIsLoading(true);
+      console.log('Signing up user:', email);
       
-      // Clean up any existing auth state
-      cleanupAuthState();
-      
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -177,22 +122,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
+      console.log('Signing in user:', email);
       
-      // Clean up existing state
-      cleanupAuthState();
-      
-      // Attempt global sign out to clear any existing sessions
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.warn('Error during global sign out:', err);
-      }
-      
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
       
       if (error) throw error;
       
-      // Don't navigate here - let the auth state change handle it
+      console.log('Sign in successful:', data.user?.id);
+      // Navigation will be handled by the auth state change listener
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast({
@@ -207,19 +147,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       setIsLoading(true);
+      console.log('Signing out user');
       
-      // Clean up auth state first
-      cleanupAuthState();
+      const { error } = await supabase.auth.signOut();
       
-      // Attempt global sign out
-      await supabase.auth.signOut({ scope: 'global' });
+      if (error) throw error;
       
-      // Clear local state
       setSession(null);
       setUser(null);
-      
-      // Force page reload for a clean state
-      window.location.href = '/';
+      navigate('/');
     } catch (error: any) {
       console.error('Sign out error:', error);
       toast({
@@ -227,11 +163,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive"
       });
-      
-      // Force cleanup even if signOut fails
-      setSession(null);
-      setUser(null);
-      window.location.href = '/';
     } finally {
       setIsLoading(false);
     }
