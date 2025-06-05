@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 import { Plus, FileText, MoreVertical, Edit, Copy, Trash2, Download, Eye, Calendar, Clock, Sparkles, TrendingUp } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -125,245 +127,243 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your dashboard...</p>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
-  const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 30) return `${diffInDays}d ago`;
-    const diffInMonths = Math.floor(diffInDays / 30);
-    return `${diffInMonths}mo ago`;
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-4xl font-bold">Dashboard</h1>
-            <Button onClick={() => navigate('/templates')} className="bg-primary hover:bg-primary/90">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New CV
-            </Button>
-          </div>
-          <p className="text-lg text-muted-foreground">
-            Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}! 👋
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total CVs</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalCVs}</div>
-              <p className="text-xs text-muted-foreground">Active CVs in your account</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Views This Month</CardTitle>
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.viewsThisMonth}</div>
-              <p className="text-xs text-green-600 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +12% from last month
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Downloads</CardTitle>
-              <Download className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.downloadsThisMonth}</div>
-              <p className="text-xs text-green-600 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +8% from last month
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-200/20">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-              <Sparkles className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">94%</div>
-              <p className="text-xs text-blue-600">Interview callback rate</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* CVs List */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Your CVs</h2>
-              <Button variant="outline" onClick={() => navigate('/templates')}>
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 pt-16">
+        <div className="container mx-auto py-8 px-6">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
+              <Button onClick={() => navigate('/templates')} className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="mr-2 h-4 w-4" />
-                New CV
+                Create New CV
               </Button>
             </div>
+            <p className="text-lg text-gray-600">
+              Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}! 👋
+            </p>
+          </div>
 
-            {cvs.length === 0 ? (
-              <Card className="text-center py-12">
-                <CardContent>
-                  <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No CVs yet</h3>
-                  <p className="text-muted-foreground mb-6">Create your first professional CV to get started</p>
-                  <Button onClick={() => navigate('/templates')}>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="hover:shadow-lg transition-shadow bg-white border border-gray-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">Total CVs</CardTitle>
+                <FileText className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stats.totalCVs}</div>
+                <p className="text-xs text-gray-500">Active CVs in your account</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow bg-white border border-gray-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">Views This Month</CardTitle>
+                <Eye className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stats.viewsThisMonth}</div>
+                <p className="text-xs text-green-600 flex items-center">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +12% from last month
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow bg-white border border-gray-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">Downloads</CardTitle>
+                <Download className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stats.downloadsThisMonth}</div>
+                <p className="text-xs text-green-600 flex items-center">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +8% from last month
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">Success Rate</CardTitle>
+                <Sparkles className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">94%</div>
+                <p className="text-xs text-blue-600">Interview callback rate</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* CVs List */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900">Your CVs</h2>
+                <Button variant="outline" onClick={() => navigate('/templates')} className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New CV
+                </Button>
+              </div>
+
+              {cvs.length === 0 ? (
+                <Card className="text-center py-12 bg-white border border-gray-200">
+                  <CardContent>
+                    <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2 text-gray-900">No CVs yet</h3>
+                    <p className="text-gray-600 mb-6">Create your first professional CV to get started</p>
+                    <Button onClick={() => navigate('/templates')} className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Your First CV
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {cvs.map((cv) => (
+                    <Card key={cv.id} className="hover:shadow-lg transition-all duration-200 group bg-white border border-gray-200">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                              {cv.title.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-lg text-gray-900">{cv.title}</h3>
+                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <Badge variant="secondary" className="capitalize bg-gray-100 text-gray-700">
+                                  {cv.template}
+                                </Badge>
+                                <span className="flex items-center">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {getTimeAgo(cv.updated_at)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate(`/preview?id=${cv.id}`)}
+                              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => navigate(`/builder/${cv.id}`)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-gray-500 hover:bg-gray-100">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-white border border-gray-200">
+                                <DropdownMenuItem onClick={() => duplicateCV(cv)} className="text-gray-700 hover:bg-gray-50">
+                                  <Copy className="mr-2 h-4 w-4" />
+                                  Duplicate
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => deleteCV(cv.id)}
+                                  className="text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions Sidebar */}
+            <div className="space-y-6">
+              <Card className="bg-white border border-gray-200">
+                <CardHeader>
+                  <CardTitle className="text-gray-900">Quick Actions</CardTitle>
+                  <CardDescription className="text-gray-600">Common tasks and shortcuts</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50"
+                    onClick={() => navigate('/templates')}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Your First CV
+                    Create New CV
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50"
+                    onClick={() => navigate('/profile')}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Update Profile
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export All CVs
                   </Button>
                 </CardContent>
               </Card>
-            ) : (
-              <div className="space-y-4">
-                {cvs.map((cv) => (
-                  <Card key={cv.id} className="hover:shadow-lg transition-all duration-200 group">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-                            {cv.title.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{cv.title}</h3>
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <Badge variant="secondary" className="capitalize">
-                                {cv.template}
-                              </Badge>
-                              <span className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {getTimeAgo(cv.updated_at)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate(`/preview?id=${cv.id}`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={() => navigate(`/builder/${cv.id}`)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-background border-border">
-                              <DropdownMenuItem onClick={() => duplicateCV(cv)}>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Duplicate
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => deleteCV(cv.id)}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* Quick Actions Sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common tasks and shortcuts</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/templates')}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create New CV
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => navigate('/profile')}
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Update Profile
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export All CVs
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tips & Tricks</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 text-sm">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                    <p>Use action verbs to make your experience stand out</p>
+              <Card className="bg-white border border-gray-200">
+                <CardHeader>
+                  <CardTitle className="text-gray-900">Tips & Tricks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 text-sm">
+                    <div className="flex items-start space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600">Use action verbs to make your experience stand out</p>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600">Keep your CV to 1-2 pages for better readability</p>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600">Customize your CV for each job application</p>
+                    </div>
                   </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                    <p>Keep your CV to 1-2 pages for better readability</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
-                    <p>Customize your CV for each job application</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

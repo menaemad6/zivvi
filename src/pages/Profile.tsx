@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,6 +8,11 @@ import { ProfileForm } from '@/components/profile/ProfileForm';
 import { OnboardingModal } from '@/components/profile/OnboardingModal';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { User, Mail, Calendar, MapPin, Briefcase, Shield, Settings, Edit3, Camera } from 'lucide-react';
 
 const Profile = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -22,14 +28,12 @@ const Profile = () => {
     if (shouldShowOnboarding && profile && profile.onboarding_completed === false) {
       setShowOnboarding(true);
     } else if (shouldShowOnboarding && profile && profile.onboarding_completed == null) {
-      // If onboarding_completed is null (not set), treat as not completed
       setShowOnboarding(true);
     } else {
       setShowOnboarding(false);
     }
   }, [shouldShowOnboarding, profile]);
 
-  // Redirect to auth if not logged in
   if (!authLoading && !user) {
     console.log('No user, redirecting to login');
     return <Navigate to="/login" />;
@@ -39,8 +43,8 @@ const Profile = () => {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen pt-24 px-4">
-          <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen pt-24 px-4 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
             <div className="space-y-6">
               <Skeleton className="h-8 w-48" />
               <Skeleton className="h-96 w-full" />
@@ -62,17 +66,127 @@ const Profile = () => {
     setShowOnboarding(false);
   };
 
+  const userInitials = user?.user_metadata?.full_name 
+    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+    : user?.email?.charAt(0).toUpperCase() || 'U';
+
+  const joinDate = user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long' 
+  }) : 'Unknown';
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-24 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-            <p className="text-gray-600 mt-2">Manage your account and preferences</p>
+      <div className="min-h-screen pt-16 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white">
+          <div className="max-w-6xl mx-auto px-6 py-12">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="relative group">
+                <Avatar className="w-32 h-32 border-4 border-white shadow-2xl">
+                  <AvatarFallback className="text-4xl font-bold bg-white text-gray-800">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <Button 
+                  size="sm" 
+                  className="absolute -bottom-2 -right-2 rounded-full w-10 h-10 bg-white text-gray-800 hover:bg-gray-100 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Camera className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <div className="text-center md:text-left flex-1">
+                <h1 className="text-4xl md:text-5xl font-bold mb-3">
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Your Profile'}
+                </h1>
+                <p className="text-xl text-blue-100 mb-4 flex items-center justify-center md:justify-start gap-2">
+                  <Mail className="w-5 h-5" />
+                  {user?.email}
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                  <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Joined {joinDate}
+                  </Badge>
+                  <Badge className="bg-green-500/20 text-green-100 border-green-300/30 backdrop-blur-sm">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Verified Account
+                  </Badge>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <ProfileForm profile={profile} onUpdate={updateProfile} />
+        </div>
+
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Profile Stats */}
+            <div className="space-y-6">
+              <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
+                    <User className="w-5 h-5 text-blue-600" />
+                    Profile Stats
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-gray-700 font-medium">CVs Created</span>
+                    <span className="text-2xl font-bold text-blue-600">12</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-gray-700 font-medium">Profile Views</span>
+                    <span className="text-2xl font-bold text-green-600">248</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span className="text-gray-700 font-medium">Downloads</span>
+                    <span className="text-2xl font-bold text-purple-600">89</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
+                    <Settings className="w-5 h-5 text-blue-600" />
+                    Quick Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Privacy Settings
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Export Data
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Main Profile Form */}
+            <div className="lg:col-span-2">
+              <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-2xl text-gray-900 flex items-center gap-2">
+                    <Settings className="w-6 h-6 text-blue-600" />
+                    Profile Settings
+                  </CardTitle>
+                  <p className="text-gray-600">Manage your account information and preferences</p>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <ProfileForm profile={profile} onUpdate={updateProfile} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
       
