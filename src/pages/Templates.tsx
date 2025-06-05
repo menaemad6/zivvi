@@ -81,10 +81,10 @@ const Templates = () => {
   const getTemplateGradient = (templateId: string) => {
     const gradients = {
       modern: 'from-blue-500 via-purple-500 to-cyan-500',
-      classic: 'from-gray-700 via-gray-800 to-slate-900',
+      classic: 'from-slate-600 via-gray-700 to-slate-800',
       creative: 'from-purple-500 via-pink-500 to-red-500',
-      minimal: 'from-gray-100 via-white to-gray-50',
-      executive: 'from-slate-900 via-black to-gray-900',
+      minimal: 'from-gray-400 via-gray-500 to-gray-600',
+      executive: 'from-slate-800 via-black to-gray-900',
       academic: 'from-indigo-600 via-blue-600 to-cyan-600',
       tech: 'from-emerald-500 via-teal-500 to-green-600',
       artistic: 'from-orange-500 via-red-500 to-pink-500',
@@ -109,56 +109,63 @@ const Templates = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
         {/* Hero Section */}
-        <div className="bg-gray-900 text-white">
-          <div className="container mx-auto py-16 px-6">
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
+          <div className="container mx-auto py-20 px-6 relative">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => navigate('/dashboard')}
-              className="mb-8 text-gray-300 hover:text-white hover:bg-white/10"
+              className="mb-12 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
             
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-6xl font-bold mb-6">
+              <div className="flex items-center justify-center mb-8">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-2xl">
+                  <Sparkles className="h-10 w-10 text-white" />
+                </div>
+              </div>
+              
+              <h1 className="text-6xl font-bold mb-8">
                 Choose Your Perfect
                 <br />
-                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Template
                 </span>
               </h1>
-              <p className="text-xl text-gray-300 leading-relaxed mb-8">
+              <p className="text-2xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
                 Professionally designed templates crafted for different industries and career stages. 
                 Start with a template and customize it to match your unique style.
               </p>
               
               {/* Search and Filter */}
-              <div className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto mb-8">
+              <div className="flex flex-col md:flex-row gap-6 max-w-3xl mx-auto mb-12">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
                     placeholder="Search templates..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400"
+                    className="pl-12 h-14 text-lg bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="flex gap-2 flex-wrap justify-center">
+                <div className="flex gap-3 flex-wrap justify-center">
                   {categories.map((category) => (
                     <Button
                       key={category}
                       variant={selectedCategory === category ? "default" : "outline"}
-                      size="sm"
+                      size="lg"
                       onClick={() => setSelectedCategory(category)}
                       className={selectedCategory === category 
-                        ? "bg-white text-black hover:bg-gray-100" 
-                        : "border-white/20 text-white hover:bg-white/10"
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg" 
+                        : "border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
                       }
                     >
-                      {category === 'all' ? <Filter className="h-3 w-3 mr-1" /> : getCategoryIcon(category)}
+                      {category === 'all' ? <Filter className="h-4 w-4 mr-2" /> : getCategoryIcon(category)}
                       {category.charAt(0).toUpperCase() + category.slice(1)}
                     </Button>
                   ))}
@@ -171,58 +178,61 @@ const Templates = () => {
         <div className="container mx-auto py-12 px-6">
           {/* Featured Templates */}
           {selectedCategory === 'all' && searchTerm === '' && (
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-8">
-                <Crown className="h-6 w-6 text-yellow-500" />
-                <h2 className="text-3xl font-bold text-gray-900">Featured Templates</h2>
-                <Badge className="bg-yellow-50 text-yellow-600 border-yellow-200">
-                  Most Popular
-                </Badge>
+            <div className="mb-20">
+              <div className="text-center mb-12">
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <Crown className="h-8 w-8 text-yellow-500" />
+                  <h2 className="text-4xl font-bold text-gray-900">Featured Templates</h2>
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-0 px-4 py-2 text-lg">
+                    Most Popular
+                  </Badge>
+                </div>
+                <p className="text-xl text-gray-600">Hand-picked templates that stand out from the crowd</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {featuredTemplates.map((template) => (
                   <Card 
                     key={template.id} 
-                    className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 border-0 bg-white overflow-hidden"
+                    className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-6 border-0 bg-white/80 backdrop-blur-lg overflow-hidden shadow-lg"
                     onMouseEnter={() => setHoveredTemplate(template.id)}
                     onMouseLeave={() => setHoveredTemplate(null)}
                   >
                     <div className="relative">
                       <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-500 ${hoveredTemplate === template.id ? 'scale-105' : ''}`}>
-                        <div className="text-center p-6 text-white">
-                          <Flame className="h-8 w-8 mx-auto mb-4 opacity-80" />
-                          <div className="text-3xl font-bold mb-3">{template.name}</div>
-                          <div className="text-sm opacity-90 mb-6">Premium Template</div>
-                          <div className="space-y-2">
-                            <div className="h-3 bg-white/30 rounded-full"></div>
-                            <div className="h-3 bg-white/20 rounded-full w-3/4 mx-auto"></div>
-                            <div className="h-3 bg-white/20 rounded-full w-1/2 mx-auto"></div>
+                        <div className="text-center p-8 text-white">
+                          <Flame className="h-12 w-12 mx-auto mb-6 opacity-80" />
+                          <div className="text-3xl font-bold mb-4">{template.name}</div>
+                          <div className="text-lg opacity-90 mb-8">Premium Template</div>
+                          <div className="space-y-3">
+                            <div className="h-4 bg-white/30 rounded-full"></div>
+                            <div className="h-4 bg-white/20 rounded-full w-3/4 mx-auto"></div>
+                            <div className="h-4 bg-white/20 rounded-full w-1/2 mx-auto"></div>
                           </div>
                         </div>
                       </div>
-                      <Badge className="absolute top-4 right-4 bg-yellow-500 text-black">
-                        <Star className="h-3 w-3 mr-1" />
+                      <Badge className="absolute top-6 right-6 bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-0 px-3 py-2">
+                        <Star className="h-4 w-4 mr-1" />
                         Featured
                       </Badge>
                     </div>
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl text-gray-900">{template.name}</CardTitle>
-                        <Badge variant="outline" className="text-xs text-gray-600 border-gray-300">
+                        <CardTitle className="text-2xl text-gray-900">{template.name}</CardTitle>
+                        <Badge variant="outline" className="text-sm text-gray-600 border-2 border-gray-200 px-3 py-1">
                           {template.category}
                         </Badge>
                       </div>
-                      <CardDescription className="leading-relaxed text-gray-600">
+                      <CardDescription className="leading-relaxed text-gray-600 text-lg">
                         {template.description}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <Button
                         onClick={() => createCVFromTemplate(template.id, template.name)}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-14 text-lg rounded-xl"
                       >
-                        <Sparkles className="h-4 w-4 mr-2" />
+                        <Sparkles className="h-5 w-5 mr-3" />
                         Use This Template
                       </Button>
                     </CardContent>
@@ -234,40 +244,40 @@ const Templates = () => {
 
           {/* All Templates */}
           <div>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="text-4xl font-bold text-gray-900">
                 {selectedCategory === 'all' ? 'All Templates' : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Templates`}
               </h2>
-              <Badge variant="secondary" className="text-sm bg-gray-100 text-gray-700">
+              <Badge variant="outline" className="text-lg bg-white/80 text-gray-700 border-2 border-gray-200 px-4 py-2">
                 {filteredTemplates.length} templates
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {filteredTemplates.map((template) => (
                 <Card 
                   key={template.id} 
-                  className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 bg-white border-gray-200 overflow-hidden"
+                  className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-4 bg-white/80 backdrop-blur-lg border-0 shadow-lg overflow-hidden"
                   onMouseEnter={() => setHoveredTemplate(template.id)}
                   onMouseLeave={() => setHoveredTemplate(null)}
                 >
                   <div className="relative">
-                    <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-300 ${hoveredTemplate === template.id ? 'scale-105' : ''}`}>
-                      <div className="text-center p-4 text-white">
-                        <div className="text-2xl font-bold mb-2">{template.name}</div>
-                        <div className="text-sm opacity-80 mb-4">CV Template</div>
-                        <div className="space-y-1">
-                          <div className="h-2 bg-white/30 rounded"></div>
-                          <div className="h-2 bg-white/20 rounded w-3/4 mx-auto"></div>
-                          <div className="h-2 bg-white/20 rounded w-1/2 mx-auto"></div>
+                    <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-300 ${hoveredTemplate === template.id ? 'scale-110' : ''}`}>
+                      <div className="text-center p-6 text-white">
+                        <div className="text-2xl font-bold mb-3">{template.name}</div>
+                        <div className="text-sm opacity-80 mb-6">CV Template</div>
+                        <div className="space-y-2">
+                          <div className="h-3 bg-white/30 rounded"></div>
+                          <div className="h-3 bg-white/20 rounded w-3/4 mx-auto"></div>
+                          <div className="h-3 bg-white/20 rounded w-1/2 mx-auto"></div>
                         </div>
                       </div>
                     </div>
                   </div>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg text-gray-900">{template.name}</CardTitle>
-                      <Badge variant="outline" className="text-xs capitalize text-gray-600 border-gray-300">
+                      <CardTitle className="text-xl text-gray-900">{template.name}</CardTitle>
+                      <Badge variant="outline" className="text-sm capitalize text-gray-600 border-2 border-gray-200">
                         {template.category}
                       </Badge>
                     </div>
@@ -278,7 +288,7 @@ const Templates = () => {
                   <CardContent className="pt-0">
                     <Button
                       onClick={() => createCVFromTemplate(template.id, template.name)}
-                      className="w-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl"
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
                       Use Template
@@ -289,11 +299,16 @@ const Templates = () => {
             </div>
             
             {filteredTemplates.length === 0 && (
-              <div className="text-center py-16">
-                <div className="text-4xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-900">No templates found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your search or filter criteria</p>
-                <Button onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <div className="text-center py-20">
+                <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
+                  <Search className="h-12 w-12 text-gray-500" />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 text-gray-900">No templates found</h3>
+                <p className="text-xl text-gray-600 mb-8">Try adjusting your search or filter criteria</p>
+                <Button 
+                  onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   Clear Filters
                 </Button>
               </div>

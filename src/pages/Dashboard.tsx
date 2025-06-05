@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Plus, FileText, MoreVertical, Edit, Copy, Trash2, Download, Eye, Calendar, Clock, Sparkles, TrendingUp } from 'lucide-react';
+import { Plus, FileText, MoreVertical, Edit, Copy, Trash2, Download, Eye, Calendar, Clock, Sparkles, TrendingUp, Zap, Users, Award } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { getTimeAgo } from '@/utils/timeUtils';
 
@@ -129,10 +130,10 @@ const Dashboard = () => {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center pt-16">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading your dashboard...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your dashboard...</p>
           </div>
         </div>
         <Footer />
@@ -143,154 +144,181 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-900 pt-16">
-        <div className="container mx-auto py-8 px-6">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-4xl font-bold text-white">Dashboard</h1>
-              <Button onClick={() => navigate('/templates')} className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="mr-2 h-4 w-4" />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
+        <div className="container mx-auto py-12 px-6">
+          {/* Enhanced Hero Section */}
+          <div className="text-center mb-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-12 border border-white/20 shadow-xl">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
+                  <Sparkles className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
+              </h1>
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Ready to create something amazing? Your professional journey continues here.
+              </p>
+              <Button 
+                onClick={() => navigate('/templates')} 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <Plus className="mr-3 h-6 w-6" />
                 Create New CV
               </Button>
             </div>
-            <p className="text-lg text-gray-400">
-              Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}! 👋
-            </p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="hover:shadow-lg transition-shadow bg-gray-800 border border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <Card className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Total CVs</CardTitle>
-                <FileText className="h-4 w-4 text-gray-500" />
+                <CardTitle className="text-sm font-medium text-gray-600">Total CVs</CardTitle>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.totalCVs}</div>
-                <p className="text-xs text-gray-500">Active CVs in your account</p>
+                <div className="text-3xl font-bold text-gray-900">{stats.totalCVs}</div>
+                <p className="text-sm text-gray-500 mt-1">Active CVs in your account</p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow bg-gray-800 border border-gray-700">
+            <Card className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Views This Month</CardTitle>
-                <Eye className="h-4 w-4 text-gray-500" />
+                <CardTitle className="text-sm font-medium text-gray-600">Views This Month</CardTitle>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.viewsThisMonth}</div>
-                <p className="text-xs text-green-400 flex items-center">
-                  <TrendingUp className="h-3 w-3 mr-1" />
+                <div className="text-3xl font-bold text-gray-900">{stats.viewsThisMonth}</div>
+                <p className="text-sm text-green-600 flex items-center mt-1">
+                  <TrendingUp className="h-4 w-4 mr-1" />
                   +12% from last month
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow bg-gray-800 border border-gray-700">
+            <Card className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Downloads</CardTitle>
-                <Download className="h-4 w-4 text-gray-500" />
+                <CardTitle className="text-sm font-medium text-gray-600">Downloads</CardTitle>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Download className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.downloadsThisMonth}</div>
-                <p className="text-xs text-green-400 flex items-center">
-                  <TrendingUp className="h-3 w-3 mr-1" />
+                <div className="text-3xl font-bold text-gray-900">{stats.downloadsThisMonth}</div>
+                <p className="text-sm text-green-600 flex items-center mt-1">
+                  <TrendingUp className="h-4 w-4 mr-1" />
                   +8% from last month
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow bg-gradient-to-r from-blue-900 to-purple-900 border border-blue-800">
+            <Card className="group hover:shadow-2xl transition-all duration-500 bg-gradient-to-r from-orange-500 to-red-500 border-0 shadow-lg hover:-translate-y-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Success Rate</CardTitle>
-                <Sparkles className="h-4 w-4 text-blue-400" />
+                <CardTitle className="text-sm font-medium text-white/90">Success Rate</CardTitle>
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Award className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">94%</div>
-                <p className="text-xs text-blue-400">Interview callback rate</p>
+                <div className="text-3xl font-bold text-white">94%</div>
+                <p className="text-sm text-white/80 mt-1">Interview callback rate</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* CVs List */}
             <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-white">Your CVs</h2>
-                <Button variant="outline" onClick={() => navigate('/templates')} className="border-gray-700 text-gray-400 hover:bg-gray-800">
-                  <Plus className="mr-2 h-4 w-4" />
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-gray-900">Your CVs</h2>
+                <Button 
+                  onClick={() => navigate('/templates')} 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
                   New CV
                 </Button>
               </div>
 
               {cvs.length === 0 ? (
-                <Card className="text-center py-12 bg-gray-800 border border-gray-700">
+                <Card className="text-center py-16 bg-white/80 backdrop-blur-lg border-0 shadow-lg">
                   <CardContent>
-                    <FileText className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2 text-white">No CVs yet</h3>
-                    <p className="text-gray-400 mb-6">Create your first professional CV to get started</p>
-                    <Button onClick={() => navigate('/templates')} className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <Plus className="mr-2 h-4 w-4" />
+                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-6">
+                      <FileText className="h-12 w-12 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">No CVs yet</h3>
+                    <p className="text-gray-600 mb-8 text-lg">Create your first professional CV to get started on your career journey</p>
+                    <Button 
+                      onClick={() => navigate('/templates')} 
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Plus className="mr-3 h-6 w-6" />
                       Create Your First CV
                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {cvs.map((cv) => (
-                    <Card key={cv.id} className="hover:shadow-lg transition-all duration-200 group bg-gray-800 border border-gray-700">
-                      <CardContent className="p-6">
+                    <Card key={cv.id} className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-1">
+                      <CardContent className="p-8">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                          <div className="flex items-center space-x-6">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
                               {cv.title.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <h3 className="font-semibold text-lg text-white">{cv.title}</h3>
-                              <div className="flex items-center space-x-4 text-sm text-gray-400">
-                                <Badge variant="secondary" className="capitalize bg-gray-700 text-gray-300">
+                              <h3 className="font-bold text-xl text-gray-900 mb-2">{cv.title}</h3>
+                              <div className="flex items-center space-x-4">
+                                <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-1">
                                   {cv.template}
                                 </Badge>
-                                <span className="flex items-center">
-                                  <Clock className="h-3 w-3 mr-1" />
+                                <span className="flex items-center text-sm text-gray-500">
+                                  <Clock className="h-4 w-4 mr-2" />
                                   {getTimeAgo(cv.updated_at)}
                                 </span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-3">
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => navigate(`/preview?id=${cv.id}`)}
-                              className="border-gray-700 text-gray-400 hover:bg-gray-800"
+                              className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 rounded-xl"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button 
                               size="sm"
                               onClick={() => navigate(`/builder/${cv.id}`)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-gray-500 hover:bg-gray-800">
+                                <Button variant="outline" size="sm" className="border-2 border-gray-200 hover:border-gray-300 rounded-xl">
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-gray-800 border border-gray-700">
-                                <DropdownMenuItem onClick={() => duplicateCV(cv)} className="text-gray-300 hover:bg-gray-700">
+                              <DropdownMenuContent align="end" className="bg-white border-0 shadow-xl rounded-xl">
+                                <DropdownMenuItem onClick={() => duplicateCV(cv)} className="hover:bg-gray-50 rounded-lg">
                                   <Copy className="mr-2 h-4 w-4" />
                                   Duplicate
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   onClick={() => deleteCV(cv.id)}
-                                  className="text-red-400 hover:bg-red-900"
+                                  className="text-red-600 hover:bg-red-50 rounded-lg"
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   Delete
@@ -306,54 +334,62 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Quick Actions Sidebar */}
-            <div className="space-y-6">
-              <Card className="bg-gray-800 border border-gray-700">
+            {/* Sidebar */}
+            <div className="space-y-8">
+              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-white">Quick Actions</CardTitle>
-                  <CardDescription className="text-gray-400">Common tasks and shortcuts</CardDescription>
+                  <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+                    <Zap className="mr-3 h-6 w-6 text-blue-600" />
+                    Quick Actions
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">Common tasks and shortcuts</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   <Button 
-                    variant="outline" 
-                    className="w-full justify-start border-gray-700 text-gray-400 hover:bg-gray-800"
                     onClick={() => navigate('/templates')}
+                    className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="mr-3 h-5 w-5" />
                     Create New CV
                   </Button>
                   <Button 
-                    variant="outline" 
-                    className="w-full justify-start border-gray-700 text-gray-400 hover:bg-gray-800"
                     onClick={() => navigate('/profile')}
+                    variant="outline"
+                    className="w-full justify-start border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
                   >
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Users className="mr-3 h-5 w-5" />
                     Update Profile
                   </Button>
-                  <Button variant="outline" className="w-full justify-start border-gray-700 text-gray-400 hover:bg-gray-800">
-                    <Download className="mr-2 h-4 w-4" />
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
+                  >
+                    <Download className="mr-3 h-5 w-5" />
                     Export All CVs
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border border-gray-700">
+              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-white">Tips & Tricks</CardTitle>
+                  <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+                    <Sparkles className="mr-3 h-6 w-6 text-purple-600" />
+                    Pro Tips
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4 text-sm">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                      <p className="text-gray-400">Use action verbs to make your experience stand out</p>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600 leading-relaxed">Use action verbs to make your experience stand out and capture attention</p>
                     </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                      <p className="text-gray-400">Keep your CV to 1-2 pages for better readability</p>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600 leading-relaxed">Keep your CV to 1-2 pages for better readability and impact</p>
                     </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
-                      <p className="text-gray-400">Customize your CV for each job application</p>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 mt-2 flex-shrink-0" />
+                      <p className="text-gray-600 leading-relaxed">Customize your CV for each job application to increase success</p>
                     </div>
                   </div>
                 </CardContent>
