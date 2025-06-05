@@ -4,63 +4,63 @@ import { Link } from 'react-router-dom';
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-800 py-12 px-6 md:px-12 lg:px-24">
+    <footer className="bg-background border-t border-border py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CV</span>
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">CV</span>
             </div>
-            <span className="font-bold text-xl text-white">CVBuilder</span>
+            <span className="font-semibold text-xl text-foreground">CVBuilder</span>
           </div>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             Build professional CVs that stand out and get you hired.
           </p>
         </div>
 
         <div>
-          <h3 className="font-semibold mb-4 text-white">Product</h3>
+          <h3 className="font-semibold mb-4 text-foreground">Product</h3>
           <ul className="space-y-2">
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/templates" className="text-muted-foreground hover:text-foreground transition-colors">
                 Templates
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
                 Features
-              </Link>
+              </a>
             </li>
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
-              </Link>
+              </a>
             </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="font-semibold mb-4 text-white">Company</h3>
+          <h3 className="font-semibold mb-4 text-foreground">Company</h3>
           <ul className="space-y-2">
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
                 About
-              </Link>
+              </a>
             </li>
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#blog" className="text-muted-foreground hover:text-foreground transition-colors">
                 Blog
-              </Link>
+              </a>
             </li>
             <li>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#contact" className="text-muted-foreground hover:text-foreground transition-colors">
                 Contact
-              </Link>
+              </a>
             </li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
+      <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} CVBuilder. All rights reserved.</p>
       </div>
     </footer>
