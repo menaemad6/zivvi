@@ -108,7 +108,7 @@ export const useCV = (cvId: string | undefined) => {
     }
   };
 
-  const saveCV = async (data: CVData, deletedSections?: string[]) => {
+  const saveCV = async (data: CVData, deletedSections?: string[], activeSections?: string[]) => {
     if (!cvId || cvId === 'new') return;
 
     try {
@@ -119,7 +119,7 @@ export const useCV = (cvId: string | undefined) => {
       const contentToSave = {
         ...data,
         _deletedSections: deletedSections || [],
-        _sections: ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'].filter(
+        _sections: activeSections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'].filter(
           section => !(deletedSections || []).includes(section)
         )
       };

@@ -36,13 +36,8 @@ const Builder = () => {
   }, [cvExists, navigate]);
 
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
-  const [cvSections, setCVSections] = useState([
-    'personalInfo',
-    'experience', 
-    'education',
-    'skills',
-    'projects'
-  ]);
+  // Start with empty sections for new CVs
+  const [cvSections, setCVSections] = useState<string[]>([]);
   const [deletedSections, setDeletedSections] = useState<string[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState('modern');
   const [cvMetadata, setCVMetadata] = useState({ name: '', description: '' });
@@ -65,13 +60,27 @@ const Builder = () => {
       fetchCVMetadata();
       fetchCVTemplate();
       
-      // Load deleted sections from database
+      // Load sections configuration from database
       const content = cvData as any;
       if (content._deletedSections && Array.isArray(content._deletedSections)) {
         setDeletedSections(content._deletedSections);
-        // Filter out deleted sections from cvSections
-        setCVSections(prev => prev.filter(section => !content._deletedSections.includes(section)));
       }
+      
+      // Load active sections from database, or use default for existing CVs
+      if (content._sections && Array.isArray(content._sections)) {
+        setCVSections(content._sections);
+      } else {
+        // For existing CVs without _sections, show all sections except deleted ones
+        const defaultSections = ['personalInfo', 'experience', 'education', 'skills', 'projects'];
+        const activeSections = defaultSections.filter(section => 
+          !(content._deletedSections || []).includes(section)
+        );
+        setCVSections(activeSections);
+      }
+    } else if (id === 'new') {
+      // For new CVs, start completely empty
+      setCVSections([]);
+      setDeletedSections([]);
     }
   }, [cvData, id]);
 
@@ -306,14 +315,20 @@ const Builder = () => {
 
   const currentTemplateInfo = cvTemplates.find(t => t.id === currentTemplate);
 
-  const availableSections = [
+  // All available sections - these are always shown in the sidebar if not in the CV structure
+  const allSections = [
     { id: 'personalInfo', title: 'Personal Info', icon: <User className="h-5 w-5" />, description: 'Your basic information' },
     { id: 'experience', title: 'Experience', icon: <Briefcase className="h-5 w-5" />, description: 'Work history and achievements' },
     { id: 'education', title: 'Education', icon: <GraduationCap className="h-5 w-5" />, description: 'Academic background' },
     { id: 'skills', title: 'Skills', icon: <Award className="h-5 w-5" />, description: 'Technical and soft skills' },
     { id: 'projects', title: 'Projects', icon: <FileText className="h-5 w-5" />, description: 'Portfolio and projects' },
     { id: 'references', title: 'References', icon: <Users className="h-5 w-5" />, description: 'Professional references' }
-  ].filter(section => !deletedSections.includes(section.id));
+  ];
+
+  // Available sections are those not currently in the CV structure and not deleted
+  const availableSections = allSections.filter(section => 
+    !cvSections.includes(section.id) && !deletedSections.includes(section.id)
+  );
 
   const getTemplateStyles = (templateId: string) => {
     const styles = {
@@ -462,7 +477,7 @@ const Builder = () => {
     if (cvData) {
       saveToHistory(cvData);
     }
-    const section = availableSections.find(s => s.id === sectionId);
+    const section = allSections.find(s => s.id === sectionId);
     if (section) {
       setEditModal({
         isOpen: true,
@@ -477,9 +492,11 @@ const Builder = () => {
       saveToHistory(cvData);
     }
     const baseId = sectionId.split('_')[0];
+    
+    // Remove from CV structure
     setCVSections(cvSections.filter(id => id !== sectionId));
     
-    // Add to deleted sections
+    // Add to deleted sections to persist the deletion
     const newDeletedSections = [...deletedSections, baseId];
     setDeletedSections(newDeletedSections);
     
@@ -870,22 +887,20 @@ const Builder = () => {
                   <p className="text-sm text-gray-500">Drag sections to your CV</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {availableSections
-                    .filter(section => !cvSections.some(s => s.split('_')[0] === section.id))
-                    .map((section) => (
-                      <div key={section.id} className="group">
-                        <SidebarSection
-                          title={section.title}
-                          icon={section.icon}
-                          onDragStart={(e) => handleDragStart(e, section.id)}
-                        />
-                        <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {section.description}
-                        </p>
-                      </div>
-                    ))}
+                  {availableSections.map((section) => (
+                    <div key={section.id} className="group">
+                      <SidebarSection
+                        title={section.title}
+                        icon={section.icon}
+                        onDragStart={(e) => handleDragStart(e, section.id)}
+                      />
+                      <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {section.description}
+                      </p>
+                    </div>
+                  ))}
                   
-                  {availableSections.filter(section => !cvSections.some(s => s.split('_')[0] === section.id)).length === 0 && (
+                  {availableSections.length === 0 && (
                     <div className="text-center py-6">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
                         <Award className="h-6 w-6 text-white" />
@@ -933,7 +948,7 @@ const Builder = () => {
                   >
                     {cvSections.map((sectionId, index) => {
                       const baseId = sectionId.split('_')[0];
-                      const section = availableSections.find(s => s.id === baseId);
+                      const section = allSections.find(s => s.id === baseId);
                       const isDragOver = dragOverIndex === index;
                       
                       return (
