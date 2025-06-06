@@ -75,13 +75,14 @@ const Preview = () => {
       // Set author name
       setAuthorName(cvDataResponse.profiles?.full_name || 'Unknown Author');
 
-      // Parse CV content
+      // Parse CV content with proper type checking
       const content = cvDataResponse.content;
-      if (content && typeof content === 'object') {
+      if (content && typeof content === 'object' && !Array.isArray(content)) {
         setCVData(content);
         setTemplate(cvDataResponse.template || 'modern');
-        // Extract sections from content or use default sections
-        const contentSections = content._sections || ['personalInfo', 'experience', 'education', 'skills'];
+        // Safely extract sections from content
+        const contentWithSections = content as { [key: string]: any };
+        const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills'];
         setSections(contentSections);
       } else {
         console.error('Invalid CV content format');
