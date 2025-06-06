@@ -17,8 +17,7 @@ const getStarterData = (): CVData => ({
   education: [],
   skills: [],
   projects: [],
-  references: [],
-  customSections: []
+  references: []
 });
 
 export const useCV = (cvId: string | undefined) => {
@@ -32,7 +31,20 @@ export const useCV = (cvId: string | undefined) => {
       fetchCV();
     } else if (cvId === 'new') {
       // Set starter data for new CVs - only personalInfo
-      const newCVData = getStarterData();
+      const newCVData = {
+        personalInfo: {
+          fullName: '',
+          email: '',
+          phone: '',
+          location: '',
+          summary: ''
+        },
+        experience: [],
+        education: [],
+        skills: [],
+        projects: [],
+        references: []
+      };
       setCVData(newCVData);
       setCVExists(true);
       setIsLoading(false);
@@ -90,8 +102,7 @@ export const useCV = (cvId: string | undefined) => {
           education: Array.isArray(parsedData.education) ? parsedData.education : [],
           skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
           projects: Array.isArray(parsedData.projects) ? parsedData.projects : [],
-          references: Array.isArray(parsedData.references) ? parsedData.references : [],
-          customSections: Array.isArray(parsedData.customSections) ? parsedData.customSections : []
+          references: Array.isArray(parsedData.references) ? parsedData.references : []
         };
         setCVData(cvData);
       } else {
@@ -121,10 +132,9 @@ export const useCV = (cvId: string | undefined) => {
       // Only save sections that actually have content or are in activeSections
       const sectionsToSave = activeSections || [];
       
-      // Prepare minimal content - always save personalInfo and customSections
+      // Prepare minimal content - only save what's needed
       const contentToSave: any = {
-        personalInfo: data.personalInfo,
-        customSections: data.customSections || []
+        personalInfo: data.personalInfo
       };
 
       // Only add sections if they're active and have content

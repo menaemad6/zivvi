@@ -3,15 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Sliders } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
-import { CustomSectionManager } from '@/components/builder/CustomSectionManager';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
@@ -772,46 +770,6 @@ const Builder = () => {
     }
   };
 
-  const handleCustomSectionsChange = (newCustomSections: any[]) => {
-    if (!cvData) return;
-    
-    const updatedCVData = {
-      ...cvData,
-      customSections: newCustomSections
-    };
-    
-    setCVData(updatedCVData);
-    
-    // Auto-save
-    if (id && id !== 'new') {
-      saveCV(updatedCVData, deletedSections, cvSections);
-    }
-  };
-
-  const renderCustomSectionContent = (sectionId: string) => {
-    if (!cvData?.customSections) return null;
-    
-    const customSection = cvData.customSections.find(section => section.id === sectionId);
-    if (!customSection) return null;
-
-    return (
-      <div className="space-y-3">
-        {customSection.items && customSection.items.length > 0 ? (
-          customSection.items.map((item) => (
-            <div key={item.id} className="p-3 bg-gray-50 rounded-lg">
-              <h4 className="font-medium">{item.content}</h4>
-              {item.description && (
-                <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-              )}
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">No items added yet</p>
-        )}
-      </div>
-    );
-  };
-
   return (
     <>
       <Navbar />
@@ -948,94 +906,40 @@ const Builder = () => {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
             {/* Enhanced Sidebar */}
             <div className="lg:col-span-1">
-              <Tabs defaultValue="sections" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="sections" className="flex items-center gap-2">
-                    <Layout className="h-4 w-4" />
-                    Sections
-                  </TabsTrigger>
-                  <TabsTrigger value="custom" className="flex items-center gap-2">
-                    <Sliders className="h-4 w-4" />
-                    Custom
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="sections">
-                  <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                          <Palette className="h-5 w-5 text-white" />
-                        </div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Add Sections</CardTitle>
-                      </div>
-                      <p className="text-sm text-gray-500">Drag sections to your CV</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {availableSections.map((section) => (
-                        <div key={section.id} className="group">
-                          <SidebarSection
-                            title={section.title}
-                            icon={section.icon}
-                            onDragStart={(e) => handleDragStart(e, section.id)}
-                          />
-                          <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {section.description}
-                          </p>
-                        </div>
-                      ))}
-                      
-                      {/* Custom sections that can be dragged */}
-                      {cvData?.customSections?.map((customSection) => {
-                        if (!cvSections.includes(customSection.id)) {
-                          return (
-                            <div key={customSection.id} className="group">
-                              <SidebarSection
-                                title={customSection.title}
-                                icon={<Sliders className="h-5 w-5" />}
-                                onDragStart={(e) => handleDragStart(e, customSection.id)}
-                              />
-                              <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                Custom section
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      {availableSections.length === 0 && (!cvData?.customSections || cvData.customSections.every(cs => cvSections.includes(cs.id))) && (
-                        <div className="text-center py-6">
-                          <div className="w-12 h-12 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
-                            <Award className="h-6 w-6 text-white" />
-                          </div>
-                          <p className="text-sm text-gray-500 font-medium">All sections added!</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="custom">
-                  <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8 max-h-[80vh] overflow-y-auto">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
-                          <Sliders className="h-5 w-5 text-white" />
-                        </div>
-                        <CardTitle className="text-xl font-bold text-gray-900">Customize</CardTitle>
-                      </div>
-                      <p className="text-sm text-gray-500">Create custom sections</p>
-                    </CardHeader>
-                    <CardContent>
-                      <CustomSectionManager
-                        sections={cvData?.customSections || []}
-                        onSectionsChange={handleCustomSectionsChange}
+              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                      <Palette className="h-5 w-5 text-white" />
+                    </div>
+                    <CardTitle className="text-xl font-bold text-gray-900">Add Sections</CardTitle>
+                  </div>
+                  <p className="text-sm text-gray-500">Drag sections to your CV</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {availableSections.map((section) => (
+                    <div key={section.id} className="group">
+                      <SidebarSection
+                        title={section.title}
+                        icon={section.icon}
+                        onDragStart={(e) => handleDragStart(e, section.id)}
                       />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+                      <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {section.description}
+                      </p>
+                    </div>
+                  ))}
+                  
+                  {availableSections.length === 0 && (
+                    <div className="text-center py-6">
+                      <div className="w-12 h-12 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
+                        <Award className="h-6 w-6 text-white" />
+                      </div>
+                      <p className="text-sm text-gray-500 font-medium">All sections added!</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             {/* Enhanced CV Builder Area */}
@@ -1075,7 +979,6 @@ const Builder = () => {
                     {cvSections.map((sectionId, index) => {
                       const baseId = sectionId.split('_')[0];
                       const section = allSections.find(s => s.id === baseId);
-                      const customSection = cvData?.customSections?.find(cs => cs.id === sectionId);
                       const isDragOver = dragOverIndex === index;
                       
                       return (
@@ -1083,19 +986,19 @@ const Builder = () => {
                           {isDragOver && draggedSection && (
                             <div className="h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mb-6 animate-pulse shadow-lg" />
                           )}
-                          {(section || customSection) ? (
+                          {section ? (
                             <div
                               onDragOver={(e) => handleDragOver(e, index)}
                               onDrop={(e) => handleDrop(e, index)}
                               onDragLeave={handleDragLeave}
                             >
                               <CVSection
-                                title={section?.title || customSection?.title || 'Unknown Section'}
+                                title={section.title}
                                 onEdit={() => handleSectionEdit(baseId)}
                                 onDelete={() => handleSectionDelete(sectionId)}
                                 onDragStart={(e) => handleDragStart(e, sectionId)}
                               >
-                                {section ? renderSectionContent(sectionId) : renderCustomSectionContent(sectionId)}
+                                {renderSectionContent(sectionId)}
                               </CVSection>
                             </div>
                           ) : null}
