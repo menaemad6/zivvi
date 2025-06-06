@@ -66,20 +66,40 @@ const Builder = () => {
         setDeletedSections(content._deletedSections);
       }
       
-      // Load active sections from database, or use default for existing CVs
+      // For existing CVs, determine active sections based on actual content and saved sections
       if (content._sections && Array.isArray(content._sections)) {
         setCVSections(content._sections);
       } else {
-        // For existing CVs without _sections, show all sections except deleted ones
-        const defaultSections = ['personalInfo', 'experience', 'education', 'skills', 'projects'];
-        const activeSections = defaultSections.filter(section => 
-          !(content._deletedSections || []).includes(section)
-        );
+        // Determine sections based on actual content
+        const activeSections: string[] = [];
+        
+        // Always include personalInfo as it should always be present
+        if (cvData.personalInfo && (cvData.personalInfo.fullName || cvData.personalInfo.email)) {
+          activeSections.push('personalInfo');
+        }
+        
+        // Only include sections that have actual content
+        if (cvData.experience && cvData.experience.length > 0) {
+          activeSections.push('experience');
+        }
+        if (cvData.education && cvData.education.length > 0) {
+          activeSections.push('education');
+        }
+        if (cvData.skills && cvData.skills.length > 0) {
+          activeSections.push('skills');
+        }
+        if (cvData.projects && cvData.projects.length > 0) {
+          activeSections.push('projects');
+        }
+        if (cvData.references && cvData.references.length > 0) {
+          activeSections.push('references');
+        }
+        
         setCVSections(activeSections);
       }
     } else if (id === 'new') {
-      // For new CVs, start completely empty
-      setCVSections([]);
+      // For new CVs, start completely empty except personalInfo
+      setCVSections(['personalInfo']);
       setDeletedSections([]);
     }
   }, [cvData, id]);
@@ -493,6 +513,16 @@ const Builder = () => {
     }
     const baseId = sectionId.split('_')[0];
     
+    // Don't allow deleting personalInfo
+    if (baseId === 'personalInfo') {
+      toast({
+        title: "Cannot Delete",
+        description: "Personal Info section cannot be deleted.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Remove from CV structure
     setCVSections(cvSections.filter(id => id !== sectionId));
     
@@ -502,7 +532,7 @@ const Builder = () => {
     
     // Save to database immediately
     if (cvData) {
-      saveCV(cvData, newDeletedSections);
+      saveCV(cvData, newDeletedSections, cvSections.filter(id => id !== sectionId));
     }
     
     toast({
@@ -531,7 +561,7 @@ const Builder = () => {
     };
     
     try {
-      await saveCV(sanitizedData, deletedSections);
+      await saveCV(sanitizedData, deletedSections, cvSections);
       setCVData(sanitizedData);
     } catch (error) {
       console.error('Save error:', error);
@@ -597,7 +627,7 @@ const Builder = () => {
     
     // Auto-save to database
     if (sanitizedData) {
-      saveCV(sanitizedData, deletedSections);
+      saveCV(sanitizedData, deletedSections, cvSections);
     }
     
     toast({
@@ -902,7 +932,7 @@ const Builder = () => {
                   
                   {availableSections.length === 0 && (
                     <div className="text-center py-6">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
                         <Award className="h-6 w-6 text-white" />
                       </div>
                       <p className="text-sm text-gray-500 font-medium">All sections added!</p>

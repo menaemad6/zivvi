@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CVData } from '@/types/cv';
 import { toast } from '@/hooks/use-toast';
 
-// Starter data for demonstration - now with empty projects
+// Starter data for demonstration - only personalInfo for new CVs
 const getStarterData = (): CVData => ({
   personalInfo: {
     fullName: '',
@@ -16,7 +16,7 @@ const getStarterData = (): CVData => ({
   experience: [],
   education: [],
   skills: [],
-  projects: [], // Empty by default
+  projects: [],
   references: []
 });
 
@@ -30,8 +30,22 @@ export const useCV = (cvId: string | undefined) => {
     if (cvId && cvId !== 'new') {
       fetchCV();
     } else if (cvId === 'new') {
-      // Set starter data for new CVs
-      setCVData(getStarterData());
+      // Set starter data for new CVs - only personalInfo
+      const newCVData = {
+        personalInfo: {
+          fullName: '',
+          email: '',
+          phone: '',
+          location: '',
+          summary: ''
+        },
+        experience: [],
+        education: [],
+        skills: [],
+        projects: [],
+        references: []
+      };
+      setCVData(newCVData);
       setCVExists(true);
       setIsLoading(false);
     } else {
@@ -115,19 +129,39 @@ export const useCV = (cvId: string | undefined) => {
       setIsSaving(true);
       console.log('Saving CV data:', data);
       
-      // Prepare the content with deleted sections info and sections array
-      const contentToSave = {
-        ...data,
-        _deletedSections: deletedSections || [],
-        _sections: activeSections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'].filter(
-          section => !(deletedSections || []).includes(section)
-        )
+      // Only save sections that actually have content or are in activeSections
+      const sectionsToSave = activeSections || [];
+      
+      // Prepare minimal content - only save what's needed
+      const contentToSave: any = {
+        personalInfo: data.personalInfo
       };
+
+      // Only add sections if they're active and have content
+      if (sectionsToSave.includes('experience') && data.experience.length > 0) {
+        contentToSave.experience = data.experience;
+      }
+      if (sectionsToSave.includes('education') && data.education.length > 0) {
+        contentToSave.education = data.education;
+      }
+      if (sectionsToSave.includes('skills') && data.skills.length > 0) {
+        contentToSave.skills = data.skills;
+      }
+      if (sectionsToSave.includes('projects') && data.projects.length > 0) {
+        contentToSave.projects = data.projects;
+      }
+      if (sectionsToSave.includes('references') && data.references.length > 0) {
+        contentToSave.references = data.references;
+      }
+
+      // Add metadata
+      contentToSave._deletedSections = deletedSections || [];
+      contentToSave._sections = sectionsToSave;
       
       const { error } = await supabase
         .from('cvs')
         .update({
-          content: contentToSave as any, // Cast to any for Json compatibility
+          content: contentToSave,
           updated_at: new Date().toISOString()
         })
         .eq('id', cvId);
