@@ -15,6 +15,8 @@ import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Navbar } from '@/components/layout/Navbar';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const Builder = () => {
   const { id } = useParams();
@@ -120,6 +122,124 @@ const Builder = () => {
     } catch (error) {
       console.error('Error fetching template:', error);
     }
+  };
+
+  const handleDownload = () => {
+    const input = document.getElementById('cv-content');
+    if (input) {
+      html2canvas(input, { scale: 2, useCORS: true })
+        .then((canvas) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          const fileName = cvMetadata.name ? `${cvMetadata.name}.pdf` : 'cv.pdf';
+          pdf.save(fileName);
+        });
+    }
+  };
+
+  const handleShare = async () => {
+    if (!id || id === 'new') {
+      toast({
+        title: "Save CV First",
+        description: "Please save your CV before sharing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const shareUrl = `${window.location.origin}/preview/${id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: cvMetadata.name || 'My CV',
+          text: 'Check out my CV',
+          url: shareUrl,
+        });
+      } catch (error) {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link Copied",
+          description: "CV link has been copied to clipboard."
+        });
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link Copied",
+        description: "CV link has been copied to clipboard."
+      });
+    }
+  };
+
+  const handleImportData = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const importedData = JSON.parse(e.target?.result as string);
+            if (importedData && typeof importedData === 'object') {
+              setCVData(importedData);
+              toast({
+                title: "Data Imported",
+                description: "CV data has been imported successfully."
+              });
+            }
+          } catch (error) {
+            toast({
+              title: "Import Failed",
+              description: "Invalid file format.",
+              variant: "destructive"
+            });
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  };
+
+  const handleExport = () => {
+    if (!cvData) {
+      toast({
+        title: "No Data",
+        description: "No CV data to export.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const dataToExport = {
+      ...cvData,
+      template: currentTemplate,
+      sections: cvSections,
+      metadata: cvMetadata
+    };
+
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${cvMetadata.name || 'cv-data'}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Data Exported",
+      description: "CV data has been exported successfully."
+    });
   };
 
   if (isLoading) {
@@ -469,13 +589,6 @@ const Builder = () => {
     });
   };
 
-  const handleImportData = () => {
-    toast({
-      title: "Import Feature",
-      description: "Import functionality coming soon!",
-    });
-  };
-
   const handleAIAssist = () => {
     toast({
       title: "AI Assistant",
@@ -632,7 +745,9 @@ const Builder = () => {
                     <Zap className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">CV Builder Pro</h1>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      {cvMetadata.name || 'CV Builder Pro'}
+                    </h1>
                     {currentTemplateInfo && (
                       <div className="flex items-center gap-3 mt-2">
                         <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-1">
@@ -711,6 +826,7 @@ const Builder = () => {
                 
                 <Button 
                   variant="outline"
+                  onClick={handleShare}
                   className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
                 >
                   <Share2 className="h-4 w-4 mr-2" />
@@ -719,6 +835,7 @@ const Builder = () => {
                 
                 <Button 
                   variant="outline"
+                  onClick={handleExport}
                   className="border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 rounded-xl transition-all duration-300"
                 >
                   <Download className="h-4 w-4 mr-2" />
@@ -882,21 +999,23 @@ const Builder = () => {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="bg-white rounded-2xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
-                    {cvData && cvSections.length > 0 ? (
-                      <CVTemplateRenderer
-                        cvData={cvData}
-                        templateId={currentTemplate}
-                        sections={cvSections}
-                      />
-                    ) : (
-                      <div className="text-center text-gray-400 py-24">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-6">
-                          <FileText className="h-10 w-10 text-gray-500" />
+                    <div id="cv-content">
+                      {cvData && cvSections.length > 0 ? (
+                        <CVTemplateRenderer
+                          cvData={cvData}
+                          templateId={currentTemplate}
+                          sections={cvSections}
+                        />
+                      ) : (
+                        <div className="text-center text-gray-400 py-24">
+                          <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-6">
+                            <FileText className="h-10 w-10 text-gray-500" />
+                          </div>
+                          <p className="text-xl font-semibold mb-3 text-gray-600">Your CV Preview</p>
+                          <p className="text-gray-500">Add sections to see your CV come to life</p>
                         </div>
-                        <p className="text-xl font-semibold mb-3 text-gray-600">Your CV Preview</p>
-                        <p className="text-gray-500">Add sections to see your CV come to life</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

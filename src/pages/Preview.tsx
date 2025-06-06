@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download, Share2, FileText, Palette, Eye, Sparkles, Star, Heart } from 'lucide-react';
+import { ArrowLeft, Download, Share2, FileText, Palette, Eye, Sparkles, Star, Heart, Edit } from 'lucide-react';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { cvTemplates } from '@/data/templates';
 import { jsPDF } from 'jspdf';
@@ -13,6 +13,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const Preview = () => {
   const { id } = useParams();
@@ -24,6 +25,7 @@ const Preview = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [authorName, setAuthorName] = useState('');
+  const [cvName, setCVName] = useState('');
 
   useEffect(() => {
     const storedData = localStorage.getItem('previewCVData');
@@ -72,8 +74,9 @@ const Preview = () => {
       const cvOwnerId = cvDataResponse.user_id;
       setIsOwner(currentUserId === cvOwnerId);
       
-      // Set author name
+      // Set author name and CV name
       setAuthorName(cvDataResponse.profiles?.full_name || 'Unknown Author');
+      setCVName(cvDataResponse.name || '');
 
       // Parse CV content with proper type checking
       const content = cvDataResponse.content;
@@ -82,7 +85,7 @@ const Preview = () => {
         setTemplate(cvDataResponse.template || 'modern');
         // Safely extract sections from content
         const contentWithSections = content as { [key: string]: any };
-        const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills'];
+        const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
         setSections(contentSections);
       } else {
         console.error('Invalid CV content format');
@@ -107,8 +110,45 @@ const Preview = () => {
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          pdf.save("cv.pdf");
+          const fileName = cvName ? `${cvName}.pdf` : 'cv.pdf';
+          pdf.save(fileName);
         });
+    }
+  };
+
+  const handleShare = async () => {
+    if (!id || id === 'new') {
+      toast({
+        title: "Cannot Share",
+        description: "This CV cannot be shared.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const shareUrl = `${window.location.origin}/preview/${id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: cvName || 'CV',
+          text: 'Check out this CV',
+          url: shareUrl,
+        });
+      } catch (error) {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link Copied",
+          description: "CV link has been copied to clipboard."
+        });
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link Copied",
+        description: "CV link has been copied to clipboard."
+      });
     }
   };
 
@@ -168,7 +208,7 @@ const Preview = () => {
                     </div>
                     <div>
                       <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                        CV Preview
+                        {cvName || 'CV Preview'}
                       </h1>
                       <p className="text-sm text-gray-600">Professional CV Showcase</p>
                     </div>
@@ -205,26 +245,23 @@ const Preview = () => {
                   Download PDF
                 </Button>
                 
-                {isOwner && (
-                  <>
-                    <Button 
-                      variant="outline"
-                      className="hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:scale-105 group"
-                    >
-                      <Share2 className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
-                      Share
-                    </Button>
-                    
-                    {id && id !== 'new' && (
-                      <Button 
-                        onClick={() => navigate(`/builder/${id}`)}
-                        className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 hover:shadow-xl transition-all duration-200 text-white border-0 hover:scale-105 group"
-                      >
-                        <Palette className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
-                        Edit CV
-                      </Button>
-                    )}
-                  </>
+                <Button 
+                  variant="outline"
+                  onClick={handleShare}
+                  className="hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:scale-105 group"
+                >
+                  <Share2 className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
+                  Share
+                </Button>
+                
+                {isOwner && id && id !== 'new' && (
+                  <Button 
+                    onClick={() => navigate(`/builder/${id}`)}
+                    className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 hover:shadow-xl transition-all duration-200 text-white border-0 hover:scale-105 group"
+                  >
+                    <Edit className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
+                    Edit CV
+                  </Button>
                 )}
               </div>
             </div>
@@ -277,15 +314,6 @@ const Preview = () => {
                       <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
                         This CV doesn't contain any content or the content couldn't be loaded properly.
                       </p>
-                      {isOwner && (
-                        <Button 
-                          className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 hover:shadow-xl transition-all duration-200 hover:scale-105"
-                          onClick={() => navigate('/templates')}
-                        >
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          Create New CV
-                        </Button>
-                      )}
                     </div>
                   )}
                 </div>

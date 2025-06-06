@@ -115,10 +115,13 @@ export const useCV = (cvId: string | undefined) => {
       setIsSaving(true);
       console.log('Saving CV data:', data);
       
-      // Prepare the content with deleted sections info
+      // Prepare the content with deleted sections info and sections array
       const contentToSave = {
         ...data,
-        _deletedSections: deletedSections || []
+        _deletedSections: deletedSections || [],
+        _sections: ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'].filter(
+          section => !(deletedSections || []).includes(section)
+        )
       };
       
       const { error } = await supabase
