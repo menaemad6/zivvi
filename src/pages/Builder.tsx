@@ -18,6 +18,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
+import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
+import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
 
 const Builder = () => {
   const { id } = useParams();
@@ -56,6 +58,8 @@ const Builder = () => {
   const [undoStack, setUndoStack] = useState<CVData[]>([]);
   const [redoStack, setRedoStack] = useState<CVData[]>([]);
   const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
+  const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
+  const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -275,6 +279,14 @@ const Builder = () => {
 
   const handleAIAssist = () => {
     setAIAssistantOpen(true);
+  };
+
+  const handleAIOptimizer = () => {
+    setAIOptimizerOpen(true);
+  };
+
+  const handleAIEnhancer = () => {
+    setAIEnhancerOpen(true);
   };
 
   const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
@@ -874,10 +886,32 @@ const Builder = () => {
 
                 <Button 
                   variant="outline"
+                  onClick={handleAIOptimizer}
+                  size="sm"
+                  title="AI CV Optimizer"
+                  className="border-2 border-gray-200 hover:border-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-300"
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  AI Optimize
+                </Button>
+
+                <Button 
+                  variant="outline"
+                  onClick={handleAIEnhancer}
+                  size="sm"
+                  title="AI Resume Enhancer"
+                  className="border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 rounded-xl transition-all duration-300"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  AI Enhance
+                </Button>
+
+                <Button 
+                  variant="outline"
                   onClick={handleAIAssist}
                   size="sm"
                   title="AI Smart Generator"
-                  className="border-2 border-gray-200 hover:border-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-300"
+                  className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
                 >
                   <Wand2 className="h-4 w-4 mr-2" />
                   AI Generate
@@ -1088,6 +1122,25 @@ const Builder = () => {
             </div>
           </div>
         </div>
+
+        {/* AI CV Optimizer */}
+        {cvData && (
+          <AICVOptimizer
+            open={aiOptimizerOpen}
+            setOpen={setAIOptimizerOpen}
+            cvData={cvData}
+          />
+        )}
+
+        {/* AI Resume Enhancer */}
+        {cvData && (
+          <AIResumeEnhancer
+            open={aiEnhancerOpen}
+            setOpen={setAIEnhancerOpen}
+            cvData={cvData}
+            onEnhance={handleModalSave}
+          />
+        )}
 
         {/* AI Smart Assistant */}
         {cvData && (
