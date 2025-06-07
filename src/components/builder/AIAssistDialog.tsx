@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -12,9 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getGeminiResponse, parseAIResponse } from "@/utils/geminiApi";
+import { OnboardingModal } from "@/components/profile/OnboardingModal";
+import { useProfile } from "@/hooks/useProfile";
 
 // Define the types for the props
 interface AIAssistDialogProps {
@@ -27,6 +28,8 @@ export function AIAssistDialog({ open, setOpen, onAIDataGenerated }: AIAssistDia
   const [loading, setLoading] = useState(false);
   const [userPrompt, setUserPrompt] = useState("");
   const [sectionType, setSectionType] = useState("about");
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const { profile, updateProfile } = useProfile();
 
   const generateSectionPrompt = (type: string, userInput: string) => {
     switch (type) {
@@ -137,65 +140,111 @@ export function AIAssistDialog({ open, setOpen, onAIDataGenerated }: AIAssistDia
     }
   };
 
+  const handleProfileUpdate = async (data: any) => {
+    try {
+      const success = await updateProfile({
+        profile_data: data,
+        profile_completed: true
+      });
+      if (success) {
+        setProfileModalOpen(false);
+        toast({
+          title: "Profile Updated",
+          description: "Your profile data has been updated successfully."
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update profile data.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" /> 
-            AI CV Assistant
-          </DialogTitle>
-          <DialogDescription>
-            Tell us about yourself, and our AI will help fill in your CV details.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="section-type">CV Section</Label>
-            <select 
-              id="section-type"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={sectionType}
-              onChange={(e) => setSectionType(e.target.value)}
-            >
-              <option value="about">About Me</option>
-              <option value="experience">Work Experience</option>
-              <option value="education">Education</option>
-              <option value="skills">Skills</option>
-            </select>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" /> 
+              AI CV Assistant
+            </DialogTitle>
+            <DialogDescription>
+              Tell us about yourself, and our AI will help fill in your CV details.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-blue-900">Need to update your profile?</p>
+                <p className="text-xs text-blue-600">Better profile data = better AI suggestions</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setProfileModalOpen(true)}
+                className="border-blue-200 hover:border-blue-400 hover:bg-blue-50"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Button>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="section-type">CV Section</Label>
+              <select 
+                id="section-type"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={sectionType}
+                onChange={(e) => setSectionType(e.target.value)}
+              >
+                <option value="about">About Me</option>
+                <option value="experience">Work Experience</option>
+                <option value="education">Education</option>
+                <option value="skills">Skills</option>
+              </select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="user-prompt">Provide your details</Label>
+              <Textarea
+                id="user-prompt"
+                value={userPrompt}
+                onChange={(e) => setUserPrompt(e.target.value)}
+                placeholder={
+                  sectionType === 'about' 
+                    ? "My name is Jane Smith, I'm a senior software engineer with 8 years of experience..." 
+                    : sectionType === 'experience'
+                    ? "I worked at Google as a Senior Developer from 2018-2022 where I led a team..."
+                    : sectionType === 'education'
+                    ? "I studied Computer Science at MIT from 2014-2018..."
+                    : "I'm proficient in Python, JavaScript, React, and machine learning..."
+                }
+                className="min-h-[150px]"
+              />
+            </div>
           </div>
           
-          <div className="grid gap-2">
-            <Label htmlFor="user-prompt">Provide your details</Label>
-            <Textarea
-              id="user-prompt"
-              value={userPrompt}
-              onChange={(e) => setUserPrompt(e.target.value)}
-              placeholder={
-                sectionType === 'about' 
-                  ? "My name is Jane Smith, I'm a senior software engineer with 8 years of experience..." 
-                  : sectionType === 'experience'
-                  ? "I worked at Google as a Senior Developer from 2018-2022 where I led a team..."
-                  : sectionType === 'education'
-                  ? "I studied Computer Science at MIT from 2014-2018..."
-                  : "I'm proficient in Python, JavaScript, React, and machine learning..."
-              }
-              className="min-h-[150px]"
-            />
-          </div>
-        </div>
-        
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button onClick={handleGenerate} disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Generate
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleGenerate} disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Generate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <OnboardingModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        onComplete={handleProfileUpdate}
+      />
+    </>
   );
 }
