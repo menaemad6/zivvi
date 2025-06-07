@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +36,7 @@ export function AICVOptimizer({ open, setOpen, cvData }: AICVOptimizerProps) {
 
   const analyzeCVData = () => {
     const analysis = {
-      hasPersonalInfo: !!cvData.personalInfo?.name && !!cvData.personalInfo?.email,
+      hasPersonalInfo: !!cvData.personalInfo?.fullName && !!cvData.personalInfo?.email,
       hasSummary: !!cvData.personalInfo?.summary && cvData.personalInfo.summary.length > 20,
       experienceCount: cvData.experience?.length || 0,
       educationCount: cvData.education?.length || 0,
