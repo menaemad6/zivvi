@@ -7,6 +7,15 @@ export interface CVTemplate {
   category: 'modern' | 'classic' | 'creative' | 'minimal';
 }
 
+export interface CustomSection {
+  id: string;
+  title: string;
+  items: Array<{
+    id: string;
+    content: string;
+  }>;
+}
+
 export interface CVData {
   personalInfo: {
     fullName: string;
@@ -48,4 +57,5 @@ export interface CVData {
     email: string;
     phone: string;
   }>;
+  customSections?: CustomSection[];
 }

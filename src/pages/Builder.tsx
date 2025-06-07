@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 import { Navbar } from '@/components/layout/Navbar';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
 
 const Builder = () => {
   const { id } = useParams();
@@ -54,6 +55,7 @@ const Builder = () => {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [undoStack, setUndoStack] = useState<CVData[]>([]);
   const [redoStack, setRedoStack] = useState<CVData[]>([]);
+  const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -269,6 +271,31 @@ const Builder = () => {
       title: "Data Exported",
       description: "CV data has been exported successfully."
     });
+  };
+
+  const handleAIAssist = () => {
+    setAIAssistantOpen(true);
+  };
+
+  const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
+    // Save current state to history
+    if (cvData) {
+      saveToHistory(cvData);
+    }
+    
+    // Update CV data
+    setCVData(updatedCVData);
+    
+    // Add new sections to the CV structure if they're not already there
+    const sectionsToAdd = newSectionIds.filter(sectionId => !cvSections.includes(sectionId));
+    if (sectionsToAdd.length > 0) {
+      setCVSections(prev => [...prev, ...sectionsToAdd]);
+    }
+    
+    // Auto-save the changes
+    if (updatedCVData) {
+      saveCV(updatedCVData, deletedSections, [...cvSections, ...sectionsToAdd]);
+    }
   };
 
   if (isLoading) {
@@ -636,13 +663,6 @@ const Builder = () => {
     });
   };
 
-  const handleAIAssist = () => {
-    toast({
-      title: "AI Assistant",
-      description: "AI assistance feature coming soon!",
-    });
-  };
-
   const renderSectionContent = (sectionId: string): React.ReactNode => {
     if (!cvData) return null;
 
@@ -856,10 +876,11 @@ const Builder = () => {
                   variant="outline"
                   onClick={handleAIAssist}
                   size="sm"
-                  title="AI Assistant"
+                  title="AI Smart Generator"
                   className="border-2 border-gray-200 hover:border-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-300"
                 >
-                  <Wand2 className="h-4 w-4" />
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  AI Generate
                 </Button>
                 
                 <Button 
@@ -1067,6 +1088,16 @@ const Builder = () => {
             </div>
           </div>
         </div>
+
+        {/* AI Smart Assistant */}
+        {cvData && (
+          <AISmartAssistant
+            open={aiAssistantOpen}
+            setOpen={setAIAssistantOpen}
+            onSectionsGenerated={handleAISectionsGenerated}
+            cvData={cvData}
+          />
+        )}
 
         {/* Section Edit Modal */}
         <SectionEditModal

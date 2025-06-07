@@ -17,7 +17,8 @@ const getStarterData = (): CVData => ({
   education: [],
   skills: [],
   projects: [],
-  references: []
+  references: [],
+  customSections: []
 });
 
 export const useCV = (cvId: string | undefined) => {
@@ -102,7 +103,8 @@ export const useCV = (cvId: string | undefined) => {
           education: Array.isArray(parsedData.education) ? parsedData.education : [],
           skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
           projects: Array.isArray(parsedData.projects) ? parsedData.projects : [],
-          references: Array.isArray(parsedData.references) ? parsedData.references : []
+          references: Array.isArray(parsedData.references) ? parsedData.references : [],
+          customSections: Array.isArray(parsedData.customSections) ? parsedData.customSections : []
         };
         setCVData(cvData);
       } else {
