@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, User, Briefcase, GraduationCap, Award, Check, RefreshCw } from "lucide-react";
+import { Loader2, Sparkles, User, Briefcase, GraduationCap, Award, Check, RefreshCw, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { CVData } from "@/types/cv";
 import { getGeminiResponse } from "@/utils/geminiApi";
 import { v4 as uuidv4 } from 'uuid';
+import { OnboardingModal } from "@/components/profile/OnboardingModal";
 
 interface AISmartAssistantProps {
   open: boolean;
@@ -34,10 +34,30 @@ interface GeneratedSection {
 }
 
 export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }: AISmartAssistantProps) {
-  const { profile } = useProfile();
+  const { profile, updateProfile } = useProfile();
   const [loading, setLoading] = useState(false);
   const [generatedSections, setGeneratedSections] = useState<GeneratedSection[]>([]);
   const [step, setStep] = useState<'analyzing' | 'generating' | 'reviewing'>('analyzing');
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+
+  const handleOnboardingComplete = async (data: any) => {
+    try {
+      const success = await updateProfile(data);
+      if (success) {
+        setOnboardingOpen(false);
+        toast({
+          title: "Profile Updated",
+          description: "Your profile data has been updated successfully."
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update profile data.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const analyzeProfile = () => {
     if (!profile?.profile_data) {
@@ -285,144 +305,162 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            AI Smart CV Generator
-          </DialogTitle>
-          <DialogDescription>
-            Generate professional CV sections automatically using your profile data
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              AI Smart CV Generator
+            </DialogTitle>
+            <DialogDescription>
+              Generate professional CV sections automatically using your profile data
+            </DialogDescription>
+          </DialogHeader>
 
-        {step === 'analyzing' && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Profile Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {profile?.profile_data ? (
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-600">
-                      AI will analyze your profile and generate relevant CV sections
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {profile.profile_data.experience && (
-                        <Badge variant="outline" className="text-green-600 border-green-200">
-                          Experience Available
-                        </Badge>
-                      )}
-                      {profile.profile_data.education && (
-                        <Badge variant="outline" className="text-blue-600 border-blue-200">
-                          Education Available
-                        </Badge>
-                      )}
-                      {profile.profile_data.skills && (
-                        <Badge variant="outline" className="text-purple-600 border-purple-200">
-                          Skills Available
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-gray-500 mb-3">
-                      No profile data found. Please complete your profile first.
-                    </p>
-                    <Button variant="outline" onClick={() => window.open('/profile', '_blank')}>
-                      Complete Profile
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {step === 'generating' && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-6">
-              <Loader2 className="h-8 w-8 text-white animate-spin" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Generating CV Sections</h3>
-            <p className="text-gray-600">AI is analyzing your profile and creating professional content...</p>
-          </div>
-        )}
-
-        {step === 'reviewing' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Generated Sections</h3>
-              <Button variant="outline" size="sm" onClick={resetGeneration}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Regenerate
-              </Button>
-            </div>
-            
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {generatedSections.map((section, index) => (
-                <Card 
-                  key={section.type} 
-                  className={`cursor-pointer transition-all ${
-                    section.selected ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => toggleSectionSelection(index)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          section.selected ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-                        }`}>
-                          {section.selected ? <Check className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{section.title}</h4>
-                          <p className="text-sm text-gray-600">{section.preview}</p>
-                        </div>
-                      </div>
-                      <Badge variant={section.selected ? "default" : "outline"}>
-                        {section.selected ? 'Selected' : 'Click to select'}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          
           {step === 'analyzing' && (
-            <Button 
-              onClick={generateSections} 
-              disabled={!profile?.profile_data || loading}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Generate Sections
-            </Button>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Profile Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {profile?.profile_data ? (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600">
+                        AI will analyze your profile and generate relevant CV sections
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.profile_data.experience && (
+                          <Badge variant="outline" className="text-green-600 border-green-200">
+                            Experience Available
+                          </Badge>
+                        )}
+                        {profile.profile_data.education && (
+                          <Badge variant="outline" className="text-blue-600 border-blue-200">
+                            Education Available
+                          </Badge>
+                        )}
+                        {profile.profile_data.skills && (
+                          <Badge variant="outline" className="text-purple-600 border-purple-200">
+                            Skills Available
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-500 mb-3">
+                        No profile data found. Please complete your profile first.
+                      </p>
+                      <div className="flex gap-2 justify-center">
+                        <Button variant="outline" onClick={() => window.open('/profile', '_blank')}>
+                          Go to Profile
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setOnboardingOpen(true)}
+                          className="border-purple-200 hover:border-purple-400 hover:bg-purple-50"
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Update Profile Data
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           )}
-          
+
+          {step === 'generating' && (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-6">
+                <Loader2 className="h-8 w-8 text-white animate-spin" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Generating CV Sections</h3>
+              <p className="text-gray-600">AI is analyzing your profile and creating professional content...</p>
+            </div>
+          )}
+
           {step === 'reviewing' && (
-            <Button 
-              onClick={applySections}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              Apply Selected Sections
-            </Button>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Generated Sections</h3>
+                <Button variant="outline" size="sm" onClick={resetGeneration}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Regenerate
+                </Button>
+              </div>
+              
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {generatedSections.map((section, index) => (
+                  <Card 
+                    key={section.type} 
+                    className={`cursor-pointer transition-all ${
+                      section.selected ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => toggleSectionSelection(index)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                            section.selected ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                          }`}>
+                            {section.selected ? <Check className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{section.title}</h4>
+                            <p className="text-sm text-gray-600">{section.preview}</p>
+                          </div>
+                        </div>
+                        <Badge variant={section.selected ? "default" : "outline"}>
+                          {section.selected ? 'Selected' : 'Click to select'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            
+            {step === 'analyzing' && (
+              <Button 
+                onClick={generateSections} 
+                disabled={!profile?.profile_data || loading}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Generate Sections
+              </Button>
+            )}
+            
+            {step === 'reviewing' && (
+              <Button 
+                onClick={applySections}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                Apply Selected Sections
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <OnboardingModal
+        isOpen={onboardingOpen}
+        onClose={() => setOnboardingOpen(false)}
+        onComplete={handleOnboardingComplete}
+      />
+    </>
   );
 }

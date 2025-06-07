@@ -1,596 +1,754 @@
-
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Save, X, GripVertical } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Trash2, Plus, GripVertical } from 'lucide-react';
 import { CVData } from '@/types/cv';
+import { v4 as uuidv4 } from 'uuid';
+import { AIGenerateButton } from './AIGenerateButton';
 
 interface SectionEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   sectionType: string;
   sectionTitle: string;
-  cvData: CVData;
+  cvData: CVData | null;
   onSave: (updatedData: CVData) => void;
 }
 
-export const SectionEditModal: React.FC<SectionEditModalProps> = ({
-  isOpen,
-  onClose,
-  sectionType,
-  sectionTitle,
-  cvData,
-  onSave
-}) => {
-  const [formData, setFormData] = useState<any>([]);
+export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, cvData, onSave }: SectionEditModalProps) => {
+  const [localData, setLocalData] = useState<CVData | null>(null);
 
   useEffect(() => {
-    console.log('Setting form data for section:', sectionType, cvData);
-    if (sectionType === 'personalInfo') {
-      setFormData(cvData.personalInfo || {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        summary: ''
-      });
-    } else if (sectionType === 'experience') {
-      setFormData(Array.isArray(cvData.experience) ? cvData.experience : []);
-    } else if (sectionType === 'education') {
-      setFormData(Array.isArray(cvData.education) ? cvData.education : []);
-    } else if (sectionType === 'skills') {
-      setFormData(Array.isArray(cvData.skills) ? cvData.skills : []);
-    } else if (sectionType === 'projects') {
-      setFormData(Array.isArray(cvData.projects) ? cvData.projects : []);
-    } else if (sectionType === 'references') {
-      setFormData(Array.isArray(cvData.references) ? cvData.references : []);
+    if (cvData && isOpen) {
+      setLocalData({ ...cvData });
     }
-  }, [sectionType, cvData, isOpen]);
+  }, [cvData, isOpen]);
+
+  if (!localData) return null;
 
   const handleSave = () => {
-    console.log('Saving form data:', formData, 'for section:', sectionType);
-    const updatedCVData = { ...cvData };
-    
-    if (sectionType === 'personalInfo') {
-      updatedCVData.personalInfo = formData;
-    } else if (sectionType === 'experience') {
-      updatedCVData.experience = Array.isArray(formData) ? formData : [];
-    } else if (sectionType === 'education') {
-      updatedCVData.education = Array.isArray(formData) ? formData : [];
-    } else if (sectionType === 'skills') {
-      updatedCVData.skills = Array.isArray(formData) ? formData : [];
-    } else if (sectionType === 'projects') {
-      updatedCVData.projects = Array.isArray(formData) ? formData : [];
-    } else if (sectionType === 'references') {
-      updatedCVData.references = Array.isArray(formData) ? formData : [];
-    }
-    
-    console.log('Updated CV data:', updatedCVData);
-    onSave(updatedCVData);
+    onSave(localData);
     onClose();
   };
 
-  const addExperienceItem = () => {
-    const currentExperience = Array.isArray(formData) ? formData : [];
-    const newItem = {
-      id: Date.now().toString(),
-      title: '',
-      company: '',
-      startDate: '',
-      endDate: '',
-      description: ''
-    };
-    setFormData([...currentExperience, newItem]);
+  const generateExperienceDescription = (experience: any) => {
+    const prompt = `Generate a professional job description for this work experience:
+    
+    Position: ${experience.title || 'Not specified'}
+    Company: ${experience.company || 'Not specified'}
+    Start Date: ${experience.startDate || 'Not specified'}
+    End Date: ${experience.endDate || 'Present'}
+    
+    Write a compelling 2-3 sentence description highlighting key responsibilities and achievements. Focus on measurable impact and relevant skills.`;
+    
+    return prompt;
   };
 
-  const addEducationItem = () => {
-    const currentEducation = Array.isArray(formData) ? formData : [];
-    const newItem = {
-      id: Date.now().toString(),
-      degree: '',
-      school: '',
-      startDate: '',
-      endDate: ''
-    };
-    setFormData([...currentEducation, newItem]);
+  const generateProjectDescription = (project: any) => {
+    const prompt = `Generate a professional project description:
+    
+    Project Name: ${project.name || 'Not specified'}
+    Technologies: ${project.technologies || 'Not specified'}
+    Start Date: ${project.startDate || 'Not specified'}
+    End Date: ${project.endDate || 'Present'}
+    
+    Write a compelling 2-3 sentence description highlighting the project's purpose, your role, and key achievements or technologies used.`;
+    
+    return prompt;
   };
 
-  const addSkill = () => {
-    const currentSkills = Array.isArray(formData) ? formData : [];
-    setFormData([...currentSkills, '']);
+  const generatePersonalSummary = () => {
+    const prompt = `Generate a professional summary based on the following information:
+    
+    Name: ${localData.personalInfo?.fullName || 'Not specified'}
+    ${localData.experience && localData.experience.length > 0 ? `
+    Recent Experience: ${localData.experience.map(exp => `${exp.title} at ${exp.company}`).join(', ')}
+    ` : ''}
+    ${localData.skills && localData.skills.length > 0 ? `
+    Key Skills: ${localData.skills.join(', ')}
+    ` : ''}
+    ${localData.education && localData.education.length > 0 ? `
+    Education: ${localData.education.map(edu => `${edu.degree} from ${edu.school}`).join(', ')}
+    ` : ''}
+    
+    Write a compelling 2-3 sentence professional summary that highlights key strengths, experience, and career focus.`;
+    
+    return prompt;
   };
 
-  const addProjectItem = () => {
-    const currentProjects = Array.isArray(formData) ? formData : [];
-    const newItem = {
-      id: Date.now().toString(),
-      name: '',
-      description: '',
-      technologies: '',
-      link: '',
-      startDate: '',
-      endDate: ''
-    };
-    setFormData([...currentProjects, newItem]);
-  };
-
-  const addReferenceItem = () => {
-    const currentReferences = Array.isArray(formData) ? formData : [];
-    const newItem = {
-      id: Date.now().toString(),
-      name: '',
-      position: '',
-      company: '',
-      email: '',
-      phone: ''
-    };
-    setFormData([...currentReferences, newItem]);
-  };
-
-  const updateExperienceItem = (index: number, field: string, value: string) => {
-    const currentExperience = Array.isArray(formData) ? formData : [];
-    const updated = [...currentExperience];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData(updated);
-  };
-
-  const updateEducationItem = (index: number, field: string, value: string) => {
-    const currentEducation = Array.isArray(formData) ? formData : [];
-    const updated = [...currentEducation];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData(updated);
-  };
-
-  const updateSkill = (index: number, value: string) => {
-    const currentSkills = Array.isArray(formData) ? formData : [];
-    const updated = [...currentSkills];
-    updated[index] = value;
-    setFormData(updated);
-  };
-
-  const updateProjectItem = (index: number, field: string, value: string) => {
-    const currentProjects = Array.isArray(formData) ? formData : [];
-    const updated = [...currentProjects];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData(updated);
-  };
-
-  const updateReferenceItem = (index: number, field: string, value: string) => {
-    const currentReferences = Array.isArray(formData) ? formData : [];
-    const updated = [...currentReferences];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData(updated);
-  };
-
-  const removeItem = (index: number) => {
-    const currentData = Array.isArray(formData) ? formData : [];
-    const updated = currentData.filter((_: any, i: number) => i !== index);
-    setFormData(updated);
-  };
-
-  const renderPersonalInfoForm = () => (
+  const renderPersonalInfoSection = () => (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="fullName">Full Name</Label>
-        <Input
-          id="fullName"
-          value={formData.fullName || ''}
-          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-          placeholder="Enter your full name"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="fullName">Full Name</Label>
+          <Input
+            id="fullName"
+            value={localData.personalInfo?.fullName || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, fullName: e.target.value }
+            })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={localData.personalInfo?.email || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, email: e.target.value }
+            })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            id="phone"
+            value={localData.personalInfo?.phone || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, phone: e.target.value }
+            })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="location">Location</Label>
+          <Input
+            id="location"
+            value={localData.personalInfo?.location || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, location: e.target.value }
+            })}
+          />
+        </div>
       </div>
+      
       <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email || ''}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Enter your email"
-        />
-      </div>
-      <div>
-        <Label htmlFor="phone">Phone</Label>
-        <Input
-          id="phone"
-          value={formData.phone || ''}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          placeholder="Enter your phone number"
-        />
-      </div>
-      <div>
-        <Label htmlFor="location">Location</Label>
-        <Input
-          id="location"
-          value={formData.location || ''}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-          placeholder="Enter your location"
-        />
-      </div>
-      <div>
-        <Label htmlFor="summary">Summary</Label>
+        <div className="flex items-center justify-between mb-2">
+          <Label htmlFor="summary">Professional Summary</Label>
+          <AIGenerateButton
+            onGenerated={(text) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, summary: text }
+            })}
+            prompt={generatePersonalSummary()}
+            type="summary"
+            disabled={!localData.personalInfo?.fullName}
+          />
+        </div>
         <Textarea
           id="summary"
-          value={formData.summary || ''}
-          onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-          placeholder="Enter a brief summary about yourself"
+          value={localData.personalInfo?.summary || ''}
+          onChange={(e) => setLocalData({
+            ...localData,
+            personalInfo: { ...localData.personalInfo!, summary: e.target.value }
+          })}
           rows={4}
+          placeholder="Write a brief professional summary..."
         />
       </div>
     </div>
   );
 
-  const renderExperienceForm = () => {
-    const experienceArray = Array.isArray(formData) ? formData : [];
-    
-    return (
-      <div className="space-y-6">
-        {experienceArray.map((exp: any, index: number) => (
-          <div key={exp.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <GripVertical className="h-4 w-4 text-gray-400" />
-                <h4 className="font-medium">Experience {index + 1}</h4>
-              </div>
+  const renderExperienceSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Work Experience</h3>
+        <Button
+          onClick={() => {
+            const newExp = {
+              id: uuidv4(),
+              title: '',
+              company: '',
+              startDate: '',
+              endDate: '',
+              description: ''
+            };
+            setLocalData({
+              ...localData,
+              experience: [...(localData.experience || []), newExp]
+            });
+          }}
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Experience
+        </Button>
+      </div>
+      
+      {localData.experience?.map((exp, index) => (
+        <Card key={exp.id} className="relative">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Experience {index + 1}</CardTitle>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={() => removeItem(index)}
-                className="text-red-500 hover:text-red-700"
+                onClick={() => {
+                  const newExp = localData.experience?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, experience: newExp });
+                }}
+                className="text-red-600 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Job Title</Label>
                 <Input
-                  value={exp.title || ''}
-                  onChange={(e) => updateExperienceItem(index, 'title', e.target.value)}
-                  placeholder="Job title"
+                  value={exp.title}
+                  onChange={(e) => {
+                    const newExp = [...(localData.experience || [])];
+                    newExp[index] = { ...exp, title: e.target.value };
+                    setLocalData({ ...localData, experience: newExp });
+                  }}
+                  placeholder="e.g., Software Engineer"
                 />
               </div>
               <div>
                 <Label>Company</Label>
                 <Input
-                  value={exp.company || ''}
-                  onChange={(e) => updateExperienceItem(index, 'company', e.target.value)}
-                  placeholder="Company name"
+                  value={exp.company}
+                  onChange={(e) => {
+                    const newExp = [...(localData.experience || [])];
+                    newExp[index] = { ...exp, company: e.target.value };
+                    setLocalData({ ...localData, experience: newExp });
+                  }}
+                  placeholder="e.g., Google Inc."
                 />
               </div>
               <div>
                 <Label>Start Date</Label>
                 <Input
-                  value={exp.startDate || ''}
-                  onChange={(e) => updateExperienceItem(index, 'startDate', e.target.value)}
-                  placeholder="MM/YYYY"
+                  type="month"
+                  value={exp.startDate}
+                  onChange={(e) => {
+                    const newExp = [...(localData.experience || [])];
+                    newExp[index] = { ...exp, startDate: e.target.value };
+                    setLocalData({ ...localData, experience: newExp });
+                  }}
                 />
               </div>
               <div>
                 <Label>End Date</Label>
                 <Input
-                  value={exp.endDate || ''}
-                  onChange={(e) => updateExperienceItem(index, 'endDate', e.target.value)}
-                  placeholder="MM/YYYY or Present"
+                  type="month"
+                  value={exp.endDate}
+                  onChange={(e) => {
+                    const newExp = [...(localData.experience || [])];
+                    newExp[index] = { ...exp, endDate: e.target.value };
+                    setLocalData({ ...localData, experience: newExp });
+                  }}
+                  placeholder="Leave empty if current"
                 />
               </div>
             </div>
+            
             <div>
-              <Label>Description</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Job Description</Label>
+                <AIGenerateButton
+                  onGenerated={(text) => {
+                    const newExp = [...(localData.experience || [])];
+                    newExp[index] = { ...exp, description: text };
+                    setLocalData({ ...localData, experience: newExp });
+                  }}
+                  prompt={generateExperienceDescription(exp)}
+                  type="description"
+                  disabled={!exp.title || !exp.company}
+                />
+              </div>
               <Textarea
-                value={exp.description || ''}
-                onChange={(e) => updateExperienceItem(index, 'description', e.target.value)}
-                placeholder="Describe your role and achievements"
+                value={exp.description}
+                onChange={(e) => {
+                  const newExp = [...(localData.experience || [])];
+                  newExp[index] = { ...exp, description: e.target.value };
+                  setLocalData({ ...localData, experience: newExp });
+                }}
                 rows={3}
+                placeholder="Describe your responsibilities and achievements..."
               />
             </div>
-          </div>
-        ))}
-        <Button onClick={addExperienceItem} variant="outline" className="w-full">
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.experience || localData.experience.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No work experience added yet.</p>
+          <p className="text-sm">Click "Add Experience" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderProjectsSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Projects</h3>
+        <Button
+          onClick={() => {
+            const newProject = {
+              id: uuidv4(),
+              name: '',
+              description: '',
+              technologies: '',
+              link: '',
+              startDate: '',
+              endDate: ''
+            };
+            setLocalData({
+              ...localData,
+              projects: [...(localData.projects || []), newProject]
+            });
+          }}
+          size="sm"
+        >
           <Plus className="h-4 w-4 mr-2" />
-          Add Experience
+          Add Project
         </Button>
       </div>
-    );
-  };
-
-  const renderEducationForm = () => {
-    const educationArray = Array.isArray(formData) ? formData : [];
-    
-    return (
-      <div className="space-y-6">
-        {educationArray.map((edu: any, index: number) => (
-          <div key={edu.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <GripVertical className="h-4 w-4 text-gray-400" />
-                <h4 className="font-medium">Education {index + 1}</h4>
-              </div>
+      
+      {localData.projects?.map((project, index) => (
+        <Card key={project.id} className="relative">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Project {index + 1}</CardTitle>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={() => removeItem(index)}
-                className="text-red-500 hover:text-red-700"
+                onClick={() => {
+                  const newProjects = localData.projects?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, projects: newProjects });
+                }}
+                className="text-red-600 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Project Name</Label>
+                <Input
+                  value={project.name}
+                  onChange={(e) => {
+                    const newProjects = [...(localData.projects || [])];
+                    newProjects[index] = { ...project, name: e.target.value };
+                    setLocalData({ ...localData, projects: newProjects });
+                  }}
+                  placeholder="e.g., E-commerce Platform"
+                />
+              </div>
+              <div>
+                <Label>Technologies</Label>
+                <Input
+                  value={project.technologies}
+                  onChange={(e) => {
+                    const newProjects = [...(localData.projects || [])];
+                    newProjects[index] = { ...project, technologies: e.target.value };
+                    setLocalData({ ...localData, projects: newProjects });
+                  }}
+                  placeholder="e.g., React, Node.js, MongoDB"
+                />
+              </div>
+              <div>
+                <Label>Start Date</Label>
+                <Input
+                  type="month"
+                  value={project.startDate}
+                  onChange={(e) => {
+                    const newProjects = [...(localData.projects || [])];
+                    newProjects[index] = { ...project, startDate: e.target.value };
+                    setLocalData({ ...localData, projects: newProjects });
+                  }}
+                />
+              </div>
+              <div>
+                <Label>End Date</Label>
+                <Input
+                  type="month"
+                  value={project.endDate}
+                  onChange={(e) => {
+                    const newProjects = [...(localData.projects || [])];
+                    newProjects[index] = { ...project, endDate: e.target.value };
+                    setLocalData({ ...localData, projects: newProjects });
+                  }}
+                  placeholder="Leave empty if ongoing"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Project Link (Optional)</Label>
+              <Input
+                type="url"
+                value={project.link}
+                onChange={(e) => {
+                  const newProjects = [...(localData.projects || [])];
+                  newProjects[index] = { ...project, link: e.target.value };
+                  setLocalData({ ...localData, projects: newProjects });
+                }}
+                placeholder="https://github.com/username/project"
+              />
+            </div>
+            
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Project Description</Label>
+                <AIGenerateButton
+                  onGenerated={(text) => {
+                    const newProjects = [...(localData.projects || [])];
+                    newProjects[index] = { ...project, description: text };
+                    setLocalData({ ...localData, projects: newProjects });
+                  }}
+                  prompt={generateProjectDescription(project)}
+                  type="description"
+                  disabled={!project.name}
+                />
+              </div>
+              <Textarea
+                value={project.description}
+                onChange={(e) => {
+                  const newProjects = [...(localData.projects || [])];
+                  newProjects[index] = { ...project, description: e.target.value };
+                  setLocalData({ ...localData, projects: newProjects });
+                }}
+                rows={3}
+                placeholder="Describe what the project does and your role..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.projects || localData.projects.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No projects added yet.</p>
+          <p className="text-sm">Click "Add Project" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderEducationSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Education</h3>
+        <Button
+          onClick={() => {
+            const newEdu = {
+              id: uuidv4(),
+              degree: '',
+              school: '',
+              startDate: '',
+              endDate: ''
+            };
+            setLocalData({
+              ...localData,
+              education: [...(localData.education || []), newEdu]
+            });
+          }}
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Education
+        </Button>
+      </div>
+      
+      {localData.education?.map((edu, index) => (
+        <Card key={edu.id}>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Education {index + 1}</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newEdu = localData.education?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, education: newEdu });
+                }}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Degree</Label>
                 <Input
-                  value={edu.degree || ''}
-                  onChange={(e) => updateEducationItem(index, 'degree', e.target.value)}
-                  placeholder="Degree name"
+                  value={edu.degree}
+                  onChange={(e) => {
+                    const newEdu = [...(localData.education || [])];
+                    newEdu[index] = { ...edu, degree: e.target.value };
+                    setLocalData({ ...localData, education: newEdu });
+                  }}
+                  placeholder="e.g., Bachelor of Science"
                 />
               </div>
               <div>
                 <Label>School</Label>
                 <Input
-                  value={edu.school || ''}
-                  onChange={(e) => updateEducationItem(index, 'school', e.target.value)}
-                  placeholder="School/University name"
+                  value={edu.school}
+                  onChange={(e) => {
+                    const newEdu = [...(localData.education || [])];
+                    newEdu[index] = { ...edu, school: e.target.value };
+                    setLocalData({ ...localData, education: newEdu });
+                  }}
+                  placeholder="e.g., University of California"
                 />
               </div>
               <div>
                 <Label>Start Date</Label>
                 <Input
-                  value={edu.startDate || ''}
-                  onChange={(e) => updateEducationItem(index, 'startDate', e.target.value)}
-                  placeholder="MM/YYYY"
+                  type="month"
+                  value={edu.startDate}
+                  onChange={(e) => {
+                    const newEdu = [...(localData.education || [])];
+                    newEdu[index] = { ...edu, startDate: e.target.value };
+                    setLocalData({ ...localData, education: newEdu });
+                  }}
                 />
               </div>
               <div>
                 <Label>End Date</Label>
                 <Input
-                  value={edu.endDate || ''}
-                  onChange={(e) => updateEducationItem(index, 'endDate', e.target.value)}
-                  placeholder="MM/YYYY"
+                  type="month"
+                  value={edu.endDate}
+                  onChange={(e) => {
+                    const newEdu = [...(localData.education || [])];
+                    newEdu[index] = { ...edu, endDate: e.target.value };
+                    setLocalData({ ...localData, education: newEdu });
+                  }}
                 />
               </div>
             </div>
-          </div>
-        ))}
-        <Button onClick={addEducationItem} variant="outline" className="w-full">
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.education || localData.education.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No education added yet.</p>
+          <p className="text-sm">Click "Add Education" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSkillsSection = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Skills</h3>
+      
+      <div>
+        <Label htmlFor="skills">Skills (Enter skills separated by commas)</Label>
+        <Textarea
+          id="skills"
+          value={localData.skills?.join(', ') || ''}
+          onChange={(e) => {
+            const skillsArray = e.target.value
+              .split(',')
+              .map(skill => skill.trim())
+              .filter(skill => skill.length > 0);
+            setLocalData({ ...localData, skills: skillsArray });
+          }}
+          rows={4}
+          placeholder="e.g., JavaScript, React, Node.js, Python, SQL"
+        />
+      </div>
+      
+      {localData.skills && localData.skills.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {localData.skills.map((skill, index) => (
+            <Badge key={index} variant="secondary">
+              {skill}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderReferencesSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">References</h3>
+        <Button
+          onClick={() => {
+            const newRef = {
+              id: uuidv4(),
+              name: '',
+              position: '',
+              company: '',
+              email: '',
+              phone: ''
+            };
+            setLocalData({
+              ...localData,
+              references: [...(localData.references || []), newRef]
+            });
+          }}
+          size="sm"
+        >
           <Plus className="h-4 w-4 mr-2" />
-          Add Education
+          Add Reference
         </Button>
       </div>
-    );
-  };
-
-  const renderSkillsForm = () => {
-    const skillsArray = Array.isArray(formData) ? formData : [];
-    
-    return (
-      <div className="space-y-4">
-        {skillsArray.map((skill: string, index: number) => (
-          <div key={index} className="flex gap-2 items-center">
-            <GripVertical className="h-4 w-4 text-gray-400" />
-            <Input
-              value={skill || ''}
-              onChange={(e) => updateSkill(index, e.target.value)}
-              placeholder="Enter a skill"
-              className="flex-1"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeItem(index)}
-              className="text-red-500 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-        <Button onClick={addSkill} variant="outline" className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Skill
-        </Button>
-      </div>
-    );
-  };
-
-  const renderProjectsForm = () => {
-    const projectsArray = Array.isArray(formData) ? formData : [];
-    
-    return (
-      <div className="space-y-6">
-        {projectsArray.map((project: any, index: number) => (
-          <div key={project.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <GripVertical className="h-4 w-4 text-gray-400" />
-                <h4 className="font-medium">Project {index + 1}</h4>
-              </div>
+      
+      {localData.references?.map((ref, index) => (
+        <Card key={ref.id}>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Reference {index + 1}</CardTitle>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={() => removeItem(index)}
-                className="text-red-500 hover:text-red-700"
+                onClick={() => {
+                  const newRefs = localData.references?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, references: newRefs });
+                }}
+                className="text-red-600 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Project Name</Label>
-                <Input
-                  value={project.name || ''}
-                  onChange={(e) => updateProjectItem(index, 'name', e.target.value)}
-                  placeholder="Project name"
-                />
-              </div>
-              <div>
-                <Label>Link</Label>
-                <Input
-                  value={project.link || ''}
-                  onChange={(e) => updateProjectItem(index, 'link', e.target.value)}
-                  placeholder="Project URL"
-                />
-              </div>
-              <div>
-                <Label>Start Date</Label>
-                <Input
-                  value={project.startDate || ''}
-                  onChange={(e) => updateProjectItem(index, 'startDate', e.target.value)}
-                  placeholder="MM/YYYY"
-                />
-              </div>
-              <div>
-                <Label>End Date</Label>
-                <Input
-                  value={project.endDate || ''}
-                  onChange={(e) => updateProjectItem(index, 'endDate', e.target.value)}
-                  placeholder="MM/YYYY or Present"
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Technologies</Label>
-              <Input
-                value={project.technologies || ''}
-                onChange={(e) => updateProjectItem(index, 'technologies', e.target.value)}
-                placeholder="React, Node.js, MongoDB"
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea
-                value={project.description || ''}
-                onChange={(e) => updateProjectItem(index, 'description', e.target.value)}
-                placeholder="Describe the project and your role"
-                rows={3}
-              />
-            </div>
-          </div>
-        ))}
-        <Button onClick={addProjectItem} variant="outline" className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Project
-        </Button>
-      </div>
-    );
-  };
-
-  const renderReferencesForm = () => {
-    const referencesArray = Array.isArray(formData) ? formData : [];
-    
-    return (
-      <div className="space-y-6">
-        {referencesArray.map((reference: any, index: number) => (
-          <div key={reference.id || index} className="border rounded-lg p-4 space-y-3 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <GripVertical className="h-4 w-4 text-gray-400" />
-                <h4 className="font-medium">Reference {index + 1}</h4>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeItem(index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Full Name</Label>
                 <Input
-                  value={reference.name || ''}
-                  onChange={(e) => updateReferenceItem(index, 'name', e.target.value)}
-                  placeholder="Reference name"
+                  value={ref.name}
+                  onChange={(e) => {
+                    const newRefs = [...(localData.references || [])];
+                    newRefs[index] = { ...ref, name: e.target.value };
+                    setLocalData({ ...localData, references: newRefs });
+                  }}
+                  placeholder="e.g., John Smith"
                 />
               </div>
               <div>
                 <Label>Position</Label>
                 <Input
-                  value={reference.position || ''}
-                  onChange={(e) => updateReferenceItem(index, 'position', e.target.value)}
-                  placeholder="Job title"
+                  value={ref.position}
+                  onChange={(e) => {
+                    const newRefs = [...(localData.references || [])];
+                    newRefs[index] = { ...ref, position: e.target.value };
+                    setLocalData({ ...localData, references: newRefs });
+                  }}
+                  placeholder="e.g., Senior Manager"
                 />
               </div>
               <div>
                 <Label>Company</Label>
                 <Input
-                  value={reference.company || ''}
-                  onChange={(e) => updateReferenceItem(index, 'company', e.target.value)}
-                  placeholder="Company name"
+                  value={ref.company}
+                  onChange={(e) => {
+                    const newRefs = [...(localData.references || [])];
+                    newRefs[index] = { ...ref, company: e.target.value };
+                    setLocalData({ ...localData, references: newRefs });
+                  }}
+                  placeholder="e.g., Google Inc."
                 />
               </div>
               <div>
                 <Label>Email</Label>
                 <Input
-                  value={reference.email || ''}
-                  onChange={(e) => updateReferenceItem(index, 'email', e.target.value)}
-                  placeholder="Email address"
+                  type="email"
+                  value={ref.email}
+                  onChange={(e) => {
+                    const newRefs = [...(localData.references || [])];
+                    newRefs[index] = { ...ref, email: e.target.value };
+                    setLocalData({ ...localData, references: newRefs });
+                  }}
+                  placeholder="john.smith@company.com"
                 />
               </div>
-              <div className="col-span-2">
+              <div>
                 <Label>Phone</Label>
                 <Input
-                  value={reference.phone || ''}
-                  onChange={(e) => updateReferenceItem(index, 'phone', e.target.value)}
-                  placeholder="Phone number"
+                  value={ref.phone}
+                  onChange={(e) => {
+                    const newRefs = [...(localData.references || [])];
+                    newRefs[index] = { ...ref, phone: e.target.value };
+                    setLocalData({ ...localData, references: newRefs });
+                  }}
+                  placeholder="+1 (555) 123-4567"
                 />
               </div>
             </div>
-          </div>
-        ))}
-        <Button onClick={addReferenceItem} variant="outline" className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Reference
-        </Button>
-      </div>
-    );
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.references || localData.references.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No references added yet.</p>
+          <p className="text-sm">Click "Add Reference" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderCustomSections = () => {
+    // Add custom sections here
   };
 
-  const renderForm = () => {
+  const renderContent = () => {
     switch (sectionType) {
       case 'personalInfo':
-        return renderPersonalInfoForm();
+        return renderPersonalInfoSection();
       case 'experience':
-        return renderExperienceForm();
+        return renderExperienceSection();
       case 'education':
-        return renderEducationForm();
+        return renderEducationSection();
       case 'skills':
-        return renderSkillsForm();
+        return renderSkillsSection();
       case 'projects':
-        return renderProjectsForm();
+        return renderProjectsSection();
       case 'references':
-        return renderReferencesForm();
+        return renderReferencesSection();
       default:
-        return <p>Section editing coming soon...</p>;
+        return <div>Section not found</div>;
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            Edit {sectionTitle}
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogTitle>
+          <DialogTitle>Edit {sectionTitle}</DialogTitle>
+          <DialogDescription>
+            Update your {sectionTitle.toLowerCase()} information. Use the AI Generate buttons to create professional content automatically.
+          </DialogDescription>
         </DialogHeader>
+        
         <div className="py-4">
-          {renderForm()}
+          {renderContent()}
         </div>
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        
+        <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600">
-            <Save className="h-4 w-4 mr-2" />
+          <Button onClick={handleSave}>
             Save Changes
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
