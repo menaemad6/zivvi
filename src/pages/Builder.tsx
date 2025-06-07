@@ -1,1181 +1,544 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Loader2, Sparkles, Target, Search } from "lucide-react";
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target } from 'lucide-react';
-import { SidebarSection } from '@/components/builder/SidebarSection';
-import { CVSection } from '@/components/builder/CVSection';
-import { SectionEditModal } from '@/components/builder/SectionEditModal';
-import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
-import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
-import { cvTemplates } from '@/data/templates';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { Navbar } from '@/components/layout/Navbar';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
+import { AIJobMatchAnalyzer } from '@/components/builder/AIJobMatchAnalyzer';
 
-const Builder = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { cvData, setCVData, isLoading, isSaving, cvExists, saveCV, updateCVMetadata } = useCV(id);
-  
-  // Check if CV exists and redirect if not
-  useEffect(() => {
-    if (cvExists === false) {
-      toast({
-        title: "CV Not Found",
-        description: "The requested CV could not be found or you don't have access to it.",
-        variant: "destructive"
-      });
-      navigate('/dashboard');
-    }
-  }, [cvExists, navigate]);
-
-  const [draggedSection, setDraggedSection] = useState<string | null>(null);
-  // Start with empty sections for new CVs
-  const [cvSections, setCVSections] = useState<string[]>([]);
+export default function Builder() {
+  const [cvId, setCvId] = useState<string | undefined>('new');
+  const { cvData, setCVData, isLoading, isSaving, cvExists, saveCV, updateCVMetadata } = useCV(cvId);
+  const [activeSections, setActiveSections] = useState<string[]>(['personalInfo']);
   const [deletedSections, setDeletedSections] = useState<string[]>([]);
-  const [currentTemplate, setCurrentTemplate] = useState('modern');
-  const [cvMetadata, setCVMetadata] = useState({ name: '', description: '' });
-  const [editModal, setEditModal] = useState<{
-    isOpen: boolean;
-    sectionType: string;
-    sectionTitle: string;
-  }>({
-    isOpen: false,
-    sectionType: '',
-    sectionTitle: ''
-  });
-  const [settingsModal, setSettingsModal] = useState(false);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [undoStack, setUndoStack] = useState<CVData[]>([]);
-  const [redoStack, setRedoStack] = useState<CVData[]>([]);
-  const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
-  const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
-  const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const [showOptimizer, setShowOptimizer] = useState(false);
+  const [showResumeEnhancer, setShowResumeEnhancer] = useState(false);
+  const [showJobMatchAnalyzer, setShowJobMatchAnalyzer] = useState(false);
 
   useEffect(() => {
-    if (cvData && id && id !== 'new') {
-      fetchCVMetadata();
-      fetchCVTemplate();
-      
-      // Load sections configuration from database
-      const content = cvData as any;
-      if (content._deletedSections && Array.isArray(content._deletedSections)) {
-        setDeletedSections(content._deletedSections);
-      }
-      
-      // For existing CVs, determine active sections based on actual content and saved sections
-      if (content._sections && Array.isArray(content._sections)) {
-        setCVSections(content._sections);
-      } else {
-        // Determine sections based on actual content
-        const activeSections: string[] = [];
-        
-        // Always include personalInfo as it should always be present
-        if (cvData.personalInfo && (cvData.personalInfo.fullName || cvData.personalInfo.email)) {
-          activeSections.push('personalInfo');
-        }
-        
-        // Only include sections that have actual content
-        if (cvData.experience && cvData.experience.length > 0) {
-          activeSections.push('experience');
-        }
-        if (cvData.education && cvData.education.length > 0) {
-          activeSections.push('education');
-        }
-        if (cvData.skills && cvData.skills.length > 0) {
-          activeSections.push('skills');
-        }
-        if (cvData.projects && cvData.projects.length > 0) {
-          activeSections.push('projects');
-        }
-        if (cvData.references && cvData.references.length > 0) {
-          activeSections.push('references');
-        }
-        
-        setCVSections(activeSections);
-      }
-    } else if (id === 'new') {
-      // For new CVs, start completely empty except personalInfo
-      setCVSections(['personalInfo']);
-      setDeletedSections([]);
+    // Load active sections from local storage or default to ['personalInfo']
+    const storedActiveSections = localStorage.getItem('activeSections');
+    if (storedActiveSections) {
+      setActiveSections(JSON.parse(storedActiveSections));
     }
-  }, [cvData, id]);
+  }, []);
 
-  // Auto-save preview data whenever cvData changes
   useEffect(() => {
-    if (cvData && id && id !== 'new') {
-      localStorage.setItem('previewCVData', JSON.stringify({
-        cvData,
-        template: currentTemplate,
-        sections: cvSections,
-        cvId: id
-      }));
-    }
-  }, [cvData, currentTemplate, cvSections, id]);
+    // Save active sections to local storage whenever they change
+    localStorage.setItem('activeSections', JSON.stringify(activeSections));
+  }, [activeSections]);
 
-  const fetchCVMetadata = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('cvs')
-        .select('name, description')
-        .eq('id', id)
-        .single();
+  const toggleSection = (section: string) => {
+    const isActive = activeSections.includes(section);
+    let updatedSections = [...activeSections];
 
-      if (error) throw error;
-      if (data) {
-        setCVMetadata({ 
-          name: data.name || '', 
-          description: data.description || '' 
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching CV metadata:', error);
-    }
-  };
-
-  const fetchCVTemplate = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('cvs')
-        .select('template')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      if (data?.template) {
-        setCurrentTemplate(data.template);
-      }
-    } catch (error) {
-      console.error('Error fetching template:', error);
-    }
-  };
-
-  const handleDownload = () => {
-    const input = document.getElementById('cv-content');
-    if (input) {
-      html2canvas(input, { scale: 2, useCORS: true })
-        .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          const fileName = cvMetadata.name ? `${cvMetadata.name}.pdf` : 'cv.pdf';
-          pdf.save(fileName);
-        });
-    }
-  };
-
-  const handleShare = async () => {
-    if (!id || id === 'new') {
-      toast({
-        title: "Save CV First",
-        description: "Please save your CV before sharing.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const shareUrl = `${window.location.origin}/preview/${id}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: cvMetadata.name || 'My CV',
-          text: 'Check out my CV',
-          url: shareUrl,
-        });
-      } catch (error) {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: "Link Copied",
-          description: "CV link has been copied to clipboard."
-        });
-      }
+    if (isActive) {
+      updatedSections = updatedSections.filter(s => s !== section);
+      setDeletedSections(prev => [...prev, section]);
     } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast({
-        title: "Link Copied",
-        description: "CV link has been copied to clipboard."
-      });
+      updatedSections.push(section);
+      setDeletedSections(prev => prev.filter(s => s !== section));
     }
+
+    setActiveSections(updatedSections);
   };
 
-  const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const importedData = JSON.parse(e.target?.result as string);
-            if (importedData && typeof importedData === 'object') {
-              setCVData(importedData);
-              toast({
-                title: "Data Imported",
-                description: "CV data has been imported successfully."
-              });
-            }
-          } catch (error) {
-            toast({
-              title: "Import Failed",
-              description: "Invalid file format.",
-              variant: "destructive"
-            });
-          }
-        };
-        reader.readAsText(file);
+  const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setCVData(prev => ({
+      ...prev,
+      personalInfo: {
+        ...prev?.personalInfo,
+        [name]: value
       }
-    };
-    input.click();
-  };
-
-  const handleExport = () => {
-    if (!cvData) {
-      toast({
-        title: "No Data",
-        description: "No CV data to export.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const dataToExport = {
-      ...cvData,
-      template: currentTemplate,
-      sections: cvSections,
-      metadata: cvMetadata
-    };
-
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${cvMetadata.name || 'cv-data'}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: "Data Exported",
-      description: "CV data has been exported successfully."
-    });
-  };
-
-  const handleAIAssist = () => {
-    setAIAssistantOpen(true);
-  };
-
-  const handleAIOptimizer = () => {
-    setAIOptimizerOpen(true);
-  };
-
-  const handleAIEnhancer = () => {
-    setAIEnhancerOpen(true);
-  };
-
-  const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
-    // Save current state to history
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    
-    // Update CV data
-    setCVData(updatedCVData);
-    
-    // Add new sections to the CV structure if they're not already there
-    const sectionsToAdd = newSectionIds.filter(sectionId => !cvSections.includes(sectionId));
-    if (sectionsToAdd.length > 0) {
-      setCVSections(prev => [...prev, ...sectionsToAdd]);
-    }
-    
-    // Auto-save the changes
-    if (updatedCVData) {
-      saveCV(updatedCVData, deletedSections, [...cvSections, ...sectionsToAdd]);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600">Loading CV Builder...</p>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  if (id === 'new') {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <Card className="w-full max-w-md bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Choose a Template</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 mb-6 text-lg">
-                Please select a template first to start building your CV.
-              </p>
-              <Button 
-                onClick={() => navigate('/templates')} 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                Browse Templates
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (!cvData || cvExists === false) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">CV not found</h2>
-            <Button 
-              onClick={() => navigate('/dashboard')} 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Back to Dashboard
-            </Button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  const currentTemplateInfo = cvTemplates.find(t => t.id === currentTemplate);
-
-  // All available sections - these are always shown in the sidebar if not in the CV structure
-  const allSections = [
-    { id: 'personalInfo', title: 'Personal Info', icon: <User className="h-5 w-5" />, description: 'Your basic information' },
-    { id: 'experience', title: 'Experience', icon: <Briefcase className="h-5 w-5" />, description: 'Work history and achievements' },
-    { id: 'education', title: 'Education', icon: <GraduationCap className="h-5 w-5" />, description: 'Academic background' },
-    { id: 'skills', title: 'Skills', icon: <Award className="h-5 w-5" />, description: 'Technical and soft skills' },
-    { id: 'projects', title: 'Projects', icon: <FileText className="h-5 w-5" />, description: 'Portfolio and projects' },
-    { id: 'references', title: 'References', icon: <Users className="h-5 w-5" />, description: 'Professional references' }
-  ];
-
-  // Available sections are those not currently in the CV structure and not deleted
-  const availableSections = allSections.filter(section => 
-    !cvSections.includes(section.id) && !deletedSections.includes(section.id)
-  );
-
-  const getTemplateStyles = (templateId: string) => {
-    const styles = {
-      modern: {
-        bgGradient: 'from-blue-50 to-cyan-50',
-        accentColor: 'text-blue-600',
-        borderColor: 'border-blue-200',
-        buttonColor: 'bg-blue-500 hover:bg-blue-600'
-      },
-      classic: {
-        bgGradient: 'from-gray-50 to-slate-50',
-        accentColor: 'text-slate-700',
-        borderColor: 'border-slate-300',
-        buttonColor: 'bg-slate-600 hover:bg-slate-700'
-      },
-      creative: {
-        bgGradient: 'from-purple-50 to-pink-50',
-        accentColor: 'text-purple-600',
-        borderColor: 'border-purple-200',
-        buttonColor: 'bg-purple-500 hover:bg-purple-600'
-      },
-      minimal: {
-        bgGradient: 'from-gray-50 to-white',
-        accentColor: 'text-gray-700',
-        borderColor: 'border-gray-200',
-        buttonColor: 'bg-gray-500 hover:bg-gray-600'
-      },
-      executive: {
-        bgGradient: 'from-slate-900 to-gray-900',
-        accentColor: 'text-yellow-400',
-        borderColor: 'border-yellow-200',
-        buttonColor: 'bg-yellow-600 hover:bg-yellow-700'
-      },
-      tech: {
-        bgGradient: 'from-emerald-50 to-teal-50',
-        accentColor: 'text-emerald-600',
-        borderColor: 'border-emerald-200',
-        buttonColor: 'bg-emerald-500 hover:bg-emerald-600'
-      },
-      artistic: {
-        bgGradient: 'from-orange-50 to-red-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      },
-      corporate: {
-        bgGradient: 'from-indigo-50 to-blue-50',
-        accentColor: 'text-indigo-600',
-        borderColor: 'border-indigo-200',
-        buttonColor: 'bg-indigo-500 hover:bg-indigo-600'
-      },
-      startup: {
-        bgGradient: 'from-orange-50 to-amber-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      }
-    };
-    
-    return styles[templateId as keyof typeof styles] || styles.modern;
-  };
-
-  const templateStyle = getTemplateStyles(currentTemplate);
-
-  const saveToHistory = (data: CVData) => {
-    setUndoStack(prev => [...prev.slice(-9), data]);
-    setRedoStack([]);
-  };
-
-  const handleUndo = () => {
-    if (undoStack.length > 0 && cvData) {
-      const previousState = undoStack[undoStack.length - 1];
-      setRedoStack(prev => [cvData, ...prev.slice(0, 9)]);
-      setUndoStack(prev => prev.slice(0, -1));
-      setCVData(previousState);
-    }
-  };
-
-  const handleRedo = () => {
-    if (redoStack.length > 0) {
-      const nextState = redoStack[0];
-      if (cvData) {
-        setUndoStack(prev => [...prev.slice(-9), cvData]);
-      }
-      setRedoStack(prev => prev.slice(1));
-      setCVData(nextState);
-    }
-  };
-
-  const handleDragStart = (e: React.DragEvent, sectionId: string) => {
-    console.log('Drag start:', sectionId);
-    setDraggedSection(sectionId);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', sectionId);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index?: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (typeof index === 'number') {
-      setDragOverIndex(index);
-    }
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOverIndex(null);
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex?: number) => {
-    e.preventDefault();
-    console.log('Drop event:', { draggedSection, targetIndex });
-    setDragOverIndex(null);
-    
-    if (!draggedSection) return;
-
-    if (typeof targetIndex === 'number') {
-      // Reordering existing sections
-      const currentIndex = cvSections.indexOf(draggedSection);
-      if (currentIndex !== -1 && currentIndex !== targetIndex) {
-        console.log('Reordering sections from', currentIndex, 'to', targetIndex);
-        const newSections = [...cvSections];
-        newSections.splice(currentIndex, 1);
-        newSections.splice(targetIndex, 0, draggedSection);
-        setCVSections(newSections);
-        toast({
-          title: "Section Reordered",
-          description: "Section order has been updated."
-        });
-      }
-    } else {
-      // Adding new section from sidebar
-      if (!cvSections.includes(draggedSection)) {
-        console.log('Adding new section:', draggedSection);
-        setCVSections([...cvSections, draggedSection]);
-        toast({
-          title: "Section Added",
-          description: "New section has been added to your CV."
-        });
-      }
-    }
-    setDraggedSection(null);
-  };
-
-  const handleSectionEdit = (sectionId: string) => {
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    const section = allSections.find(s => s.id === sectionId);
-    if (section) {
-      setEditModal({
-        isOpen: true,
-        sectionType: sectionId,
-        sectionTitle: section.title
-      });
-    }
-  };
-
-  const handleSectionDelete = (sectionId: string) => {
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    const baseId = sectionId.split('_')[0];
-    
-    // Don't allow deleting personalInfo
-    if (baseId === 'personalInfo') {
-      toast({
-        title: "Cannot Delete",
-        description: "Personal Info section cannot be deleted.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Remove from CV structure
-    setCVSections(cvSections.filter(id => id !== sectionId));
-    
-    // Add to deleted sections to persist the deletion
-    const newDeletedSections = [...deletedSections, baseId];
-    setDeletedSections(newDeletedSections);
-    
-    // Save to database immediately
-    if (cvData) {
-      saveCV(cvData, newDeletedSections, cvSections.filter(id => id !== sectionId));
-    }
-    
-    toast({
-      title: "Section Removed",
-      description: "Section has been permanently removed from your CV."
-    });
-  };
-
-  const handleSave = async () => {
-    if (!cvData) return;
-    
-    // Ensure data integrity before saving
-    const sanitizedData: CVData = {
-      personalInfo: cvData.personalInfo || {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        summary: ''
-      },
-      experience: Array.isArray(cvData.experience) ? cvData.experience : [],
-      education: Array.isArray(cvData.education) ? cvData.education : [],
-      skills: Array.isArray(cvData.skills) ? cvData.skills : [],
-      projects: Array.isArray(cvData.projects) ? cvData.projects : [],
-      references: Array.isArray(cvData.references) ? cvData.references : []
-    };
-    
-    try {
-      await saveCV(sanitizedData, deletedSections, cvSections);
-      setCVData(sanitizedData);
-    } catch (error) {
-      console.error('Save error:', error);
-    }
-  };
-
-  const handlePreview = () => {
-    if (!cvData) {
-      toast({
-        title: "Error",
-        description: "Cannot preview CV. Please save your changes first.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Save CV data to localStorage for preview with CV ID
-    localStorage.setItem('previewCVData', JSON.stringify({
-      cvData,
-      template: currentTemplate,
-      sections: cvSections,
-      cvId: id !== 'new' ? id : undefined
     }));
-    
-    // Navigate to preview page
-    if (id && id !== 'new') {
-      navigate(`/preview/${id}`);
-    } else {
-      navigate('/preview');
-    }
   };
 
-  const handleModalSave = (updatedData: CVData) => {
-    console.log('Modal save:', updatedData);
-    
-    // Ensure all array fields exist and are properly structured
-    const sanitizedData: CVData = {
-      personalInfo: updatedData.personalInfo || {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        summary: ''
-      },
-      experience: Array.isArray(updatedData.experience) ? updatedData.experience : [],
-      education: Array.isArray(updatedData.education) ? updatedData.education : [],
-      skills: Array.isArray(updatedData.skills) ? updatedData.skills : [],
-      projects: Array.isArray(updatedData.projects) ? updatedData.projects : [],
-      references: Array.isArray(updatedData.references) ? updatedData.references : []
-    };
-    
-    setCVData(sanitizedData);
-    
-    // Update localStorage immediately for preview sync
-    if (id && id !== 'new') {
-      localStorage.setItem('previewCVData', JSON.stringify({
-        cvData: sanitizedData,
-        template: currentTemplate,
-        sections: cvSections,
-        cvId: id
-      }));
-    }
-    
-    // Auto-save to database
-    if (sanitizedData) {
-      saveCV(sanitizedData, deletedSections, cvSections);
-    }
-    
-    toast({
-      title: "Changes Applied",
-      description: "Section updated and saved successfully!",
+  const handleExperienceChange = (index: number, field: string, value: string) => {
+    setCVData(prev => {
+      const updatedExperience = [...prev.experience];
+      updatedExperience[index] = {
+        ...updatedExperience[index],
+        [field]: value
+      };
+      return { ...prev, experience: updatedExperience };
     });
   };
 
-  const renderSectionContent = (sectionId: string): React.ReactNode => {
-    if (!cvData) return null;
+  const addExperience = () => {
+    setCVData(prev => ({
+      ...prev,
+      experience: [...prev.experience, { title: '', company: '', location: '', startDate: '', endDate: '', description: '' }]
+    }));
+  };
 
-    const baseId = sectionId.split('_')[0];
-    
-    switch (baseId) {
-      case 'personalInfo':
-        return (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              <strong>Name:</strong> {cvData.personalInfo?.fullName || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Email:</strong> {cvData.personalInfo?.email || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Phone:</strong> {cvData.personalInfo?.phone || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Location:</strong> {cvData.personalInfo?.location || 'Not provided'}
-            </p>
-            {cvData.personalInfo?.summary && (
-              <p className="text-sm text-gray-600">
-                <strong>Summary:</strong> {cvData.personalInfo.summary}
-              </p>
-            )}
-          </div>
-        );
-      
-      case 'experience':
-        return (
-          <div className="space-y-3">
-            {cvData.experience && cvData.experience.length > 0 ? (
-              cvData.experience.map((exp) => (
-                <div key={exp.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{exp.title}</h4>
-                  <p className="text-sm text-gray-600">{exp.company}</p>
-                  <p className="text-xs text-gray-500">
-                    {exp.startDate} - {exp.endDate || 'Present'}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No experience added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'education':
-        return (
-          <div className="space-y-3">
-            {cvData.education && cvData.education.length > 0 ? (
-              cvData.education.map((edu) => (
-                <div key={edu.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{edu.degree}</h4>
-                  <p className="text-sm text-gray-600">{edu.school}</p>
-                  <p className="text-xs text-gray-500">
-                    {edu.startDate} - {edu.endDate}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No education added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'skills':
-        return (
-          <div className="space-y-2">
-            {cvData.skills && cvData.skills.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {cvData.skills.map((skill, index) => (
-                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No skills added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'projects':
-        return (
-          <div className="space-y-3">
-            {cvData.projects && cvData.projects.length > 0 ? (
-              cvData.projects.map((project) => (
-                <div key={project.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{project.name}</h4>
-                  <p className="text-sm text-gray-600">{project.technologies}</p>
-                  <p className="text-xs text-gray-500">
-                    {project.startDate} - {project.endDate || 'Present'}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No projects added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'references':
-        return (
-          <div className="space-y-3">
-            {cvData.references && cvData.references.length > 0 ? (
-              cvData.references.map((reference) => (
-                <div key={reference.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{reference.name}</h4>
-                  <p className="text-sm text-gray-600">
-                    {reference.position} at {reference.company}
-                  </p>
-                  <p className="text-xs text-gray-500">{reference.email}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No references added yet</p>
-            )}
-          </div>
-        );
-      
-      default:
-        return <p className="text-sm text-gray-500">Section content</p>;
-    }
+  const removeExperience = (index: number) => {
+    setCVData(prev => {
+      const updatedExperience = [...prev.experience];
+      updatedExperience.splice(index, 1);
+      return { ...prev, experience: updatedExperience };
+    });
+  };
+
+  const handleEducationChange = (index: number, field: string, value: string) => {
+    setCVData(prev => {
+      const updatedEducation = [...prev.education];
+      updatedEducation[index] = {
+        ...updatedEducation[index],
+        [field]: value
+      };
+      return { ...prev, education: updatedEducation };
+    });
+  };
+
+  const addEducation = () => {
+    setCVData(prev => ({
+      ...prev,
+      education: [...prev.education, { institution: '', degree: '', location: '', startDate: '', endDate: '', description: '' }]
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    setCVData(prev => {
+      const updatedEducation = [...prev.education];
+      updatedEducation.splice(index, 1);
+      return { ...prev, education: updatedEducation };
+    });
+  };
+
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const skills = e.target.value.split(',').map(s => s.trim());
+    setCVData(prev => ({ ...prev, skills: skills }));
+  };
+
+  const handleProjectsChange = (index: number, field: string, value: string) => {
+    setCVData(prev => {
+      const updatedProjects = [...prev.projects];
+      updatedProjects[index] = {
+        ...updatedProjects[index],
+        [field]: value
+      };
+      return { ...prev, projects: updatedProjects };
+    });
+  };
+
+  const addProject = () => {
+    setCVData(prev => ({
+      ...prev,
+      projects: [...prev.projects, { name: '', description: '', link: '' }]
+    }));
+  };
+
+  const removeProject = (index: number) => {
+    setCVData(prev => {
+      const updatedProjects = [...prev.projects];
+      updatedProjects.splice(index, 1);
+      return { ...prev, projects: updatedProjects };
+    });
+  };
+
+  const handleReferencesChange = (index: number, field: string, value: string) => {
+    setCVData(prev => {
+      const updatedReferences = [...prev.references];
+      updatedReferences[index] = {
+        ...updatedReferences[index],
+        [field]: value
+      };
+      return { ...prev, references: updatedReferences };
+    });
+  };
+
+  const addReference = () => {
+    setCVData(prev => ({
+      ...prev,
+      references: [...prev.references, { name: '', position: '', company: '', email: '', phone: '' }]
+    }));
+  };
+
+  const removeReference = (index: number) => {
+    setCVData(prev => {
+      const updatedReferences = [...prev.references];
+      updatedReferences.splice(index, 1);
+      return { ...prev, references: updatedReferences };
+    });
+  };
+
+  const handleCVUpdate = (updatedData: CVData) => {
+    setCVData(updatedData);
+    saveCV(updatedData, deletedSections, activeSections);
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
-        {/* Enhanced Header */}
-        <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-lg">
-          <div className="container mx-auto py-6 px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate('/dashboard')}
-                  className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back
-                </Button>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                    <Zap className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      {cvMetadata.name || 'CV Builder Pro'}
-                    </h1>
-                    {currentTemplateInfo && (
-                      <div className="flex items-center gap-3 mt-2">
-                        <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-1">
-                          {currentTemplateInfo.name}
-                        </Badge>
-                        <Badge variant="outline" className="border-2 border-gray-200 px-3 py-1">
-                          {currentTemplateInfo.category}
-                        </Badge>
-                      </div>
-                    )}
+    <div className="min-h-screen bg-background">
+      <div className="bg-secondary py-4">
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>SC</AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium">shadcn</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm">Download</Button>
+            <Button size="sm">Save</Button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">CV Builder</h1>
+            <p className="text-muted-foreground">Create and customize your professional CV</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowJobMatchAnalyzer(true)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              Job Match Analyzer
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowResumeEnhancer(true)}
+              className="bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-700 hover:to-purple-700"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              AI Enhancer
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowOptimizer(true)}
+              className="bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700"
+            >
+              <Target className="h-4 w-4 mr-2" />
+              AI Optimizer
+            </Button>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="outline">Sections</Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Toggle Sections</DrawerTitle>
+                  <DrawerDescription>
+                    Enable or disable sections to customize your CV layout.
+                  </DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="personalInfo">Personal Information</Label>
+                      <Switch id="personalInfo" checked={activeSections.includes('personalInfo')} onCheckedChange={() => toggleSection('personalInfo')} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="experience">Experience</Label>
+                      <Switch id="experience" checked={activeSections.includes('experience')} onCheckedChange={() => toggleSection('experience')} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="education">Education</Label>
+                      <Switch id="education" checked={activeSections.includes('education')} onCheckedChange={() => toggleSection('education')} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="skills">Skills</Label>
+                      <Switch id="skills" checked={activeSections.includes('skills')} onCheckedChange={() => toggleSection('skills')} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="projects">Projects</Label>
+                      <Switch id="projects" checked={activeSections.includes('projects')} onCheckedChange={() => toggleSection('projects')} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="references">References</Label>
+                      <Switch id="references" checked={activeSections.includes('references')} onCheckedChange={() => toggleSection('references')} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline"
-                  onClick={handleUndo}
-                  disabled={undoStack.length === 0}
-                  size="sm"
-                  title="Undo"
-                  className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                >
-                  <Undo className="h-4 w-4" />
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={handleRedo}
-                  disabled={redoStack.length === 0}
-                  size="sm"
-                  title="Redo"
-                  className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                >
-                  <Redo className="h-4 w-4" />
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  onClick={() => setSettingsModal(true)}
-                  size="sm"
-                  title="CV Settings"
-                  className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  onClick={handleImportData}
-                  size="sm"
-                  title="Import Data"
-                  className="border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 rounded-xl transition-all duration-300"
-                >
-                  <Import className="h-4 w-4" />
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  onClick={handleAIOptimizer}
-                  size="sm"
-                  title="AI CV Optimizer"
-                  className="border-2 border-gray-200 hover:border-orange-500 hover:bg-orange-50 rounded-xl transition-all duration-300"
-                >
-                  <Target className="h-4 w-4 mr-2" />
-                  AI Optimize
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  onClick={handleAIEnhancer}
-                  size="sm"
-                  title="AI Resume Enhancer"
-                  className="border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 rounded-xl transition-all duration-300"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  AI Enhance
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  onClick={handleAIAssist}
-                  size="sm"
-                  title="AI Smart Generator"
-                  className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
-                >
-                  <Wand2 className="h-4 w-4 mr-2" />
-                  AI Generate
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={handlePreview}
-                  className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={handleShare}
-                  className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={handleExport}
-                  className="border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 rounded-xl transition-all duration-300"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-                
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving} 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Saving...' : 'Save CV'}
-                </Button>
-              </div>
-            </div>
+                <DrawerFooter>
+                  <DrawerClose>Close</DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
           </div>
         </div>
 
-        <div className="container mx-auto py-12 px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-            {/* Enhanced Sidebar */}
-            <div className="lg:col-span-1">
-              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                      <Palette className="h-5 w-5 text-white" />
-                    </div>
-                    <CardTitle className="text-xl font-bold text-gray-900">Add Sections</CardTitle>
-                  </div>
-                  <p className="text-sm text-gray-500">Drag sections to your CV</p>
+        {isLoading ? (
+          <div className="text-center py-8">
+            <Loader2 className="h-6 w-6 text-muted-foreground animate-spin mx-auto mb-2" />
+            Loading CV data...
+          </div>
+        ) : cvExists === false ? (
+          <div className="text-center py-8">
+            CV not found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Personal Information */}
+            {activeSections.includes('personalInfo') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Personal Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {availableSections.map((section) => (
-                    <div key={section.id} className="group">
-                      <SidebarSection
-                        title={section.title}
-                        icon={section.icon}
-                        onDragStart={(e) => handleDragStart(e, section.id)}
-                      />
-                      <p className="text-xs text-gray-400 mt-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {section.description}
-                      </p>
-                    </div>
-                  ))}
-                  
-                  {availableSections.length === 0 && (
-                    <div className="text-center py-6">
-                      <div className="w-12 h-12 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
-                        <Award className="h-6 w-6 text-white" />
-                      </div>
-                      <p className="text-sm text-gray-500 font-medium">All sections added!</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Enhanced CV Builder Area */}
-            <div className="lg:col-span-2">
-              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl">
-                <CardHeader className="border-b border-gray-100">
-                  <div className="flex items-center justify-between">
+                <CardContent className="grid gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
-                      <p className="text-gray-600 mt-2">
-                        Drag to reorder • Click to edit content
-                      </p>
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input type="text" id="fullName" name="fullName" value={cvData?.personalInfo?.fullName || ''} onChange={handlePersonalInfoChange} />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-2">
-                        {cvSections.length} sections
-                      </Badge>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => navigate('/templates')}
-                        className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                      >
-                        <Layout className="h-4 w-4 mr-2" />
-                        Change Template
-                      </Button>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input type="email" id="email" name="email" value={cvData?.personalInfo?.email || ''} onChange={handlePersonalInfoChange} />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input type="tel" id="phone" name="phone" value={cvData?.personalInfo?.phone || ''} onChange={handlePersonalInfoChange} />
+                    </div>
+                    <div>
+                      <Label htmlFor="location">Location</Label>
+                      <Input type="text" id="location" name="location" value={cvData?.personalInfo?.location || ''} onChange={handlePersonalInfoChange} />
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <div 
-                    className="min-h-[600px] space-y-6 p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 backdrop-blur-sm transition-all duration-300 hover:border-blue-300"
-                    onDragOver={(e) => handleDragOver(e)}
-                    onDrop={(e) => handleDrop(e)}
-                    onDragLeave={handleDragLeave}
-                  >
-                    {cvSections.map((sectionId, index) => {
-                      const baseId = sectionId.split('_')[0];
-                      const section = allSections.find(s => s.id === baseId);
-                      const isDragOver = dragOverIndex === index;
-                      
-                      return (
-                        <div key={sectionId}>
-                          {isDragOver && draggedSection && (
-                            <div className="h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mb-6 animate-pulse shadow-lg" />
-                          )}
-                          {section ? (
-                            <div
-                              onDragOver={(e) => handleDragOver(e, index)}
-                              onDrop={(e) => handleDrop(e, index)}
-                              onDragLeave={handleDragLeave}
-                            >
-                              <CVSection
-                                title={section.title}
-                                onEdit={() => handleSectionEdit(baseId)}
-                                onDelete={() => handleSectionDelete(sectionId)}
-                                onDragStart={(e) => handleDragStart(e, sectionId)}
-                              >
-                                {renderSectionContent(sectionId)}
-                              </CVSection>
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    })}
-                    
-                    {cvSections.length === 0 && (
-                      <div className="text-center py-24">
-                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-8 shadow-xl">
-                          <Plus className="h-12 w-12 text-white" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                          Start Building Your CV
-                        </h3>
-                        <p className="text-gray-600 text-lg max-w-md mx-auto">
-                          Drag sections from the sidebar to begin creating your professional CV
-                        </p>
-                      </div>
-                    )}
+                  <div>
+                    <Label htmlFor="summary">Summary</Label>
+                    <Textarea id="summary" name="summary" value={cvData?.personalInfo?.summary || ''} onChange={handlePersonalInfoChange} />
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            )}
 
-            {/* Enhanced Preview */}
-            <div className="lg:col-span-2">
-              <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8">
-                <CardHeader className="border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                        <Eye className="h-5 w-5 text-white" />
-                      </div>
-                      <CardTitle className="text-xl font-bold text-gray-900">Live Preview</CardTitle>
-                    </div>
-                    {currentTemplateInfo && (
-                      <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-2">
-                        {currentTemplateInfo.name}
-                      </Badge>
-                    )}
-                  </div>
+            {/* Experience */}
+            {activeSections.includes('experience') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Experience</CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="bg-white rounded-2xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
-                    <div id="cv-content">
-                      {cvData && cvSections.length > 0 ? (
-                        <CVTemplateRenderer
-                          cvData={cvData}
-                          templateId={currentTemplate}
-                          sections={cvSections}
-                        />
-                      ) : (
-                        <div className="text-center text-gray-400 py-24">
-                          <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-6">
-                            <FileText className="h-10 w-10 text-gray-500" />
+                <CardContent>
+                  <div className="space-y-4">
+                    {cvData?.experience?.map((exp, index) => (
+                      <div key={index} className="border rounded-md p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`title-${index}`}>Title</Label>
+                            <Input type="text" id={`title-${index}`} value={exp.title} onChange={(e) => handleExperienceChange(index, 'title', e.target.value)} />
                           </div>
-                          <p className="text-xl font-semibold mb-3 text-gray-600">Your CV Preview</p>
-                          <p className="text-gray-500">Add sections to see your CV come to life</p>
+                          <div>
+                            <Label htmlFor={`company-${index}`}>Company</Label>
+                            <Input type="text" id={`company-${index}`} value={exp.company} onChange={(e) => handleExperienceChange(index, 'company', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`location-${index}`}>Location</Label>
+                            <Input type="text" id={`location-${index}`} value={exp.location} onChange={(e) => handleExperienceChange(index, 'location', e.target.value)} />
+                          </div>
+                          <div className="flex gap-2">
+                            <div>
+                              <Label htmlFor={`startDate-${index}`}>Start Date</Label>
+                              <Input type="date" id={`startDate-${index}`} value={exp.startDate} onChange={(e) => handleExperienceChange(index, 'startDate', e.target.value)} />
+                            </div>
+                            <div>
+                              <Label htmlFor={`endDate-${index}`}>End Date</Label>
+                              <Input type="date" id={`endDate-${index}`} value={exp.endDate} onChange={(e) => handleExperienceChange(index, 'endDate', e.target.value)} />
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        <div>
+                          <Label htmlFor={`description-${index}`}>Description</Label>
+                          <Textarea id={`description-${index}`} value={exp.description} onChange={(e) => handleExperienceChange(index, 'description', e.target.value)} />
+                        </div>
+                        <Button variant="destructive" size="sm" onClick={() => removeExperience(index)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button onClick={addExperience}>Add Experience</Button>
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            )}
+
+            {/* Education */}
+            {activeSections.includes('education') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Education</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {cvData?.education?.map((edu, index) => (
+                      <div key={index} className="border rounded-md p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`institution-${index}`}>Institution</Label>
+                            <Input type="text" id={`institution-${index}`} value={edu.institution} onChange={(e) => handleEducationChange(index, 'institution', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`degree-${index}`}>Degree</Label>
+                            <Input type="text" id={`degree-${index}`} value={edu.degree} onChange={(e) => handleEducationChange(index, 'degree', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`location-${index}`}>Location</Label>
+                            <Input type="text" id={`location-${index}`} value={edu.location} onChange={(e) => handleEducationChange(index, 'location', e.target.value)} />
+                          </div>
+                          <div className="flex gap-2">
+                            <div>
+                              <Label htmlFor={`startDate-${index}`}>Start Date</Label>
+                              <Input type="date" id={`startDate-${index}`} value={edu.startDate} onChange={(e) => handleEducationChange(index, 'startDate', e.target.value)} />
+                            </div>
+                            <div>
+                              <Label htmlFor={`endDate-${index}`}>End Date</Label>
+                              <Input type="date" id={`endDate-${index}`} value={edu.endDate} onChange={(e) => handleEducationChange(index, 'endDate', e.target.value)} />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor={`description-${index}`}>Description</Label>
+                          <Textarea id={`description-${index}`} value={edu.description} onChange={(e) => handleEducationChange(index, 'description', e.target.value)} />
+                        </div>
+                        <Button variant="destructive" size="sm" onClick={() => removeEducation(index)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button onClick={addEducation}>Add Education</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Skills */}
+            {activeSections.includes('skills') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Skills</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Label htmlFor="skills">Skills (comma-separated)</Label>
+                  <Input type="text" id="skills" value={cvData?.skills?.join(', ') || ''} onChange={handleSkillsChange} />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Projects */}
+            {activeSections.includes('projects') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Projects</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {cvData?.projects?.map((project, index) => (
+                      <div key={index} className="border rounded-md p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`name-${index}`}>Name</Label>
+                            <Input type="text" id={`name-${index}`} value={project.name} onChange={(e) => handleProjectsChange(index, 'name', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`link-${index}`}>Link</Label>
+                            <Input type="url" id={`link-${index}`} value={project.link} onChange={(e) => handleProjectsChange(index, 'link', e.target.value)} />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor={`description-${index}`}>Description</Label>
+                          <Textarea id={`description-${index}`} value={project.description} onChange={(e) => handleProjectsChange(index, 'description', e.target.value)} />
+                        </div>
+                        <Button variant="destructive" size="sm" onClick={() => removeProject(index)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button onClick={addProject}>Add Project</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* References */}
+            {activeSections.includes('references') && (
+              <Card className="col-span-1 md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>References</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {cvData?.references?.map((reference, index) => (
+                      <div key={index} className="border rounded-md p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`name-${index}`}>Name</Label>
+                            <Input type="text" id={`name-${index}`} value={reference.name} onChange={(e) => handleReferencesChange(index, 'name', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`position-${index}`}>Position</Label>
+                            <Input type="text" id={`position-${index}`} value={reference.position} onChange={(e) => handleReferencesChange(index, 'position', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`company-${index}`}>Company</Label>
+                            <Input type="text" id={`company-${index}`} value={reference.company} onChange={(e) => handleReferencesChange(index, 'company', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`email-${index}`}>Email</Label>
+                            <Input type="email" id={`email-${index}`} value={reference.email} onChange={(e) => handleReferencesChange(index, 'email', e.target.value)} />
+                          </div>
+                          <div>
+                            <Label htmlFor={`phone-${index}`}>Phone</Label>
+                            <Input type="tel" id={`phone-${index}`} value={reference.phone} onChange={(e) => handleReferencesChange(index, 'phone', e.target.value)} />
+                          </div>
+                        </div>
+                        <Button variant="destructive" size="sm" onClick={() => removeReference(index)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button onClick={addReference}>Add Reference</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        </div>
-
-        {/* AI CV Optimizer */}
-        {cvData && (
-          <AICVOptimizer
-            open={aiOptimizerOpen}
-            setOpen={setAIOptimizerOpen}
-            cvData={cvData}
-          />
-        )}
-
-        {/* AI Resume Enhancer */}
-        {cvData && (
-          <AIResumeEnhancer
-            open={aiEnhancerOpen}
-            setOpen={setAIEnhancerOpen}
-            cvData={cvData}
-            onEnhance={handleModalSave}
-          />
-        )}
-
-        {/* AI Smart Assistant */}
-        {cvData && (
-          <AISmartAssistant
-            open={aiAssistantOpen}
-            setOpen={setAIAssistantOpen}
-            onSectionsGenerated={handleAISectionsGenerated}
-            cvData={cvData}
-          />
-        )}
-
-        {/* Section Edit Modal */}
-        <SectionEditModal
-          isOpen={editModal.isOpen}
-          onClose={() => setEditModal({ ...editModal, isOpen: false })}
-          sectionType={editModal.sectionType}
-          sectionTitle={editModal.sectionTitle}
-          cvData={cvData}
-          onSave={handleModalSave}
-        />
-
-        {/* CV Settings Modal */}
-        {id && id !== 'new' && (
-          <CVSettingsModal
-            isOpen={settingsModal}
-            onClose={() => setSettingsModal(false)}
-            cvId={id}
-            currentName={cvMetadata.name}
-            currentDescription={cvMetadata.description}
-            onUpdate={updateCVMetadata}
-          />
         )}
       </div>
-    </>
-  );
-};
 
-export default Builder;
+      <AIJobMatchAnalyzer
+        open={showJobMatchAnalyzer}
+        setOpen={setShowJobMatchAnalyzer}
+        cvData={cvData}
+        onOptimize={handleCVUpdate}
+      />
+
+      <AIResumeEnhancer
+        open={showResumeEnhancer}
+        setOpen={setShowResumeEnhancer}
+        cvData={cvData}
+        onEnhance={handleCVUpdate}
+      />
+
+      <AICVOptimizer
+        open={showOptimizer}
+        setOpen={setShowOptimizer}
+        cvData={cvData}
+        onOptimize={handleCVUpdate}
+      />
+    </div>
+  );
+}
