@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +19,6 @@ interface AICVOptimizerProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   cvData: CVData;
-  onOptimize: (updatedData: CVData) => void;
 }
 
 interface OptimizationSuggestion {
@@ -29,13 +27,9 @@ interface OptimizationSuggestion {
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low';
-  actionable?: boolean;
-  section?: string;
-  currentContent?: string;
-  suggestedContent?: string;
 }
 
-export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimizerProps) {
+export function AICVOptimizer({ open, setOpen, cvData }: AICVOptimizerProps) {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
   const [analysisComplete, setAnalysisComplete] = useState(false);
@@ -56,7 +50,7 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
   };
 
   const generateOptimizationPrompt = (analysis: any, cvData: CVData) => {
-    return `Analyze this CV data and provide optimization suggestions in JSON format with actionable items:
+    return `Analyze this CV data and provide optimization suggestions in JSON format:
     
     CV Analysis:
     - Personal Info Complete: ${analysis.hasPersonalInfo}
@@ -77,15 +71,18 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
         "category": "Content|Format|Keywords|Structure",
         "title": "Brief suggestion title",
         "description": "Detailed explanation and specific action to take",
-        "priority": "high|medium|low",
-        "actionable": true|false,
-        "section": "summary|experience|skills|projects",
-        "currentContent": "current text if actionable",
-        "suggestedContent": "improved version if actionable"
+        "priority": "high|medium|low"
       }
     ]
     
-    Focus on providing actionable improvements with specific before/after content where possible.`;
+    Focus on:
+    1. Missing essential sections
+    2. Weak or missing descriptions
+    3. Lack of quantifiable achievements
+    4. Industry-specific keywords
+    5. Professional summary quality
+    6. Skills organization
+    7. Overall structure and flow`;
   };
 
   const parseOptimizationResponse = (response: string): OptimizationSuggestion[] => {
@@ -132,87 +129,6 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
     }
   };
 
-  const applySuggestion = (suggestion: OptimizationSuggestion) => {
-    if (!suggestion.actionable || !suggestion.suggestedContent) return;
-
-    const updatedCVData = { ...cvData };
-    
-    switch (suggestion.section) {
-      case 'summary':
-        if (updatedCVData.personalInfo) {
-          updatedCVData.personalInfo.summary = suggestion.suggestedContent;
-        }
-        break;
-      case 'experience':
-        if (updatedCVData.experience && suggestion.currentContent) {
-          const expIndex = updatedCVData.experience.findIndex(exp => 
-            exp.description === suggestion.currentContent
-          );
-          if (expIndex !== -1) {
-            updatedCVData.experience[expIndex].description = suggestion.suggestedContent;
-          }
-        }
-        break;
-      case 'projects':
-        if (updatedCVData.projects && suggestion.currentContent) {
-          const projIndex = updatedCVData.projects.findIndex(proj => 
-            proj.description === suggestion.currentContent
-          );
-          if (projIndex !== -1) {
-            updatedCVData.projects[projIndex].description = suggestion.suggestedContent;
-          }
-        }
-        break;
-    }
-    
-    onOptimize(updatedCVData);
-    toast({
-      title: "Suggestion Applied!",
-      description: "Your CV has been updated with the optimization."
-    });
-  };
-
-  const applyAllActionableSuggestions = () => {
-    let updatedCVData = { ...cvData };
-    const actionableSuggestions = suggestions.filter(s => s.actionable && s.suggestedContent);
-    
-    actionableSuggestions.forEach(suggestion => {
-      switch (suggestion.section) {
-        case 'summary':
-          if (updatedCVData.personalInfo) {
-            updatedCVData.personalInfo.summary = suggestion.suggestedContent!;
-          }
-          break;
-        case 'experience':
-          if (updatedCVData.experience && suggestion.currentContent) {
-            const expIndex = updatedCVData.experience.findIndex(exp => 
-              exp.description === suggestion.currentContent
-            );
-            if (expIndex !== -1) {
-              updatedCVData.experience[expIndex].description = suggestion.suggestedContent!;
-            }
-          }
-          break;
-        case 'projects':
-          if (updatedCVData.projects && suggestion.currentContent) {
-            const projIndex = updatedCVData.projects.findIndex(proj => 
-              proj.description === suggestion.currentContent
-            );
-            if (projIndex !== -1) {
-              updatedCVData.projects[projIndex].description = suggestion.suggestedContent!;
-            }
-          }
-          break;
-      }
-    });
-    
-    onOptimize(updatedCVData);
-    toast({
-      title: "All Suggestions Applied!",
-      description: `Applied ${actionableSuggestions.length} optimization suggestions to your CV.`
-    });
-  };
-
   const getSuggestionIcon = (type: string) => {
     switch (type) {
       case 'improvement':
@@ -252,11 +168,9 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
     );
   };
 
-  const actionableSuggestionsCount = suggestions.filter(s => s.actionable).length;
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-green-600 to-blue-600 flex items-center justify-center">
@@ -301,21 +215,10 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Optimization Suggestions</h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={analyzeCV}>
-                  <Target className="h-4 w-4 mr-2" />
-                  Re-analyze
-                </Button>
-                {actionableSuggestionsCount > 0 && (
-                  <Button 
-                    onClick={applyAllActionableSuggestions}
-                    size="sm"
-                    className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-                  >
-                    Apply All ({actionableSuggestionsCount})
-                  </Button>
-                )}
-              </div>
+              <Button variant="outline" size="sm" onClick={analyzeCV}>
+                <Target className="h-4 w-4 mr-2" />
+                Re-analyze
+              </Button>
             </div>
             
             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -332,36 +235,11 @@ export function AICVOptimizer({ open, setOpen, cvData, onOptimize }: AICVOptimiz
                         <Badge variant="outline" className="text-xs">
                           {suggestion.category}
                         </Badge>
-                        {suggestion.actionable && suggestion.suggestedContent && (
-                          <Button 
-                            size="sm"
-                            onClick={() => applySuggestion(suggestion)}
-                            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
-                          >
-                            Apply
-                          </Button>
-                        )}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
-                    {suggestion.actionable && suggestion.currentContent && suggestion.suggestedContent && (
-                      <div className="space-y-2 mt-3">
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 mb-1">Current:</p>
-                          <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                            {suggestion.currentContent}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 mb-1">Suggested:</p>
-                          <p className="text-sm text-gray-800 bg-green-50 p-2 rounded border-l-2 border-green-400">
-                            {suggestion.suggestedContent}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <p className="text-sm text-gray-600">{suggestion.description}</p>
                   </CardContent>
                 </Card>
               ))}
