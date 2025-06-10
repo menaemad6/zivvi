@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic, ChevronLeft, ChevronRight, Scan, PenTool, BookOpen, Languages, Globe, Camera, Lightbulb, Star, Shuffle, RefreshCw, Scissors } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -572,7 +572,8 @@ const Builder = () => {
     }
     
     // Remove from CV structure
-    setCVSections(cvSections.filter(id => id !== sectionId));
+    const newCVSections = cvSections.filter(id => id !== sectionId);
+    setCVSections(newCVSections);
     
     // Add to deleted sections to persist the deletion
     const newDeletedSections = [...deletedSections, baseId];
@@ -580,12 +581,12 @@ const Builder = () => {
     
     // Save to database immediately
     if (cvData) {
-      saveCV(cvData, newDeletedSections, cvSections.filter(id => id !== sectionId));
+      saveCV(cvData, newDeletedSections, newCVSections);
     }
     
     toast({
       title: "Section Removed",
-      description: "Section has been removed and is now available in the sidebar."
+      description: "Section has been removed and is now available in the sidebar.",
     });
   };
 
@@ -814,69 +815,200 @@ const Builder = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
         <TooltipProvider>
           <div className="min-h-screen flex w-full relative">
-            {/* Modern Collapsible Sidebar */}
+            {/* Ultra Modern Collapsible Sidebar */}
             <div 
               className={`
-                fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white/95 backdrop-blur-xl border-r border-gray-200/60 
-                shadow-2xl transition-all duration-300 ease-in-out z-30
-                ${sidebarCollapsed ? 'w-20' : 'w-80'}
+                fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white/95 backdrop-blur-2xl border-r border-gray-200/50 
+                shadow-[0_8px_32px_rgba(0,0,0,0.06)] transition-all duration-500 ease-in-out z-30 
+                before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:to-transparent before:pointer-events-none
+                ${sidebarCollapsed ? 'w-20' : 'w-96'}
               `}
             >
-              {/* Sidebar Header */}
-              <div className="p-6 border-b border-gray-100/80">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
-                    <Zap className="h-5 w-5 text-white" />
+              {/* Enhanced Sidebar Header */}
+              <div className="p-6 border-b border-gray-100/80 relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-blue-500/5 rounded-b-3xl"></div>
+                <div className="relative flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-xl ring-4 ring-white/50">
+                    <Zap className="h-6 w-6 text-white" />
                   </div>
                   {!sidebarCollapsed && (
                     <div className="animate-fade-in">
-                      <h2 className="text-lg font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      <h2 className="text-xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
                         CV Builder Pro
                       </h2>
-                      <p className="text-xs text-gray-500 font-medium">AI-Powered Tools</p>
+                      <p className="text-xs text-gray-500 font-medium mt-0.5">
+                        AI-Powered Creative Suite
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Sidebar Content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-8">
+              {/* Enhanced Sidebar Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
                 {/* AI Tools Section */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 px-2">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-white" />
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+                      <Bot className="h-5 w-5 text-white" />
                     </div>
                     {!sidebarCollapsed && (
-                      <h3 className="text-sm font-bold text-gray-700 animate-fade-in">AI Assistant Tools</h3>
+                      <div className="animate-fade-in">
+                        <h3 className="text-sm font-bold text-gray-800">AI Assistant Suite</h3>
+                        <p className="text-xs text-gray-500">Powered by advanced AI</p>
+                      </div>
                     )}
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {[
-                      { icon: Wand2, label: 'AI Generator', desc: 'Generate CV sections', action: handleAIAssist, color: 'from-purple-500 to-violet-500' },
-                      { icon: Target, label: 'CV Optimizer', desc: 'Optimize your CV', action: handleAIOptimizer, color: 'from-orange-500 to-red-500' },
-                      { icon: Sparkles, label: 'Resume Enhancer', desc: 'Enhance content', action: handleAIEnhancer, color: 'from-pink-500 to-rose-500' }
+                      { 
+                        icon: Wand2, 
+                        label: 'Smart Generator', 
+                        desc: 'Generate CV sections with AI', 
+                        action: handleAIAssist, 
+                        gradient: 'from-purple-600 via-violet-600 to-indigo-600',
+                        iconBg: 'from-purple-500 to-violet-500'
+                      },
+                      { 
+                        icon: Target, 
+                        label: 'CV Optimizer', 
+                        desc: 'Optimize for ATS & recruiters', 
+                        action: handleAIOptimizer, 
+                        gradient: 'from-orange-600 via-red-600 to-pink-600',
+                        iconBg: 'from-orange-500 to-red-500'
+                      },
+                      { 
+                        icon: Sparkles, 
+                        label: 'Content Enhancer', 
+                        desc: 'Polish and improve content', 
+                        action: handleAIEnhancer, 
+                        gradient: 'from-pink-600 via-rose-600 to-red-600',
+                        iconBg: 'from-pink-500 to-rose-500'
+                      },
+                      { 
+                        icon: Lightbulb, 
+                        label: 'Smart Suggestions', 
+                        desc: 'Get personalized tips', 
+                        action: () => toast({ title: "Coming Soon!", description: "Smart suggestions feature is in development." }), 
+                        gradient: 'from-yellow-600 via-amber-600 to-orange-600',
+                        iconBg: 'from-yellow-500 to-amber-500'
+                      },
+                      { 
+                        icon: Scan, 
+                        label: 'CV Analyzer', 
+                        desc: 'Deep analysis & scoring', 
+                        action: () => toast({ title: "Coming Soon!", description: "CV analyzer feature is in development." }), 
+                        gradient: 'from-emerald-600 via-teal-600 to-cyan-600',
+                        iconBg: 'from-emerald-500 to-teal-500'
+                      },
+                      { 
+                        icon: Languages, 
+                        label: 'Multi-Language', 
+                        desc: 'Translate to any language', 
+                        action: () => toast({ title: "Coming Soon!", description: "Multi-language support is in development." }), 
+                        gradient: 'from-blue-600 via-indigo-600 to-purple-600',
+                        iconBg: 'from-blue-500 to-indigo-500'
+                      }
                     ].map((tool, index) => (
                       <Tooltip key={index}>
                         <TooltipTrigger asChild>
                           <button
                             onClick={tool.action}
                             className={`
-                              w-full p-4 rounded-2xl bg-gradient-to-br ${tool.color} 
+                              w-full p-4 rounded-2xl bg-gradient-to-br ${tool.gradient} 
+                              hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 
+                              text-white group border border-white/20 hover:border-white/40
+                              relative overflow-hidden
+                            `}
+                          >
+                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div className="relative flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.iconBg} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                                <tool.icon className="h-5 w-5 text-white" />
+                              </div>
+                              {!sidebarCollapsed && (
+                                <div className="text-left animate-fade-in">
+                                  <div className="font-semibold text-sm">{tool.label}</div>
+                                  <div className="text-xs opacity-90 mt-0.5">{tool.desc}</div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
+                          <p className="font-medium">{tool.label}</p>
+                          <p className="text-xs text-gray-500">{tool.desc}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Productivity Tools */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
+                      <Zap className="h-5 w-5 text-white" />
+                    </div>
+                    {!sidebarCollapsed && (
+                      <div className="animate-fade-in">
+                        <h3 className="text-sm font-bold text-gray-800">Productivity Tools</h3>
+                        <p className="text-xs text-gray-500">Boost your workflow</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {[
+                      { 
+                        icon: Shuffle, 
+                        label: 'Quick Templates', 
+                        desc: 'Switch templates instantly', 
+                        action: () => navigate('/templates'),
+                        color: 'from-blue-500 to-cyan-500'
+                      },
+                      { 
+                        icon: Copy, 
+                        label: 'Duplicate CV', 
+                        desc: 'Create CV variations', 
+                        action: () => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." }),
+                        color: 'from-green-500 to-emerald-500'
+                      },
+                      { 
+                        icon: Camera, 
+                        label: 'Photo Manager', 
+                        desc: 'Add professional photos', 
+                        action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
+                        color: 'from-purple-500 to-pink-500'
+                      },
+                      { 
+                        icon: RefreshCw, 
+                        label: 'Auto-Save', 
+                        desc: 'Never lose your progress', 
+                        action: handleSave,
+                        color: 'from-orange-500 to-red-500'
+                      }
+                    ].map((tool, index) => (
+                      <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={tool.action}
+                            className={`
+                              w-full p-3 rounded-xl bg-gradient-to-r ${tool.color} 
                               hover:shadow-lg hover:scale-[1.02] transition-all duration-200 
-                              text-white group border border-white/20
+                              text-white group opacity-90 hover:opacity-100
                             `}
                           >
                             <div className="flex items-center gap-3">
-                              <tool.icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                              <tool.icon className="h-4 w-4 group-hover:scale-110 transition-transform" />
                               {!sidebarCollapsed && (
                                 <div className="text-left animate-fade-in">
                                   <div className="font-medium text-sm">{tool.label}</div>
-                                  <div className="text-xs opacity-90">{tool.desc}</div>
+                                  <div className="text-xs opacity-80">{tool.desc}</div>
                                 </div>
                               )}
                             </div>
@@ -893,15 +1025,18 @@ const Builder = () => {
                 {/* Available Sections */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 px-2">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                      <Plus className="h-4 w-4 text-white" />
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
+                      <Plus className="h-5 w-5 text-white" />
                     </div>
                     {!sidebarCollapsed && (
-                      <h3 className="text-sm font-bold text-gray-700 animate-fade-in">Add Sections</h3>
+                      <div className="animate-fade-in">
+                        <h3 className="text-sm font-bold text-gray-800">CV Sections</h3>
+                        <p className="text-xs text-gray-500">Drag to add to your CV</p>
+                      </div>
                     )}
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {availableSections.map((section) => (
                       <Tooltip key={section.id}>
                         <TooltipTrigger asChild>
@@ -910,41 +1045,43 @@ const Builder = () => {
                             onDragStart={(e) => handleDragStart(e, section.id)}
                             className="
                               p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-white 
-                              border border-gray-200/60 hover:border-blue-300/60 
-                              hover:shadow-md hover:scale-[1.02] transition-all duration-200 
+                              border-2 border-gray-200/60 hover:border-blue-400/60 
+                              hover:shadow-xl hover:scale-[1.02] transition-all duration-300 
                               cursor-grab active:cursor-grabbing group
+                              hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50
                             "
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                                 {React.cloneElement(section.icon as React.ReactElement, { 
-                                  className: "h-4 w-4 text-white" 
+                                  className: "h-5 w-5 text-white" 
                                 })}
                               </div>
                               {!sidebarCollapsed && (
                                 <div className="text-left animate-fade-in">
-                                  <div className="font-medium text-sm text-gray-900">{section.title}</div>
-                                  <div className="text-xs text-gray-500">{section.description}</div>
+                                  <div className="font-semibold text-sm text-gray-900">{section.title}</div>
+                                  <div className="text-xs text-gray-600 mt-0.5">{section.description}</div>
                                 </div>
                               )}
                             </div>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
-                          <p>{section.title}</p>
+                          <p className="font-medium">{section.title}</p>
+                          <p className="text-xs text-gray-500">{section.description}</p>
                         </TooltipContent>
                       </Tooltip>
                     ))}
                     
                     {availableSections.length === 0 && (
                       <div className="text-center py-8">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                          <Award className="h-8 w-8 text-white" />
+                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-xl">
+                          <Star className="h-8 w-8 text-white" />
                         </div>
                         {!sidebarCollapsed && (
                           <div className="animate-fade-in">
-                            <p className="text-sm text-gray-600 font-medium">All sections added!</p>
-                            <p className="text-xs text-gray-400 mt-1">Your CV is complete</p>
+                            <p className="text-sm text-gray-700 font-semibold">All sections added!</p>
+                            <p className="text-xs text-gray-500 mt-1">Your CV is complete ✨</p>
                           </div>
                         )}
                       </div>
@@ -953,54 +1090,57 @@ const Builder = () => {
                 </div>
               </div>
 
-              {/* Collapse Handle */}
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="
-                  absolute -right-4 top-1/2 transform -translate-y-1/2 
-                  w-8 h-12 bg-white border border-gray-200 rounded-r-xl 
-                  shadow-lg hover:shadow-xl transition-all duration-200 
-                  flex items-center justify-center group hover:bg-gray-50
-                  z-10
-                "
-              >
-                {sidebarCollapsed ? (
-                  <ChevronRight className="h-4 w-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
-                ) : (
-                  <ChevronLeft className="h-4 w-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
-                )}
-              </button>
+              {/* Ultra Modern Collapse Handle */}
+              <div className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-20">
+                <button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  className="
+                    w-6 h-16 bg-gradient-to-b from-violet-600 via-purple-600 to-blue-600 
+                    rounded-r-2xl shadow-2xl hover:shadow-violet-500/25 
+                    transition-all duration-300 flex items-center justify-center group 
+                    hover:w-7 border-2 border-white/20 hover:border-white/40
+                    backdrop-blur-xl
+                  "
+                >
+                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-r-2xl"></div>
+                  {sidebarCollapsed ? (
+                    <ChevronRight className="h-4 w-4 text-white group-hover:scale-110 transition-transform relative z-10" />
+                  ) : (
+                    <ChevronLeft className="h-4 w-4 text-white group-hover:scale-110 transition-transform relative z-10" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'}`}>
+            <div className={`flex-1 transition-all duration-500 ${sidebarCollapsed ? 'ml-20' : 'ml-96'}`}>
               {/* Enhanced Header */}
-              <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-lg">
-                <div className="container mx-auto py-6 px-6">
+              <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl">
+                <div className="container mx-auto py-8 px-8">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-8">
                       <Button
                         variant="outline"
                         onClick={() => navigate('/dashboard')}
-                        className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                        className="border-2 border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-2xl transition-all duration-300 px-6 py-3"
                       >
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
+                        Back to Dashboard
                       </Button>
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                          <Zap className="h-7 w-7 text-white" />
+                      <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl ring-4 ring-white/50">
+                          <Zap className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            {cvMetadata.name || 'CV Builder Pro'}
+                          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+                            {cvMetadata.name || 'Professional CV Builder'}
                           </h1>
                           {currentTemplateInfo && (
-                            <div className="flex items-center gap-3 mt-2">
-                              <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-1">
+                            <div className="flex items-center gap-4 mt-3">
+                              <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
                                 {currentTemplateInfo.name}
                               </Badge>
-                              <Badge variant="outline" className="border-2 border-gray-200 px-3 py-1">
+                              <Badge variant="outline" className="border-2 border-gray-300 px-4 py-2 text-sm">
                                 {currentTemplateInfo.category}
                               </Badge>
                             </div>
@@ -1009,80 +1149,53 @@ const Builder = () => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <Button 
-                        variant="outline"
-                        onClick={handleUndo}
-                        disabled={undoStack.length === 0}
-                        size="sm"
-                        title="Undo"
-                        className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                      >
-                        <Undo className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={handleRedo}
-                        disabled={redoStack.length === 0}
-                        size="sm"
-                        title="Redo"
-                        className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
-                      >
-                        <Redo className="h-4 w-4" />
-                      </Button>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
+                        <Button 
+                          variant="outline"
+                          onClick={handleUndo}
+                          disabled={undoStack.length === 0}
+                          size="sm"
+                          title="Undo"
+                          className="border-0 hover:bg-white rounded-xl"
+                        >
+                          <Undo className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="outline"
+                          onClick={handleRedo}
+                          disabled={redoStack.length === 0}
+                          size="sm"
+                          title="Redo"
+                          className="border-0 hover:bg-white rounded-xl"
+                        >
+                          <Redo className="h-4 w-4" />
+                        </Button>
+                      </div>
 
                       <Button 
                         variant="outline"
                         onClick={() => setSettingsModal(true)}
-                        size="sm"
-                        title="CV Settings"
-                        className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
+                        className="border-2 border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-xl px-4 py-2"
                       >
-                        <Settings className="h-4 w-4" />
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
                       </Button>
 
                       <Button 
                         variant="outline"
-                        onClick={handleImportData}
-                        size="sm"
-                        title="Import Data"
-                        className="border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 rounded-xl transition-all duration-300"
-                      >
-                        <Import className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
                         onClick={handlePreview}
-                        className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                        className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         Preview
                       </Button>
                       
                       <Button 
-                        variant="outline"
-                        onClick={handleShare}
-                        className="border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={handleExport}
-                        className="border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 rounded-xl transition-all duration-300"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Export
-                      </Button>
-                      
-                      <Button 
                         onClick={handleSave} 
                         disabled={isSaving} 
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {isSaving ? 'Saving...' : 'Save CV'}
@@ -1092,38 +1205,38 @@ const Builder = () => {
                 </div>
               </div>
 
-              <div className="container mx-auto py-12 px-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="container mx-auto py-12 px-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   {/* Enhanced CV Builder Area */}
                   <div className="lg:col-span-1">
-                    <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl">
-                      <CardHeader className="border-b border-gray-100">
+                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50">
                         <div className="flex items-center justify-between">
                           <div>
                             <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
-                            <p className="text-gray-600 mt-2">
+                            <p className="text-gray-600 mt-2 text-lg">
                               Drag to reorder • Click to edit content
                             </p>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-2">
+                          <div className="flex items-center gap-4">
+                            <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
                               {cvSections.length} sections
                             </Badge>
                             <Button 
                               variant="outline" 
                               size="sm" 
                               onClick={() => navigate('/templates')}
-                              className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                              className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
                             >
                               <Layout className="h-4 w-4 mr-2" />
-                              Change Template
+                              Templates
                             </Button>
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent className="p-8">
                         <div 
-                          className="min-h-[600px] space-y-6 p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 backdrop-blur-sm transition-all duration-300 hover:border-blue-300"
+                          className="min-h-[600px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
                           onDragOver={(e) => handleDragOver(e)}
                           onDrop={(e) => handleDrop(e)}
                           onDragLeave={handleDragLeave}
@@ -1136,7 +1249,7 @@ const Builder = () => {
                             return (
                               <div key={sectionId}>
                                 {isDragOver && draggedSection && (
-                                  <div className="h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mb-6 animate-pulse shadow-lg" />
+                                  <div className="h-4 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-6 animate-pulse shadow-xl" />
                                 )}
                                 {section ? (
                                   <div
@@ -1160,13 +1273,13 @@ const Builder = () => {
                           
                           {cvSections.length === 0 && (
                             <div className="text-center py-24">
-                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-8 shadow-xl">
-                                <Plus className="h-12 w-12 text-white" />
+                              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                                <Plus className="h-16 w-16 text-white" />
                               </div>
-                              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                              <h3 className="text-3xl font-bold text-gray-900 mb-6">
                                 Start Building Your CV
                               </h3>
-                              <p className="text-gray-600 text-lg max-w-md mx-auto">
+                              <p className="text-gray-600 text-xl max-w-md mx-auto leading-relaxed">
                                 Drag sections from the sidebar to begin creating your professional CV
                               </p>
                             </div>
@@ -1178,24 +1291,24 @@ const Builder = () => {
 
                   {/* Enhanced Preview */}
                   <div className="lg:col-span-1">
-                    <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-xl sticky top-8">
-                      <CardHeader className="border-b border-gray-100">
+                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-8 rounded-3xl overflow-hidden">
+                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                              <Eye className="h-5 w-5 text-white" />
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
+                              <Eye className="h-6 w-6 text-white" />
                             </div>
-                            <CardTitle className="text-xl font-bold text-gray-900">Live Preview</CardTitle>
+                            <CardTitle className="text-2xl font-bold text-gray-900">Live Preview</CardTitle>
                           </div>
                           {currentTemplateInfo && (
-                            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-2">
+                            <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-5 py-2 text-sm font-semibold">
                               {currentTemplateInfo.name}
                             </Badge>
                           )}
                         </div>
                       </CardHeader>
                       <CardContent className="p-6">
-                        <div className="bg-white rounded-2xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
+                        <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
                           <div id="cv-content">
                             {cvData && cvSections.length > 0 ? (
                               <CVTemplateRenderer
@@ -1205,11 +1318,11 @@ const Builder = () => {
                               />
                             ) : (
                               <div className="text-center text-gray-400 py-24">
-                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-6">
-                                  <FileText className="h-10 w-10 text-gray-500" />
+                                <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
+                                  <FileText className="h-12 w-12 text-gray-500" />
                                 </div>
-                                <p className="text-xl font-semibold mb-3 text-gray-600">Your CV Preview</p>
-                                <p className="text-gray-500">Add sections to see your CV come to life</p>
+                                <p className="text-2xl font-semibold mb-4 text-gray-600">Your CV Preview</p>
+                                <p className="text-gray-500 text-lg">Add sections to see your CV come to life</p>
                               </div>
                             )}
                           </div>
