@@ -1,1394 +1,398 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useCV } from '@/hooks/useCV';
-import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic, ChevronLeft, ChevronRight, Scan, PenTool, BookOpen, Languages, Globe, Camera, Lightbulb, Star, Shuffle, RefreshCw, Scissors } from 'lucide-react';
-import { SidebarSection } from '@/components/builder/SidebarSection';
+
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
-import { cvTemplates } from '@/data/templates';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { Navbar } from '@/components/layout/Navbar';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
+import { useCV } from '@/hooks/useCV';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Settings, 
+  Download, 
+  Eye,
+  User,
+  Briefcase,
+  GraduationCap,
+  Award,
+  Code,
+  Languages,
+  Heart,
+  FileText,
+  Contact,
+  Target,
+  Plus,
+  Bot,
+  Zap,
+  Palette,
+  Type,
+  Layout,
+  ChevronLeft,
+  ChevronRight,
+  FileCheck,
+  Sparkles,
+  TrendingUp,
+  BarChart3,
+  Clipboard,
+  Share2,
+  ImageIcon,
+  Layers,
+  Grid
+} from 'lucide-react';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { CVData } from '@/types/cv';
+import { SidebarSection } from '@/components/builder/SidebarSection';
 
-const Builder = () => {
+const availableSections = [
+  { id: 'personal', name: 'Personal Info', icon: User, color: 'bg-blue-500' },
+  { id: 'summary', name: 'Professional Summary', icon: FileText, color: 'bg-green-500' },
+  { id: 'experience', name: 'Work Experience', icon: Briefcase, color: 'bg-purple-500' },
+  { id: 'education', name: 'Education', icon: GraduationCap, color: 'bg-orange-500' },
+  { id: 'skills', name: 'Skills', icon: Code, color: 'bg-red-500' },
+  { id: 'projects', name: 'Projects', icon: Target, color: 'bg-indigo-500' },
+  { id: 'certifications', name: 'Certifications', icon: Award, color: 'bg-yellow-500' },
+  { id: 'languages', name: 'Languages', icon: Languages, color: 'bg-pink-500' },
+  { id: 'interests', name: 'Interests', icon: Heart, color: 'bg-teal-500' },
+  { id: 'references', name: 'References', icon: Contact, color: 'bg-cyan-500' },
+];
+
+const aiTools = [
+  { id: 'optimizer', name: 'CV Optimizer', icon: Bot, description: 'Optimize your CV with AI' },
+  { id: 'enhancer', name: 'Content Enhancer', icon: Zap, description: 'Enhance your content' },
+  { id: 'keywords', name: 'Keyword Analyzer', icon: TrendingUp, description: 'Analyze keywords' },
+  { id: 'grammar', name: 'Grammar Check', icon: FileCheck, description: 'Check grammar & spelling' },
+  { id: 'tone', name: 'Tone Optimizer', icon: Sparkles, description: 'Optimize tone & style' },
+];
+
+const designTools = [
+  { id: 'colors', name: 'Color Themes', icon: Palette, description: 'Customize colors' },
+  { id: 'fonts', name: 'Typography', icon: Type, description: 'Choose fonts' },
+  { id: 'layout', name: 'Layout Options', icon: Layout, description: 'Change layout' },
+  { id: 'spacing', name: 'Spacing', icon: Grid, description: 'Adjust spacing' },
+  { id: 'images', name: 'Images', icon: ImageIcon, description: 'Add images' },
+  { id: 'sections', name: 'Section Styles', icon: Layers, description: 'Style sections' },
+];
+
+const productivityTools = [
+  { id: 'analytics', name: 'CV Analytics', icon: BarChart3, description: 'View CV performance' },
+  { id: 'templates', name: 'Quick Templates', icon: Clipboard, description: 'Apply templates' },
+  { id: 'export', name: 'Export Options', icon: Share2, description: 'Export in formats' },
+];
+
+export default function Builder() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { cvData, setCVData, isLoading, isSaving, cvExists, saveCV, updateCVMetadata } = useCV(id);
-  
-  // Check if CV exists and redirect if not
-  useEffect(() => {
-    if (cvExists === false) {
-      toast({
-        title: "CV Not Found",
-        description: "The requested CV could not be found or you don't have access to it.",
-        variant: "destructive"
-      });
-      navigate('/dashboard');
-    }
-  }, [cvExists, navigate]);
-
-  const [draggedSection, setDraggedSection] = useState<string | null>(null);
-  // Start with empty sections for new CVs
-  const [cvSections, setCVSections] = useState<string[]>([]);
-  const [deletedSections, setDeletedSections] = useState<string[]>([]);
-  const [currentTemplate, setCurrentTemplate] = useState('modern');
-  const [cvMetadata, setCVMetadata] = useState({ name: '', description: '' });
-  const [editModal, setEditModal] = useState<{
-    isOpen: boolean;
-    sectionType: string;
-    sectionTitle: string;
-  }>({
-    isOpen: false,
-    sectionType: '',
-    sectionTitle: ''
-  });
-  const [settingsModal, setSettingsModal] = useState(false);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [undoStack, setUndoStack] = useState<CVData[]>([]);
-  const [redoStack, setRedoStack] = useState<CVData[]>([]);
-  const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
-  const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
-  const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const { cvData, setCVData, saveCV, isLoading } = useCV(id);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [editingSection, setEditingSection] = useState<any>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showOptimizer, setShowOptimizer] = useState(false);
+  const [showEnhancer, setShowEnhancer] = useState(false);
+  const [activeSections, setActiveSections] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (cvData && id && id !== 'new') {
-      fetchCVMetadata();
-      fetchCVTemplate();
-      
-      // Load sections configuration from database
-      const content = cvData as any;
-      if (content._deletedSections && Array.isArray(content._deletedSections)) {
-        setDeletedSections(content._deletedSections);
-      }
-      
-      // For existing CVs, determine active sections based on actual content and saved sections
-      if (content._sections && Array.isArray(content._sections)) {
-        setCVSections(content._sections);
-      } else {
-        // Determine sections based on actual content
-        const activeSections: string[] = [];
-        
-        // Always include personalInfo as it should always be present
-        if (cvData.personalInfo && (cvData.personalInfo.fullName || cvData.personalInfo.email)) {
-          activeSections.push('personalInfo');
-        }
-        
-        // Only include sections that have actual content
-        if (cvData.experience && cvData.experience.length > 0) {
-          activeSections.push('experience');
-        }
-        if (cvData.education && cvData.education.length > 0) {
-          activeSections.push('education');
-        }
-        if (cvData.skills && cvData.skills.length > 0) {
-          activeSections.push('skills');
-        }
-        if (cvData.projects && cvData.projects.length > 0) {
-          activeSections.push('projects');
-        }
-        if (cvData.references && cvData.references.length > 0) {
-          activeSections.push('references');
-        }
-        
-        setCVSections(activeSections);
-      }
-    } else if (id === 'new') {
-      // For new CVs, start completely empty except personalInfo
-      setCVSections(['personalInfo']);
-      setDeletedSections([]);
-    }
-  }, [cvData, id]);
-
-  // Auto-save preview data whenever cvData changes
-  useEffect(() => {
-    if (cvData && id && id !== 'new') {
-      localStorage.setItem('previewCVData', JSON.stringify({
-        cvData,
-        template: currentTemplate,
-        sections: cvSections,
-        cvId: id
-      }));
-    }
-  }, [cvData, currentTemplate, cvSections, id]);
-
-  const fetchCVMetadata = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('cvs')
-        .select('name, description')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setCVMetadata({ 
-          name: data.name || '', 
-          description: data.description || '' 
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching CV metadata:', error);
-    }
+  const handleDragStart = (e: React.DragEvent, sectionType: string) => {
+    e.dataTransfer.setData('text/plain', sectionType);
   };
 
-  const fetchCVTemplate = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('cvs')
-        .select('template')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      if (data?.template) {
-        setCurrentTemplate(data.template);
-      }
-    } catch (error) {
-      console.error('Error fetching template:', error);
-    }
-  };
-
-  const handleDownload = () => {
-    const input = document.getElementById('cv-content');
-    if (input) {
-      html2canvas(input, { scale: 2, useCORS: true })
-        .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          const fileName = cvMetadata.name ? `${cvMetadata.name}.pdf` : 'cv.pdf';
-          pdf.save(fileName);
-        });
-    }
-  };
-
-  const handleShare = async () => {
-    if (!id || id === 'new') {
-      toast({
-        title: "Save CV First",
-        description: "Please save your CV before sharing.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const shareUrl = `${window.location.origin}/preview/${id}`;
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const sectionType = e.dataTransfer.getData('text/plain');
     
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: cvMetadata.name || 'My CV',
-          text: 'Check out my CV',
-          url: shareUrl,
-        });
-      } catch (error) {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: "Link Copied",
-          description: "CV link has been copied to clipboard."
-        });
-      }
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast({
-        title: "Link Copied",
-        description: "CV link has been copied to clipboard."
-      });
+    if (!activeSections.includes(sectionType)) {
+      setActiveSections([...activeSections, sectionType]);
     }
   };
 
-  const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const importedData = JSON.parse(e.target?.result as string);
-            if (importedData && typeof importedData === 'object') {
-              setCVData(importedData);
-              toast({
-                title: "Data Imported",
-                description: "CV data has been imported successfully."
-              });
-            }
-          } catch (error) {
-            toast({
-              title: "Import Failed",
-              description: "Invalid file format.",
-              variant: "destructive"
-            });
-          }
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
-  const handleExport = () => {
-    if (!cvData) {
-      toast({
-        title: "No Data",
-        description: "No CV data to export.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const dataToExport = {
-      ...cvData,
-      template: currentTemplate,
-      sections: cvSections,
-      metadata: cvMetadata
-    };
-
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${cvMetadata.name || 'cv-data'}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: "Data Exported",
-      description: "CV data has been exported successfully."
-    });
+  const handleSectionEdit = (sectionType: string) => {
+    setEditingSection(sectionType);
   };
 
-  const handleAIAssist = () => {
-    setAIAssistantOpen(true);
+  const handleSectionDelete = (sectionType: string) => {
+    setActiveSections(activeSections.filter(s => s !== sectionType));
   };
 
-  const handleAIOptimizer = () => {
-    setAIOptimizerOpen(true);
+  const handleSectionUpdate = (updatedData: CVData) => {
+    setCVData(updatedData);
+    saveCV(updatedData);
   };
 
-  const handleAIEnhancer = () => {
-    setAIEnhancerOpen(true);
-  };
-
-  const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
-    // Save current state to history
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    
-    // Update CV data
-    setCVData(updatedCVData);
-    
-    // Add new sections to the CV structure if they're not already there
-    const sectionsToAdd = newSectionIds.filter(sectionId => !cvSections.includes(sectionId));
-    if (sectionsToAdd.length > 0) {
-      setCVSections(prev => [...prev, ...sectionsToAdd]);
-    }
-    
-    // Auto-save the changes
-    if (updatedCVData) {
-      saveCV(updatedCVData, deletedSections, [...cvSections, ...sectionsToAdd]);
-    }
+  const handleSave = () => {
+    saveCV(cvData);
   };
 
   if (isLoading) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600">Loading CV Builder...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading CV...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Enhanced Sidebar */}
+      <div className={`${sidebarCollapsed ? 'w-16' : 'w-80'} bg-card border-r border-border transition-all duration-300 ease-in-out flex flex-col relative`}>
+        {/* Enhanced Collapse Handler */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute -right-3 top-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl"
+        >
+          {sidebarCollapsed ? (
+            <ChevronRight className="h-3 w-3" />
+          ) : (
+            <ChevronLeft className="h-3 w-3" />
+          )}
+        </button>
+
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            {!sidebarCollapsed && (
+              <h2 className="text-lg font-semibold">CV Builder</h2>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size={sidebarCollapsed ? "icon" : "sm"}
+                onClick={() => setShowSettings(true)}
+                className="hover:bg-muted"
+              >
+                <Settings className="h-4 w-4" />
+                {!sidebarCollapsed && <span className="ml-2">Settings</span>}
+              </Button>
+            </div>
           </div>
         </div>
-      </>
-    );
-  }
 
-  if (id === 'new') {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <Card className="w-full max-w-md bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="h-8 w-8 text-white" />
+        {/* Scrollable Content */}
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-6">
+            {/* CV Sections */}
+            <div>
+              {!sidebarCollapsed && (
+                <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Sections
+                </h3>
+              )}
+              <div className="space-y-2">
+                {availableSections.map((section) => (
+                  <SidebarSection
+                    key={section.id}
+                    title={sidebarCollapsed ? '' : section.name}
+                    icon={
+                      <section.icon 
+                        className={`h-4 w-4 ${sidebarCollapsed ? 'mx-auto' : ''}`} 
+                      />
+                    }
+                    onDragStart={(e) => handleDragStart(e, section.id)}
+                  />
+                ))}
               </div>
-              <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Choose a Template</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 mb-6 text-lg">
-                Please select a template first to start building your CV.
-              </p>
-              <Button 
-                onClick={() => navigate('/templates')} 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                Browse Templates
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
+            </div>
 
-  if (!cvData || cvExists === false) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center pt-16">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">CV not found</h2>
-            <Button 
-              onClick={() => navigate('/dashboard')} 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            {/* AI Tools */}
+            <div>
+              {!sidebarCollapsed && (
+                <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  AI Tools
+                </h3>
+              )}
+              <div className="space-y-2">
+                {aiTools.map((tool) => (
+                  <Button
+                    key={tool.id}
+                    variant="ghost"
+                    size={sidebarCollapsed ? "icon" : "sm"}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                    onClick={() => {
+                      if (tool.id === 'optimizer') setShowOptimizer(true);
+                      if (tool.id === 'enhancer') setShowEnhancer(true);
+                    }}
+                  >
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
+                    {!sidebarCollapsed && tool.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Design Tools */}
+            <div>
+              {!sidebarCollapsed && (
+                <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                  <Palette className="h-4 w-4" />
+                  Design
+                </h3>
+              )}
+              <div className="space-y-2">
+                {designTools.map((tool) => (
+                  <Button
+                    key={tool.id}
+                    variant="ghost"
+                    size={sidebarCollapsed ? "icon" : "sm"}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                  >
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
+                    {!sidebarCollapsed && tool.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Productivity Tools */}
+            <div>
+              {!sidebarCollapsed && (
+                <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Productivity
+                </h3>
+              )}
+              <div className="space-y-2">
+                {productivityTools.map((tool) => (
+                  <Button
+                    key={tool.id}
+                    variant="ghost"
+                    size={sidebarCollapsed ? "icon" : "sm"}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                  >
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
+                    {!sidebarCollapsed && tool.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-border">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size={sidebarCollapsed ? "icon" : "sm"}
+              className="flex-1 hover:bg-muted"
             >
-              Back to Dashboard
+              <Eye className="h-4 w-4" />
+              {!sidebarCollapsed && <span className="ml-2">Preview</span>}
+            </Button>
+            <Button
+              variant="outline"
+              size={sidebarCollapsed ? "icon" : "sm"}
+              className="flex-1 hover:bg-muted"
+            >
+              <Download className="h-4 w-4" />
+              {!sidebarCollapsed && <span className="ml-2">Export</span>}
             </Button>
           </div>
         </div>
-      </>
-    );
-  }
-
-  const currentTemplateInfo = cvTemplates.find(t => t.id === currentTemplate);
-
-  // All available sections - these are always shown in the sidebar if not in the CV structure
-  const allSections = [
-    { id: 'personalInfo', title: 'Personal Info', icon: <User className="h-5 w-5" />, description: 'Your basic information' },
-    { id: 'experience', title: 'Experience', icon: <Briefcase className="h-5 w-5" />, description: 'Work history and achievements' },
-    { id: 'education', title: 'Education', icon: <GraduationCap className="h-5 w-5" />, description: 'Academic background' },
-    { id: 'skills', title: 'Skills', icon: <Award className="h-5 w-5" />, description: 'Technical and soft skills' },
-    { id: 'projects', title: 'Projects', icon: <FileText className="h-5 w-5" />, description: 'Portfolio and projects' },
-    { id: 'references', title: 'References', icon: <Users className="h-5 w-5" />, description: 'Professional references' }
-  ];
-
-  // Available sections are those not currently in the CV structure and not deleted
-  const availableSections = allSections.filter(section => 
-    !cvSections.includes(section.id) && !deletedSections.includes(section.id)
-  );
-
-  const getTemplateStyles = (templateId: string) => {
-    const styles = {
-      modern: {
-        bgGradient: 'from-blue-50 to-cyan-50',
-        accentColor: 'text-blue-600',
-        borderColor: 'border-blue-200',
-        buttonColor: 'bg-blue-500 hover:bg-blue-600'
-      },
-      classic: {
-        bgGradient: 'from-gray-50 to-slate-50',
-        accentColor: 'text-slate-700',
-        borderColor: 'border-slate-300',
-        buttonColor: 'bg-slate-600 hover:bg-slate-700'
-      },
-      creative: {
-        bgGradient: 'from-purple-50 to-pink-50',
-        accentColor: 'text-purple-600',
-        borderColor: 'border-purple-200',
-        buttonColor: 'bg-purple-500 hover:bg-purple-600'
-      },
-      minimal: {
-        bgGradient: 'from-gray-50 to-white',
-        accentColor: 'text-gray-700',
-        borderColor: 'border-gray-200',
-        buttonColor: 'bg-gray-500 hover:bg-gray-600'
-      },
-      executive: {
-        bgGradient: 'from-slate-900 to-gray-900',
-        accentColor: 'text-yellow-400',
-        borderColor: 'border-yellow-200',
-        buttonColor: 'bg-yellow-600 hover:bg-yellow-700'
-      },
-      tech: {
-        bgGradient: 'from-emerald-50 to-teal-50',
-        accentColor: 'text-emerald-600',
-        borderColor: 'border-emerald-200',
-        buttonColor: 'bg-emerald-500 hover:bg-emerald-600'
-      },
-      artistic: {
-        bgGradient: 'from-orange-50 to-red-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      },
-      corporate: {
-        bgGradient: 'from-indigo-50 to-blue-50',
-        accentColor: 'text-indigo-600',
-        borderColor: 'border-indigo-200',
-        buttonColor: 'bg-indigo-500 hover:bg-indigo-600'
-      },
-      startup: {
-        bgGradient: 'from-orange-50 to-amber-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      }
-    };
-    
-    return styles[templateId as keyof typeof styles] || styles.modern;
-  };
-
-  const templateStyle = getTemplateStyles(currentTemplate);
-
-  const saveToHistory = (data: CVData) => {
-    setUndoStack(prev => [...prev.slice(-9), data]);
-    setRedoStack([]);
-  };
-
-  const handleUndo = () => {
-    if (undoStack.length > 0 && cvData) {
-      const previousState = undoStack[undoStack.length - 1];
-      setRedoStack(prev => [cvData, ...prev.slice(0, 9)]);
-      setUndoStack(prev => prev.slice(0, -1));
-      setCVData(previousState);
-    }
-  };
-
-  const handleRedo = () => {
-    if (redoStack.length > 0) {
-      const nextState = redoStack[0];
-      if (cvData) {
-        setUndoStack(prev => [...prev.slice(-9), cvData]);
-      }
-      setRedoStack(prev => prev.slice(1));
-      setCVData(nextState);
-    }
-  };
-
-  const handleDragStart = (e: React.DragEvent, sectionId: string) => {
-    console.log('Drag start:', sectionId);
-    setDraggedSection(sectionId);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', sectionId);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index?: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (typeof index === 'number') {
-      setDragOverIndex(index);
-    }
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOverIndex(null);
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex?: number) => {
-    e.preventDefault();
-    console.log('Drop event:', { draggedSection, targetIndex });
-    setDragOverIndex(null);
-    
-    if (!draggedSection) return;
-
-    if (typeof targetIndex === 'number') {
-      // Reordering existing sections
-      const currentIndex = cvSections.indexOf(draggedSection);
-      if (currentIndex !== -1 && currentIndex !== targetIndex) {
-        console.log('Reordering sections from', currentIndex, 'to', targetIndex);
-        const newSections = [...cvSections];
-        newSections.splice(currentIndex, 1);
-        newSections.splice(targetIndex, 0, draggedSection);
-        setCVSections(newSections);
-        toast({
-          title: "Section Reordered",
-          description: "Section order has been updated."
-        });
-      }
-    } else {
-      // Adding new section from sidebar
-      if (!cvSections.includes(draggedSection)) {
-        console.log('Adding new section:', draggedSection);
-        setCVSections([...cvSections, draggedSection]);
-        // Remove from deleted sections if it was there
-        setDeletedSections(prev => prev.filter(s => s !== draggedSection));
-        toast({
-          title: "Section Added",
-          description: "New section has been added to your CV."
-        });
-      }
-    }
-    setDraggedSection(null);
-  };
-
-  const handleSectionEdit = (sectionId: string) => {
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    const section = allSections.find(s => s.id === sectionId);
-    if (section) {
-      setEditModal({
-        isOpen: true,
-        sectionType: sectionId,
-        sectionTitle: section.title
-      });
-    }
-  };
-
-  const handleSectionDelete = (sectionId: string) => {
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    const baseId = sectionId.split('_')[0];
-    
-    // Don't allow deleting personalInfo
-    if (baseId === 'personalInfo') {
-      toast({
-        title: "Cannot Delete",
-        description: "Personal Info section cannot be deleted.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Remove from CV structure
-    const newCVSections = cvSections.filter(id => id !== sectionId);
-    setCVSections(newCVSections);
-    
-    // Add to deleted sections to persist the deletion
-    const newDeletedSections = [...deletedSections, baseId];
-    setDeletedSections(newDeletedSections);
-    
-    // Save to database immediately
-    if (cvData) {
-      saveCV(cvData, newDeletedSections, newCVSections);
-    }
-    
-    toast({
-      title: "Section Removed",
-      description: "Section has been removed and is now available in the sidebar.",
-    });
-  };
-
-  const handleSave = async () => {
-    if (!cvData) return;
-    
-    // Ensure data integrity before saving
-    const sanitizedData: CVData = {
-      personalInfo: cvData.personalInfo || {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        summary: ''
-      },
-      experience: Array.isArray(cvData.experience) ? cvData.experience : [],
-      education: Array.isArray(cvData.education) ? cvData.education : [],
-      skills: Array.isArray(cvData.skills) ? cvData.skills : [],
-      projects: Array.isArray(cvData.projects) ? cvData.projects : [],
-      references: Array.isArray(cvData.references) ? cvData.references : []
-    };
-    
-    try {
-      await saveCV(sanitizedData, deletedSections, cvSections);
-      setCVData(sanitizedData);
-    } catch (error) {
-      console.error('Save error:', error);
-    }
-  };
-
-  const handlePreview = () => {
-    if (!cvData) {
-      toast({
-        title: "Error",
-        description: "Cannot preview CV. Please save your changes first.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Save CV data to localStorage for preview with CV ID
-    localStorage.setItem('previewCVData', JSON.stringify({
-      cvData,
-      template: currentTemplate,
-      sections: cvSections,
-      cvId: id !== 'new' ? id : undefined
-    }));
-    
-    // Navigate to preview page
-    if (id && id !== 'new') {
-      navigate(`/preview/${id}`);
-    } else {
-      navigate('/preview');
-    }
-  };
-
-  const handleModalSave = (updatedData: CVData) => {
-    console.log('Modal save:', updatedData);
-    
-    // Ensure all array fields exist and are properly structured
-    const sanitizedData: CVData = {
-      personalInfo: updatedData.personalInfo || {
-        fullName: '',
-        email: '',
-        phone: '',
-        location: '',
-        summary: ''
-      },
-      experience: Array.isArray(updatedData.experience) ? updatedData.experience : [],
-      education: Array.isArray(updatedData.education) ? updatedData.education : [],
-      skills: Array.isArray(updatedData.skills) ? updatedData.skills : [],
-      projects: Array.isArray(updatedData.projects) ? updatedData.projects : [],
-      references: Array.isArray(updatedData.references) ? updatedData.references : []
-    };
-    
-    setCVData(sanitizedData);
-    
-    // Update localStorage immediately for preview sync
-    if (id && id !== 'new') {
-      localStorage.setItem('previewCVData', JSON.stringify({
-        cvData: sanitizedData,
-        template: currentTemplate,
-        sections: cvSections,
-        cvId: id
-      }));
-    }
-    
-    // Auto-save to database
-    if (sanitizedData) {
-      saveCV(sanitizedData, deletedSections, cvSections);
-    }
-    
-    toast({
-      title: "Changes Applied",
-      description: "Section updated and saved successfully!",
-    });
-  };
-
-  const renderSectionContent = (sectionId: string): React.ReactNode => {
-    if (!cvData) return null;
-
-    const baseId = sectionId.split('_')[0];
-    
-    switch (baseId) {
-      case 'personalInfo':
-        return (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              <strong>Name:</strong> {cvData.personalInfo?.fullName || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Email:</strong> {cvData.personalInfo?.email || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Phone:</strong> {cvData.personalInfo?.phone || 'Not provided'}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Location:</strong> {cvData.personalInfo?.location || 'Not provided'}
-            </p>
-            {cvData.personalInfo?.summary && (
-              <p className="text-sm text-gray-600">
-                <strong>Summary:</strong> {cvData.personalInfo.summary}
-              </p>
-            )}
-          </div>
-        );
-      
-      case 'experience':
-        return (
-          <div className="space-y-3">
-            {cvData.experience && cvData.experience.length > 0 ? (
-              cvData.experience.map((exp) => (
-                <div key={exp.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{exp.title}</h4>
-                  <p className="text-sm text-gray-600">{exp.company}</p>
-                  <p className="text-xs text-gray-500">
-                    {exp.startDate} - {exp.endDate || 'Present'}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No experience added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'education':
-        return (
-          <div className="space-y-3">
-            {cvData.education && cvData.education.length > 0 ? (
-              cvData.education.map((edu) => (
-                <div key={edu.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{edu.degree}</h4>
-                  <p className="text-sm text-gray-600">{edu.school}</p>
-                  <p className="text-xs text-gray-500">
-                    {edu.startDate} - {edu.endDate}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No education added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'skills':
-        return (
-          <div className="space-y-2">
-            {cvData.skills && cvData.skills.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {cvData.skills.map((skill, index) => (
-                  <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No skills added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'projects':
-        return (
-          <div className="space-y-3">
-            {cvData.projects && cvData.projects.length > 0 ? (
-              cvData.projects.map((project) => (
-                <div key={project.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{project.name}</h4>
-                  <p className="text-sm text-gray-600">{project.technologies}</p>
-                  <p className="text-xs text-gray-500">
-                    {project.startDate} - {project.endDate || 'Present'}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No projects added yet</p>
-            )}
-          </div>
-        );
-      
-      case 'references':
-        return (
-          <div className="space-y-3">
-            {cvData.references && cvData.references.length > 0 ? (
-              cvData.references.map((reference) => (
-                <div key={reference.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium">{reference.name}</h4>
-                  <p className="text-sm text-gray-600">
-                    {reference.position} at {reference.company}
-                  </p>
-                  <p className="text-xs text-gray-500">{reference.email}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No references added yet</p>
-            )}
-          </div>
-        );
-      
-      default:
-        return <p className="text-sm text-gray-500">Section content</p>;
-    }
-  };
-
-  return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
-        <TooltipProvider>
-          <div className="min-h-screen flex w-full relative">
-            {/* Ultra Modern Collapsible Sidebar */}
-            <div 
-              className={`
-                fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white/95 backdrop-blur-2xl border-r border-gray-200/50 
-                shadow-[0_8px_32px_rgba(0,0,0,0.06)] transition-all duration-500 ease-in-out z-30 
-                before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/20 before:to-transparent before:pointer-events-none
-                ${sidebarCollapsed ? 'w-20' : 'w-96'}
-              `}
-            >
-              {/* Enhanced Sidebar Header */}
-              <div className="p-6 border-b border-gray-100/80 relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-blue-500/5 rounded-b-3xl"></div>
-                <div className="relative flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-xl ring-4 ring-white/50">
-                    <Zap className="h-6 w-6 text-white" />
-                  </div>
-                  {!sidebarCollapsed && (
-                    <div className="animate-fade-in">
-                      <h2 className="text-xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
-                        CV Builder Pro
-                      </h2>
-                      <p className="text-xs text-gray-500 font-medium mt-0.5">
-                        AI-Powered Creative Suite
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Enhanced Sidebar Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                {/* AI Tools Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
-                      <Bot className="h-5 w-5 text-white" />
-                    </div>
-                    {!sidebarCollapsed && (
-                      <div className="animate-fade-in">
-                        <h3 className="text-sm font-bold text-gray-800">AI Assistant Suite</h3>
-                        <p className="text-xs text-gray-500">Powered by advanced AI</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {[
-                      { 
-                        icon: Wand2, 
-                        label: 'Smart Generator', 
-                        desc: 'Generate CV sections with AI', 
-                        action: handleAIAssist, 
-                        gradient: 'from-purple-600 via-violet-600 to-indigo-600',
-                        iconBg: 'from-purple-500 to-violet-500'
-                      },
-                      { 
-                        icon: Target, 
-                        label: 'CV Optimizer', 
-                        desc: 'Optimize for ATS & recruiters', 
-                        action: handleAIOptimizer, 
-                        gradient: 'from-orange-600 via-red-600 to-pink-600',
-                        iconBg: 'from-orange-500 to-red-500'
-                      },
-                      { 
-                        icon: Sparkles, 
-                        label: 'Content Enhancer', 
-                        desc: 'Polish and improve content', 
-                        action: handleAIEnhancer, 
-                        gradient: 'from-pink-600 via-rose-600 to-red-600',
-                        iconBg: 'from-pink-500 to-rose-500'
-                      },
-                      { 
-                        icon: Lightbulb, 
-                        label: 'Smart Suggestions', 
-                        desc: 'Get personalized tips', 
-                        action: () => toast({ title: "Coming Soon!", description: "Smart suggestions feature is in development." }), 
-                        gradient: 'from-yellow-600 via-amber-600 to-orange-600',
-                        iconBg: 'from-yellow-500 to-amber-500'
-                      },
-                      { 
-                        icon: Scan, 
-                        label: 'CV Analyzer', 
-                        desc: 'Deep analysis & scoring', 
-                        action: () => toast({ title: "Coming Soon!", description: "CV analyzer feature is in development." }), 
-                        gradient: 'from-emerald-600 via-teal-600 to-cyan-600',
-                        iconBg: 'from-emerald-500 to-teal-500'
-                      },
-                      { 
-                        icon: Languages, 
-                        label: 'Multi-Language', 
-                        desc: 'Translate to any language', 
-                        action: () => toast({ title: "Coming Soon!", description: "Multi-language support is in development." }), 
-                        gradient: 'from-blue-600 via-indigo-600 to-purple-600',
-                        iconBg: 'from-blue-500 to-indigo-500'
-                      }
-                    ].map((tool, index) => (
-                      <Tooltip key={index}>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={tool.action}
-                            className={`
-                              w-full p-4 rounded-2xl bg-gradient-to-br ${tool.gradient} 
-                              hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 
-                              text-white group border border-white/20 hover:border-white/40
-                              relative overflow-hidden
-                            `}
-                          >
-                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div className="relative flex items-center gap-4">
-                              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.iconBg} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                <tool.icon className="h-5 w-5 text-white" />
-                              </div>
-                              {!sidebarCollapsed && (
-                                <div className="text-left animate-fade-in">
-                                  <div className="font-semibold text-sm">{tool.label}</div>
-                                  <div className="text-xs opacity-90 mt-0.5">{tool.desc}</div>
-                                </div>
-                              )}
-                            </div>
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
-                          <p className="font-medium">{tool.label}</p>
-                          <p className="text-xs text-gray-500">{tool.desc}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Productivity Tools */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
-                      <Zap className="h-5 w-5 text-white" />
-                    </div>
-                    {!sidebarCollapsed && (
-                      <div className="animate-fade-in">
-                        <h3 className="text-sm font-bold text-gray-800">Productivity Tools</h3>
-                        <p className="text-xs text-gray-500">Boost your workflow</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {[
-                      { 
-                        icon: Shuffle, 
-                        label: 'Quick Templates', 
-                        desc: 'Switch templates instantly', 
-                        action: () => navigate('/templates'),
-                        color: 'from-blue-500 to-cyan-500'
-                      },
-                      { 
-                        icon: Copy, 
-                        label: 'Duplicate CV', 
-                        desc: 'Create CV variations', 
-                        action: () => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." }),
-                        color: 'from-green-500 to-emerald-500'
-                      },
-                      { 
-                        icon: Camera, 
-                        label: 'Photo Manager', 
-                        desc: 'Add professional photos', 
-                        action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
-                        color: 'from-purple-500 to-pink-500'
-                      },
-                      { 
-                        icon: RefreshCw, 
-                        label: 'Auto-Save', 
-                        desc: 'Never lose your progress', 
-                        action: handleSave,
-                        color: 'from-orange-500 to-red-500'
-                      }
-                    ].map((tool, index) => (
-                      <Tooltip key={index}>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={tool.action}
-                            className={`
-                              w-full p-3 rounded-xl bg-gradient-to-r ${tool.color} 
-                              hover:shadow-lg hover:scale-[1.02] transition-all duration-200 
-                              text-white group opacity-90 hover:opacity-100
-                            `}
-                          >
-                            <div className="flex items-center gap-3">
-                              <tool.icon className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                              {!sidebarCollapsed && (
-                                <div className="text-left animate-fade-in">
-                                  <div className="font-medium text-sm">{tool.label}</div>
-                                  <div className="text-xs opacity-80">{tool.desc}</div>
-                                </div>
-                              )}
-                            </div>
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
-                          <p>{tool.label}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Available Sections */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
-                      <Plus className="h-5 w-5 text-white" />
-                    </div>
-                    {!sidebarCollapsed && (
-                      <div className="animate-fade-in">
-                        <h3 className="text-sm font-bold text-gray-800">CV Sections</h3>
-                        <p className="text-xs text-gray-500">Drag to add to your CV</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {availableSections.map((section) => (
-                      <Tooltip key={section.id}>
-                        <TooltipTrigger asChild>
-                          <div 
-                            draggable 
-                            onDragStart={(e) => handleDragStart(e, section.id)}
-                            className="
-                              p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-white 
-                              border-2 border-gray-200/60 hover:border-blue-400/60 
-                              hover:shadow-xl hover:scale-[1.02] transition-all duration-300 
-                              cursor-grab active:cursor-grabbing group
-                              hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50
-                            "
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                                {React.cloneElement(section.icon as React.ReactElement, { 
-                                  className: "h-5 w-5 text-white" 
-                                })}
-                              </div>
-                              {!sidebarCollapsed && (
-                                <div className="text-left animate-fade-in">
-                                  <div className="font-semibold text-sm text-gray-900">{section.title}</div>
-                                  <div className="text-xs text-gray-600 mt-0.5">{section.description}</div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
-                          <p className="font-medium">{section.title}</p>
-                          <p className="text-xs text-gray-500">{section.description}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
-                    
-                    {availableSections.length === 0 && (
-                      <div className="text-center py-8">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-xl">
-                          <Star className="h-8 w-8 text-white" />
-                        </div>
-                        {!sidebarCollapsed && (
-                          <div className="animate-fade-in">
-                            <p className="text-sm text-gray-700 font-semibold">All sections added!</p>
-                            <p className="text-xs text-gray-500 mt-1">Your CV is complete ✨</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Ultra Modern Collapse Handle */}
-              <div className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-20">
-                <button
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  className="
-                    w-6 h-16 bg-gradient-to-b from-violet-600 via-purple-600 to-blue-600 
-                    rounded-r-2xl shadow-2xl hover:shadow-violet-500/25 
-                    transition-all duration-300 flex items-center justify-center group 
-                    hover:w-7 border-2 border-white/20 hover:border-white/40
-                    backdrop-blur-xl
-                  "
-                >
-                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-r-2xl"></div>
-                  {sidebarCollapsed ? (
-                    <ChevronRight className="h-4 w-4 text-white group-hover:scale-110 transition-transform relative z-10" />
-                  ) : (
-                    <ChevronLeft className="h-4 w-4 text-white group-hover:scale-110 transition-transform relative z-10" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <div className={`flex-1 transition-all duration-500 ${sidebarCollapsed ? 'ml-20' : 'ml-96'}`}>
-              {/* Enhanced Header */}
-              <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl">
-                <div className="container mx-auto py-8 px-8">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-8">
-                      <Button
-                        variant="outline"
-                        onClick={() => navigate('/dashboard')}
-                        className="border-2 border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-2xl transition-all duration-300 px-6 py-3"
-                      >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Dashboard
-                      </Button>
-                      <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl ring-4 ring-white/50">
-                          <Zap className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
-                            {cvMetadata.name || 'Professional CV Builder'}
-                          </h1>
-                          {currentTemplateInfo && (
-                            <div className="flex items-center gap-4 mt-3">
-                              <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
-                                {currentTemplateInfo.name}
-                              </Badge>
-                              <Badge variant="outline" className="border-2 border-gray-300 px-4 py-2 text-sm">
-                                {currentTemplateInfo.category}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
-                        <Button 
-                          variant="outline"
-                          onClick={handleUndo}
-                          disabled={undoStack.length === 0}
-                          size="sm"
-                          title="Undo"
-                          className="border-0 hover:bg-white rounded-xl"
-                        >
-                          <Undo className="h-4 w-4" />
-                        </Button>
-                        
-                        <Button 
-                          variant="outline"
-                          onClick={handleRedo}
-                          disabled={redoStack.length === 0}
-                          size="sm"
-                          title="Redo"
-                          className="border-0 hover:bg-white rounded-xl"
-                        >
-                          <Redo className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <Button 
-                        variant="outline"
-                        onClick={() => setSettingsModal(true)}
-                        className="border-2 border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-xl px-4 py-2"
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Settings
-                      </Button>
-
-                      <Button 
-                        variant="outline"
-                        onClick={handlePreview}
-                        className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview
-                      </Button>
-                      
-                      <Button 
-                        onClick={handleSave} 
-                        disabled={isSaving} 
-                        className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        {isSaving ? 'Saving...' : 'Save CV'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="container mx-auto py-12 px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  {/* Enhanced CV Builder Area */}
-                  <div className="lg:col-span-1">
-                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
-                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
-                            <p className="text-gray-600 mt-2 text-lg">
-                              Drag to reorder • Click to edit content
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
-                              {cvSections.length} sections
-                            </Badge>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => navigate('/templates')}
-                              className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
-                            >
-                              <Layout className="h-4 w-4 mr-2" />
-                              Templates
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-8">
-                        <div 
-                          className="min-h-[600px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
-                          onDragOver={(e) => handleDragOver(e)}
-                          onDrop={(e) => handleDrop(e)}
-                          onDragLeave={handleDragLeave}
-                        >
-                          {cvSections.map((sectionId, index) => {
-                            const baseId = sectionId.split('_')[0];
-                            const section = allSections.find(s => s.id === baseId);
-                            const isDragOver = dragOverIndex === index;
-                            
-                            return (
-                              <div key={sectionId}>
-                                {isDragOver && draggedSection && (
-                                  <div className="h-4 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-6 animate-pulse shadow-xl" />
-                                )}
-                                {section ? (
-                                  <div
-                                    onDragOver={(e) => handleDragOver(e, index)}
-                                    onDrop={(e) => handleDrop(e, index)}
-                                    onDragLeave={handleDragLeave}
-                                  >
-                                    <CVSection
-                                      title={section.title}
-                                      onEdit={() => handleSectionEdit(baseId)}
-                                      onDelete={() => handleSectionDelete(sectionId)}
-                                      onDragStart={(e) => handleDragStart(e, sectionId)}
-                                    >
-                                      {renderSectionContent(sectionId)}
-                                    </CVSection>
-                                  </div>
-                                ) : null}
-                              </div>
-                            );
-                          })}
-                          
-                          {cvSections.length === 0 && (
-                            <div className="text-center py-24">
-                              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                                <Plus className="h-16 w-16 text-white" />
-                              </div>
-                              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                                Start Building Your CV
-                              </h3>
-                              <p className="text-gray-600 text-xl max-w-md mx-auto leading-relaxed">
-                                Drag sections from the sidebar to begin creating your professional CV
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Enhanced Preview */}
-                  <div className="lg:col-span-1">
-                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-8 rounded-3xl overflow-hidden">
-                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
-                              <Eye className="h-6 w-6 text-white" />
-                            </div>
-                            <CardTitle className="text-2xl font-bold text-gray-900">Live Preview</CardTitle>
-                          </div>
-                          {currentTemplateInfo && (
-                            <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-5 py-2 text-sm font-semibold">
-                              {currentTemplateInfo.name}
-                            </Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-6">
-                        <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
-                          <div id="cv-content">
-                            {cvData && cvSections.length > 0 ? (
-                              <CVTemplateRenderer
-                                cvData={cvData}
-                                templateId={currentTemplate}
-                                sections={cvSections}
-                              />
-                            ) : (
-                              <div className="text-center text-gray-400 py-24">
-                                <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
-                                  <FileText className="h-12 w-12 text-gray-500" />
-                                </div>
-                                <p className="text-2xl font-semibold mb-4 text-gray-600">Your CV Preview</p>
-                                <p className="text-gray-500 text-lg">Add sections to see your CV come to life</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TooltipProvider>
-
-        {/* AI CV Optimizer */}
-        {cvData && (
-          <AICVOptimizer
-            open={aiOptimizerOpen}
-            setOpen={setAIOptimizerOpen}
-            cvData={cvData}
-          />
-        )}
-
-        {/* AI Resume Enhancer */}
-        {cvData && (
-          <AIResumeEnhancer
-            open={aiEnhancerOpen}
-            setOpen={setAIEnhancerOpen}
-            cvData={cvData}
-            onEnhance={handleModalSave}
-          />
-        )}
-
-        {/* AI Smart Assistant */}
-        {cvData && (
-          <AISmartAssistant
-            open={aiAssistantOpen}
-            setOpen={setAIAssistantOpen}
-            onSectionsGenerated={handleAISectionsGenerated}
-            cvData={cvData}
-          />
-        )}
-
-        {/* Section Edit Modal */}
-        <SectionEditModal
-          isOpen={editModal.isOpen}
-          onClose={() => setEditModal({ ...editModal, isOpen: false })}
-          sectionType={editModal.sectionType}
-          sectionTitle={editModal.sectionTitle}
-          cvData={cvData}
-          onSave={handleModalSave}
-        />
-
-        {/* CV Settings Modal */}
-        {id && id !== 'new' && (
-          <CVSettingsModal
-            isOpen={settingsModal}
-            onClose={() => setSettingsModal(false)}
-            cvId={id}
-            currentName={cvMetadata.name}
-            currentDescription={cvMetadata.description}
-            onUpdate={updateCVMetadata}
-          />
-        )}
       </div>
-    </>
-  );
-};
 
-export default Builder;
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* CV Builder Area */}
+        <div
+          className="flex-1 p-6 overflow-auto"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold">CV Builder</h1>
+                <p className="text-muted-foreground">Drag sections from the sidebar to build your CV</p>
+              </div>
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+                Save CV
+              </Button>
+            </div>
+
+            {/* Active Sections */}
+            <div className="space-y-4">
+              {activeSections.length === 0 ? (
+                <Card className="border-dashed border-2 border-muted-foreground/25 p-8 text-center">
+                  <div className="text-muted-foreground">
+                    <Plus className="h-8 w-8 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Start Building Your CV</h3>
+                    <p>Drag sections from the sidebar to begin creating your professional CV</p>
+                  </div>
+                </Card>
+              ) : (
+                activeSections.map((sectionType) => {
+                  const section = availableSections.find(s => s.id === sectionType);
+                  return (
+                    <CVSection
+                      key={sectionType}
+                      sectionType={sectionType}
+                      data={cvData}
+                      onEdit={() => handleSectionEdit(sectionType)}
+                      onDelete={() => handleSectionDelete(sectionType)}
+                      onUpdate={handleSectionUpdate}
+                    />
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* CV Preview */}
+        <div className="w-96 border-l border-border bg-muted/30 p-4 overflow-auto">
+          <div className="sticky top-0 bg-muted/30 pb-4 mb-4 border-b border-border">
+            <h3 className="font-semibold">Live Preview</h3>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6 transform scale-75 origin-top">
+            <CVTemplateRenderer cvData={cvData} templateId="modern" />
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      {editingSection && (
+        <SectionEditModal
+          isOpen={true}
+          onClose={() => setEditingSection(null)}
+          sectionType={editingSection}
+          cvData={cvData}
+          onSave={handleSectionUpdate}
+        />
+      )}
+
+      {showSettings && (
+        <CVSettingsModal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          cvData={cvData}
+          onUpdate={handleSectionUpdate}
+        />
+      )}
+
+      {showOptimizer && (
+        <AICVOptimizer
+          open={showOptimizer}
+          setOpen={setShowOptimizer}
+          cvData={cvData}
+        />
+      )}
+
+      {showEnhancer && (
+        <AIResumeEnhancer
+          open={showEnhancer}
+          onClose={() => setShowEnhancer(false)}
+          cvData={cvData}
+          onUpdate={handleSectionUpdate}
+        />
+      )}
+    </div>
+  );
+}
