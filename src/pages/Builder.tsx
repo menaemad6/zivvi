@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -22,26 +21,11 @@ import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Builder = () => {
   const { id } = useParams();
@@ -82,6 +66,7 @@ const Builder = () => {
   const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
   const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
   const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -545,6 +530,8 @@ const Builder = () => {
       if (!cvSections.includes(draggedSection)) {
         console.log('Adding new section:', draggedSection);
         setCVSections([...cvSections, draggedSection]);
+        // Remove from deleted sections if it was there
+        setDeletedSections(prev => prev.filter(s => s !== draggedSection));
         toast({
           title: "Section Added",
           description: "New section has been added to your CV."
@@ -598,7 +585,7 @@ const Builder = () => {
     
     toast({
       title: "Section Removed",
-      description: "Section has been permanently removed from your CV."
+      description: "Section has been removed and is now available in the sidebar."
     });
   };
 
@@ -828,125 +815,170 @@ const Builder = () => {
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full">
-            {/* Collapsible Sidebar */}
-            <Sidebar className="border-r border-gray-200">
-              <SidebarHeader className="p-4">
+        <TooltipProvider>
+          <div className="min-h-screen flex w-full relative">
+            {/* Modern Collapsible Sidebar */}
+            <div 
+              className={`
+                fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white/95 backdrop-blur-xl border-r border-gray-200/60 
+                shadow-2xl transition-all duration-300 ease-in-out z-30
+                ${sidebarCollapsed ? 'w-20' : 'w-80'}
+              `}
+            >
+              {/* Sidebar Header */}
+              <div className="p-6 border-b border-gray-100/80">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
                     <Zap className="h-5 w-5 text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      CV Builder Pro
-                    </h2>
-                    <p className="text-xs text-gray-500">AI-Powered Tools</p>
+                  {!sidebarCollapsed && (
+                    <div className="animate-fade-in">
+                      <h2 className="text-lg font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                        CV Builder Pro
+                      </h2>
+                      <p className="text-xs text-gray-500 font-medium">AI-Powered Tools</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Sidebar Content */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-8">
+                {/* AI Tools Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                      <Bot className="h-4 w-4 text-white" />
+                    </div>
+                    {!sidebarCollapsed && (
+                      <h3 className="text-sm font-bold text-gray-700 animate-fade-in">AI Assistant Tools</h3>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {[
+                      { icon: Wand2, label: 'AI Generator', desc: 'Generate CV sections', action: handleAIAssist, color: 'from-purple-500 to-violet-500' },
+                      { icon: Target, label: 'CV Optimizer', desc: 'Optimize your CV', action: handleAIOptimizer, color: 'from-orange-500 to-red-500' },
+                      { icon: Sparkles, label: 'Resume Enhancer', desc: 'Enhance content', action: handleAIEnhancer, color: 'from-pink-500 to-rose-500' }
+                    ].map((tool, index) => (
+                      <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={tool.action}
+                            className={`
+                              w-full p-4 rounded-2xl bg-gradient-to-br ${tool.color} 
+                              hover:shadow-lg hover:scale-[1.02] transition-all duration-200 
+                              text-white group border border-white/20
+                            `}
+                          >
+                            <div className="flex items-center gap-3">
+                              <tool.icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                              {!sidebarCollapsed && (
+                                <div className="text-left animate-fade-in">
+                                  <div className="font-medium text-sm">{tool.label}</div>
+                                  <div className="text-xs opacity-90">{tool.desc}</div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
+                          <p>{tool.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
                   </div>
                 </div>
-              </SidebarHeader>
-
-              <SidebarContent className="px-2">
-                {/* AI Tools Section */}
-                <SidebarGroup>
-                  <SidebarGroupLabel className="px-2 py-2 text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
-                    AI Assistant Tools
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          onClick={handleAIAssist}
-                          className="w-full justify-start gap-3 p-3 hover:bg-purple-50 hover:text-purple-700 transition-colors"
-                        >
-                          <Wand2 className="h-4 w-4" />
-                          <div className="text-left">
-                            <span className="font-medium text-sm">AI Generator</span>
-                            <p className="text-xs text-gray-500">Generate CV sections</p>
-                          </div>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          onClick={handleAIOptimizer}
-                          className="w-full justify-start gap-3 p-3 hover:bg-orange-50 hover:text-orange-700 transition-colors"
-                        >
-                          <Target className="h-4 w-4" />
-                          <div className="text-left">
-                            <span className="font-medium text-sm">CV Optimizer</span>
-                            <p className="text-xs text-gray-500">Optimize your CV</p>
-                          </div>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          onClick={handleAIEnhancer}
-                          className="w-full justify-start gap-3 p-3 hover:bg-pink-50 hover:text-pink-700 transition-colors"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          <div className="text-left">
-                            <span className="font-medium text-sm">Resume Enhancer</span>
-                            <p className="text-xs text-gray-500">Enhance content</p>
-                          </div>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-
-                <SidebarSeparator className="my-4" />
 
                 {/* Available Sections */}
-                <SidebarGroup>
-                  <SidebarGroupLabel className="px-2 py-2 text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Sections
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {availableSections.map((section) => (
-                        <SidebarMenuItem key={section.id}>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 px-2">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                      <Plus className="h-4 w-4 text-white" />
+                    </div>
+                    {!sidebarCollapsed && (
+                      <h3 className="text-sm font-bold text-gray-700 animate-fade-in">Add Sections</h3>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {availableSections.map((section) => (
+                      <Tooltip key={section.id}>
+                        <TooltipTrigger asChild>
                           <div 
                             draggable 
                             onDragStart={(e) => handleDragStart(e, section.id)}
-                            className="cursor-grab active:cursor-grabbing hover:bg-muted/60 rounded-lg transition-all duration-200 group transform hover:scale-[1.02] hover:shadow-md"
+                            className="
+                              p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-white 
+                              border border-gray-200/60 hover:border-blue-300/60 
+                              hover:shadow-md hover:scale-[1.02] transition-all duration-200 
+                              cursor-grab active:cursor-grabbing group
+                            "
                           >
-                            <SidebarMenuButton className="w-full justify-start gap-3 py-4 h-auto transition-all duration-200 hover:translate-x-1 group-hover:bg-white/50">
-                              <span className="text-primary group-hover:scale-110 transition-transform duration-200">
-                                {section.icon}
-                              </span>
-                              <div className="text-left">
-                                <span className="font-medium text-sm">{section.title}</span>
-                                <p className="text-xs text-gray-500">{section.description}</p>
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                {React.cloneElement(section.icon as React.ReactElement, { 
+                                  className: "h-4 w-4 text-white" 
+                                })}
                               </div>
-                            </SidebarMenuButton>
+                              {!sidebarCollapsed && (
+                                <div className="text-left animate-fade-in">
+                                  <div className="font-medium text-sm text-gray-900">{section.title}</div>
+                                  <div className="text-xs text-gray-500">{section.description}</div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className={sidebarCollapsed ? '' : 'hidden'}>
+                          <p>{section.title}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
                     
                     {availableSections.length === 0 && (
-                      <div className="text-center py-6">
-                        <div className="w-12 h-12 rounded-3xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-3">
-                          <Award className="h-6 w-6 text-white" />
+                      <div className="text-center py-8">
+                        <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                          <Award className="h-8 w-8 text-white" />
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">All sections added!</p>
+                        {!sidebarCollapsed && (
+                          <div className="animate-fade-in">
+                            <p className="text-sm text-gray-600 font-medium">All sections added!</p>
+                            <p className="text-xs text-gray-400 mt-1">Your CV is complete</p>
+                          </div>
+                        )}
                       </div>
                     )}
-                  </SidebarGroupContent>
-                </SidebarGroup>
-              </SidebarContent>
-            </Sidebar>
+                  </div>
+                </div>
+              </div>
+
+              {/* Collapse Handle */}
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="
+                  absolute -right-4 top-1/2 transform -translate-y-1/2 
+                  w-8 h-12 bg-white border border-gray-200 rounded-r-xl 
+                  shadow-lg hover:shadow-xl transition-all duration-200 
+                  flex items-center justify-center group hover:bg-gray-50
+                  z-10
+                "
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="h-4 w-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                ) : (
+                  <ChevronLeft className="h-4 w-4 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                )}
+              </button>
+            </div>
 
             {/* Main Content */}
-            <SidebarInset className="flex-1">
+            <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-80'}`}>
               {/* Enhanced Header */}
               <div className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-lg">
                 <div className="container mx-auto py-6 px-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                      <SidebarTrigger className="p-2" />
                       <Button
                         variant="outline"
                         onClick={() => navigate('/dashboard')}
@@ -1187,9 +1219,9 @@ const Builder = () => {
                   </div>
                 </div>
               </div>
-            </SidebarInset>
+            </div>
           </div>
-        </SidebarProvider>
+        </TooltipProvider>
 
         {/* AI CV Optimizer */}
         {cvData && (
