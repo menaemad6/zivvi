@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
-import { AIGenerateButton } from '@/components/builder/AIGenerateButton';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { useCV } from '@/hooks/useCV';
 import { Button } from '@/components/ui/button';
@@ -32,10 +31,20 @@ import {
   Type,
   Layout,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  FileCheck,
+  Sparkles,
+  TrendingUp,
+  BarChart3,
+  Clipboard,
+  Share2,
+  ImageIcon,
+  Layers,
+  Grid
 } from 'lucide-react';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
+import { CVData } from '@/types/cv';
 
 const availableSections = [
   { id: 'personal', name: 'Personal Info', icon: User, color: 'bg-blue-500' },
@@ -54,21 +63,34 @@ const aiTools = [
   { id: 'optimizer', name: 'CV Optimizer', icon: Bot, description: 'Optimize your CV with AI' },
   { id: 'enhancer', name: 'Content Enhancer', icon: Zap, description: 'Enhance your content' },
   { id: 'keywords', name: 'Keyword Analyzer', icon: Star, description: 'Analyze keywords' },
+  { id: 'grammar', name: 'Grammar Check', icon: FileCheck, description: 'Check grammar & spelling' },
+  { id: 'tone', name: 'Tone Optimizer', icon: Sparkles, description: 'Optimize tone & style' },
+  { id: 'ats', name: 'ATS Scanner', icon: TrendingUp, description: 'ATS compatibility check' },
 ];
 
 const designTools = [
   { id: 'colors', name: 'Color Themes', icon: Palette, description: 'Customize colors' },
   { id: 'fonts', name: 'Typography', icon: Type, description: 'Choose fonts' },
   { id: 'layout', name: 'Layout Options', icon: Layout, description: 'Change layout' },
+  { id: 'spacing', name: 'Spacing', icon: Grid, description: 'Adjust spacing' },
+  { id: 'images', name: 'Images', icon: ImageIcon, description: 'Add images' },
+  { id: 'sections', name: 'Section Styles', icon: Layers, description: 'Style sections' },
+];
+
+const productivityTools = [
+  { id: 'analytics', name: 'CV Analytics', icon: BarChart3, description: 'View CV performance' },
+  { id: 'templates', name: 'Quick Templates', icon: Clipboard, description: 'Apply templates' },
+  { id: 'export', name: 'Export Options', icon: Share2, description: 'Export in formats' },
 ];
 
 export default function Builder() {
   const { id } = useParams<{ id: string }>();
-  const { cv, updateCV, addSection, removeSection, updateSection, isLoading } = useCV(id);
+  const { cvData, setCVData, isLoading, saveCV, updateCVMetadata } = useCV(id);
   const [editingSection, setEditingSection] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [activeAITool, setActiveAITool] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeSections, setActiveSections] = useState<string[]>(['personal']);
 
   if (isLoading) {
     return (
@@ -78,7 +100,7 @@ export default function Builder() {
     );
   }
 
-  if (!cv) {
+  if (!cvData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>CV not found</p>
@@ -87,19 +109,48 @@ export default function Builder() {
   }
 
   const addSectionToCV = (sectionType: string) => {
-    const sectionData = {
-      id: `${sectionType}-${Date.now()}`,
-      type: sectionType,
-      title: availableSections.find(s => s.id === sectionType)?.name || sectionType,
-      content: {},
-      order: cv.sections?.length || 0
-    };
-    addSection(sectionData);
+    if (!activeSections.includes(sectionType)) {
+      setActiveSections(prev => [...prev, sectionType]);
+    }
+  };
+
+  const removeSectionFromCV = (sectionType: string) => {
+    setActiveSections(prev => prev.filter(s => s !== sectionType));
+  };
+
+  const updateSectionData = (sectionType: string, data: any) => {
+    const newCVData = { ...cvData };
+    
+    // Update the specific section data
+    switch (sectionType) {
+      case 'personal':
+        newCVData.personalInfo = { ...newCVData.personalInfo, ...data };
+        break;
+      case 'experience':
+        newCVData.experience = data;
+        break;
+      case 'education':
+        newCVData.education = data;
+        break;
+      case 'skills':
+        newCVData.skills = data;
+        break;
+      case 'projects':
+        newCVData.projects = data;
+        break;
+      case 'references':
+        newCVData.references = data;
+        break;
+      default:
+        break;
+    }
+    
+    setCVData(newCVData);
+    saveCV(newCVData, [], activeSections);
   };
 
   const getAvailableSections = () => {
-    const usedSectionTypes = cv.sections?.map(section => section.type) || [];
-    return availableSections.filter(section => !usedSectionTypes.includes(section.id));
+    return availableSections.filter(section => !activeSections.includes(section.id));
   };
 
   const exportToPDF = () => {
@@ -108,6 +159,110 @@ export default function Builder() {
 
   const previewCV = () => {
     window.open(`/preview/${id}`, '_blank');
+  };
+
+  const renderSectionContent = (sectionType: string) => {
+    switch (sectionType) {
+      case 'personal':
+        return (
+          <div className="space-y-3">
+            <p><strong>Name:</strong> {cvData.personalInfo.fullName || 'Not specified'}</p>
+            <p><strong>Email:</strong> {cvData.personalInfo.email || 'Not specified'}</p>
+            <p><strong>Phone:</strong> {cvData.personalInfo.phone || 'Not specified'}</p>
+            <p><strong>Location:</strong> {cvData.personalInfo.location || 'Not specified'}</p>
+            {cvData.personalInfo.summary && (
+              <p><strong>Summary:</strong> {cvData.personalInfo.summary}</p>
+            )}
+          </div>
+        );
+      case 'experience':
+        return (
+          <div className="space-y-3">
+            {cvData.experience.length > 0 ? (
+              cvData.experience.map((exp, index) => (
+                <div key={index} className="border-l-2 border-blue-200 pl-4">
+                  <h4 className="font-semibold">{exp.title} at {exp.company}</h4>
+                  <p className="text-sm text-gray-600">{exp.startDate} - {exp.endDate}</p>
+                  <p className="text-sm">{exp.description}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No experience added yet</p>
+            )}
+          </div>
+        );
+      case 'education':
+        return (
+          <div className="space-y-3">
+            {cvData.education.length > 0 ? (
+              cvData.education.map((edu, index) => (
+                <div key={index} className="border-l-2 border-green-200 pl-4">
+                  <h4 className="font-semibold">{edu.degree}</h4>
+                  <p className="text-sm text-gray-600">{edu.school}</p>
+                  <p className="text-sm">{edu.startDate} - {edu.endDate}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No education added yet</p>
+            )}
+          </div>
+        );
+      case 'skills':
+        return (
+          <div className="space-y-3">
+            {cvData.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {cvData.skills.map((skill, index) => (
+                  <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No skills added yet</p>
+            )}
+          </div>
+        );
+      case 'projects':
+        return (
+          <div className="space-y-3">
+            {cvData.projects.length > 0 ? (
+              cvData.projects.map((project, index) => (
+                <div key={index} className="border-l-2 border-purple-200 pl-4">
+                  <h4 className="font-semibold">{project.name}</h4>
+                  <p className="text-sm">{project.description}</p>
+                  <p className="text-xs text-gray-600">Tech: {project.technologies}</p>
+                  {project.link && (
+                    <a href={project.link} className="text-blue-500 text-sm hover:underline">
+                      View Project
+                    </a>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No projects added yet</p>
+            )}
+          </div>
+        );
+      case 'references':
+        return (
+          <div className="space-y-3">
+            {cvData.references.length > 0 ? (
+              cvData.references.map((ref, index) => (
+                <div key={index} className="border-l-2 border-cyan-200 pl-4">
+                  <h4 className="font-semibold">{ref.name}</h4>
+                  <p className="text-sm">{ref.position} at {ref.company}</p>
+                  <p className="text-sm text-gray-600">{ref.email} | {ref.phone}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No references added yet</p>
+            )}
+          </div>
+        );
+      default:
+        return <p className="text-gray-500">Section content</p>;
+    }
   };
 
   return (
@@ -134,7 +289,7 @@ export default function Builder() {
         </div>
 
         {/* Scrollable Content */}
-        <ScrollArea className="h-[calc(100vh-120px)]">
+        <ScrollArea className="h-[calc(100vh-180px)]">
           <div className="p-4 space-y-6">
             {/* Available Sections */}
             <div>
@@ -154,7 +309,7 @@ export default function Builder() {
                         p-3 cursor-pointer transition-all duration-200 
                         hover:shadow-lg hover:scale-[1.02] border-slate-200/60
                         bg-gradient-to-r from-white to-slate-50/50
-                        ${sidebarCollapsed ? 'justify-center' : ''}
+                        ${sidebarCollapsed ? 'flex justify-center' : ''}
                       `}
                       onClick={() => addSectionToCV(section.id)}
                     >
@@ -192,7 +347,7 @@ export default function Builder() {
                         p-3 cursor-pointer transition-all duration-200 
                         hover:shadow-lg hover:scale-[1.02] border-slate-200/60
                         bg-gradient-to-r from-purple-50 to-blue-50
-                        ${sidebarCollapsed ? 'justify-center' : ''}
+                        ${sidebarCollapsed ? 'flex justify-center' : ''}
                       `}
                       onClick={() => setActiveAITool(tool.id)}
                     >
@@ -231,11 +386,49 @@ export default function Builder() {
                         p-3 cursor-pointer transition-all duration-200 
                         hover:shadow-lg hover:scale-[1.02] border-slate-200/60
                         bg-gradient-to-r from-emerald-50 to-teal-50
-                        ${sidebarCollapsed ? 'justify-center' : ''}
+                        ${sidebarCollapsed ? 'flex justify-center' : ''}
                       `}
                     >
                       <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
                         <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-2 rounded-lg shadow-sm">
+                          <IconComponent className="w-4 h-4 text-white" />
+                        </div>
+                        {!sidebarCollapsed && (
+                          <div>
+                            <h4 className="font-medium text-slate-800">{tool.name}</h4>
+                            <p className="text-xs text-slate-600">{tool.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Productivity Tools */}
+            <div>
+              {!sidebarCollapsed && (
+                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Productivity
+                </h3>
+              )}
+              <div className="space-y-2">
+                {productivityTools.map((tool) => {
+                  const IconComponent = tool.icon;
+                  return (
+                    <Card 
+                      key={tool.id}
+                      className={`
+                        p-3 cursor-pointer transition-all duration-200 
+                        hover:shadow-lg hover:scale-[1.02] border-slate-200/60
+                        bg-gradient-to-r from-amber-50 to-orange-50
+                        ${sidebarCollapsed ? 'flex justify-center' : ''}
+                      `}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-2 rounded-lg shadow-sm">
                           <IconComponent className="w-4 h-4 text-white" />
                         </div>
                         {!sidebarCollapsed && (
@@ -290,25 +483,39 @@ export default function Builder() {
           </div>
         </div>
 
-        {/* Collapse Handler */}
+        {/* Enhanced Collapse Handler */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className={`
-            absolute top-1/2 -translate-y-1/2 -right-4 z-50
-            w-8 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 
-            hover:from-blue-600 hover:to-indigo-600
-            text-white rounded-r-xl shadow-lg
+            absolute top-1/2 -translate-y-1/2 -right-6 z-50
+            w-12 h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 
+            hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700
+            text-white rounded-r-2xl shadow-2xl
             flex items-center justify-center
             transition-all duration-300 ease-in-out
-            hover:shadow-xl hover:scale-105
-            border-2 border-white/20
+            hover:shadow-2xl hover:scale-105 hover:-translate-x-1
+            border-4 border-white/30
+            backdrop-blur-sm
+            group
+            before:absolute before:inset-0 before:rounded-r-2xl 
+            before:bg-gradient-to-br before:from-white/20 before:to-transparent 
+            before:opacity-0 before:transition-opacity before:duration-300
+            hover:before:opacity-100
           `}
         >
-          {sidebarCollapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <ChevronLeft className="w-4 h-4" />
-          )}
+          <div className="relative z-10 transition-transform duration-300 group-hover:scale-110">
+            {sidebarCollapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <ChevronLeft className="w-5 h-5" />
+            )}
+          </div>
+          
+          {/* Animated border effect */}
+          <div className="absolute inset-0 rounded-r-2xl border-2 border-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
+          {/* Subtle glow effect */}
+          <div className="absolute inset-0 rounded-r-2xl bg-gradient-to-br from-blue-400/30 to-indigo-400/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
         </button>
       </div>
 
@@ -321,27 +528,32 @@ export default function Builder() {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-800">{cv.title}</h1>
+                  <h1 className="text-3xl font-bold text-slate-800">My CV</h1>
                   <p className="text-slate-600">Build your professional CV</p>
                 </div>
-                <AIGenerateButton cvId={id!} />
               </div>
             </div>
 
             {/* CV Sections */}
             <div className="space-y-6">
-              {cv.sections?.map((section) => (
-                <CVSection
-                  key={section.id}
-                  section={section}
-                  onEdit={() => setEditingSection(section)}
-                  onDelete={() => removeSection(section.id)}
-                  onUpdate={(updatedSection) => updateSection(section.id, updatedSection)}
-                />
-              ))}
+              {activeSections.map((sectionType) => {
+                const section = availableSections.find(s => s.id === sectionType);
+                if (!section) return null;
+
+                return (
+                  <CVSection
+                    key={sectionType}
+                    title={section.name}
+                    onEdit={() => setEditingSection({ type: sectionType, data: cvData })}
+                    onDelete={() => removeSectionFromCV(sectionType)}
+                  >
+                    {renderSectionContent(sectionType)}
+                  </CVSection>
+                );
+              })}
             </div>
 
-            {cv.sections?.length === 0 && (
+            {activeSections.length === 0 && (
               <div className="text-center py-16">
                 <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-slate-600 mb-2">Start Building Your CV</h3>
@@ -355,37 +567,50 @@ export default function Builder() {
       {/* Modals */}
       {editingSection && (
         <SectionEditModal
-          section={editingSection}
-          onSave={(updatedSection) => {
-            updateSection(editingSection.id, updatedSection);
+          isOpen={!!editingSection}
+          onClose={() => setEditingSection(null)}
+          sectionType={editingSection.type}
+          sectionData={editingSection.data}
+          onSave={(data) => {
+            updateSectionData(editingSection.type, data);
             setEditingSection(null);
           }}
-          onClose={() => setEditingSection(null)}
         />
       )}
 
       {showSettings && (
         <CVSettingsModal
-          cv={cv}
-          onSave={updateCV}
+          isOpen={showSettings}
           onClose={() => setShowSettings(false)}
+          cvId={id!}
+          currentName="My CV"
+          currentDescription=""
+          onUpdate={updateCVMetadata}
         />
       )}
 
       {/* AI Tool Modals */}
       {activeAITool === 'optimizer' && (
         <AICVOptimizer
-          cv={cv}
+          isOpen={true}
           onClose={() => setActiveAITool(null)}
-          onUpdate={updateCV}
+          cvData={cvData}
+          onUpdate={(updatedData: CVData) => {
+            setCVData(updatedData);
+            saveCV(updatedData, [], activeSections);
+          }}
         />
       )}
 
       {activeAITool === 'enhancer' && (
         <AIResumeEnhancer
-          cv={cv}
+          isOpen={true}
           onClose={() => setActiveAITool(null)}
-          onUpdate={updateCV}
+          cvData={cvData}
+          onUpdate={(updatedData: CVData) => {
+            setCVData(updatedData);
+            saveCV(updatedData, [], activeSections);
+          }}
         />
       )}
     </div>
