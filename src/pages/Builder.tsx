@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Magic } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Download, Palette, Zap, Undo, Redo, Copy, Share2, Settings, Layout, Wand2, Import, Sparkles, Target, Bot, Mic } from 'lucide-react';
 import { SidebarSection } from '@/components/builder/SidebarSection';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
