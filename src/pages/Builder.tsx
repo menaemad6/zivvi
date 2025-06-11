@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CVSection } from '@/components/builder/CVSection';
@@ -126,6 +125,84 @@ export default function Builder() {
     saveCV(cvData);
   };
 
+  const renderSectionContent = (sectionType: string) => {
+    const section = availableSections.find(s => s.id === sectionType);
+    if (!section) return <div>Section not found</div>;
+    
+    switch (sectionType) {
+      case 'personal':
+        return (
+          <div className="space-y-2">
+            <p><strong>Name:</strong> {cvData.personalInfo?.fullName || 'Not set'}</p>
+            <p><strong>Email:</strong> {cvData.personalInfo?.email || 'Not set'}</p>
+            <p><strong>Phone:</strong> {cvData.personalInfo?.phone || 'Not set'}</p>
+            <p><strong>Location:</strong> {cvData.personalInfo?.location || 'Not set'}</p>
+          </div>
+        );
+      case 'experience':
+        return (
+          <div className="space-y-2">
+            {cvData.experience?.length > 0 ? (
+              cvData.experience.map(exp => (
+                <div key={exp.id} className="border-l-2 border-gray-200 pl-3">
+                  <p className="font-medium">{exp.title} at {exp.company}</p>
+                  <p className="text-sm text-gray-600">{exp.startDate} - {exp.endDate}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No experience added</p>
+            )}
+          </div>
+        );
+      case 'education':
+        return (
+          <div className="space-y-2">
+            {cvData.education?.length > 0 ? (
+              cvData.education.map(edu => (
+                <div key={edu.id} className="border-l-2 border-gray-200 pl-3">
+                  <p className="font-medium">{edu.degree}</p>
+                  <p className="text-sm text-gray-600">{edu.school}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No education added</p>
+            )}
+          </div>
+        );
+      case 'skills':
+        return (
+          <div className="flex flex-wrap gap-2">
+            {cvData.skills?.length > 0 ? (
+              cvData.skills.map((skill, index) => (
+                <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500">No skills added</p>
+            )}
+          </div>
+        );
+      case 'projects':
+        return (
+          <div className="space-y-2">
+            {cvData.projects?.length > 0 ? (
+              cvData.projects.map(project => (
+                <div key={project.id} className="border-l-2 border-gray-200 pl-3">
+                  <p className="font-medium">{project.name}</p>
+                  <p className="text-sm text-gray-600">{project.technologies}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No projects added</p>
+            )}
+          </div>
+        );
+      default:
+        return <p className="text-gray-500">Section content not implemented</p>;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -144,12 +221,12 @@ export default function Builder() {
         {/* Enhanced Collapse Handler */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl"
+          className="absolute -right-4 top-6 z-50 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl border-2 border-white/20"
         >
           {sidebarCollapsed ? (
-            <ChevronRight className="h-3 w-3" />
+            <ChevronRight className="h-4 w-4" />
           ) : (
-            <ChevronLeft className="h-3 w-3" />
+            <ChevronLeft className="h-4 w-4" />
           )}
         </button>
 
@@ -173,8 +250,8 @@ export default function Builder() {
           </div>
         </div>
 
-        {/* Scrollable Content */}
-        <ScrollArea className="flex-1">
+        {/* Scrollable Content with Custom Scrollbar */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-4 space-y-6">
             {/* CV Sections */}
             <div>
@@ -186,16 +263,19 @@ export default function Builder() {
               )}
               <div className="space-y-2">
                 {availableSections.map((section) => (
-                  <SidebarSection
+                  <Button
                     key={section.id}
-                    title={sidebarCollapsed ? '' : section.name}
-                    icon={
-                      <section.icon 
-                        className={`h-4 w-4 ${sidebarCollapsed ? 'mx-auto' : ''}`} 
-                      />
-                    }
+                    variant="ghost"
+                    size={sidebarCollapsed ? "icon" : "sm"}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'} hover:bg-muted/60 cursor-grab active:cursor-grabbing`}
+                    draggable
                     onDragStart={(e) => handleDragStart(e, section.id)}
-                  />
+                  >
+                    <section.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'} flex-shrink-0`} />
+                    {!sidebarCollapsed && (
+                      <span className="truncate">{section.name}</span>
+                    )}
+                  </Button>
                 ))}
               </div>
             </div>
@@ -214,14 +294,16 @@ export default function Builder() {
                     key={tool.id}
                     variant="ghost"
                     size={sidebarCollapsed ? "icon" : "sm"}
-                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'} hover:bg-muted/60`}
                     onClick={() => {
                       if (tool.id === 'optimizer') setShowOptimizer(true);
                       if (tool.id === 'enhancer') setShowEnhancer(true);
                     }}
                   >
-                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-                    {!sidebarCollapsed && tool.name}
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'} flex-shrink-0`} />
+                    {!sidebarCollapsed && (
+                      <span className="truncate">{tool.name}</span>
+                    )}
                   </Button>
                 ))}
               </div>
@@ -241,10 +323,12 @@ export default function Builder() {
                     key={tool.id}
                     variant="ghost"
                     size={sidebarCollapsed ? "icon" : "sm"}
-                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'} hover:bg-muted/60`}
                   >
-                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-                    {!sidebarCollapsed && tool.name}
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'} flex-shrink-0`} />
+                    {!sidebarCollapsed && (
+                      <span className="truncate">{tool.name}</span>
+                    )}
                   </Button>
                 ))}
               </div>
@@ -264,16 +348,18 @@ export default function Builder() {
                     key={tool.id}
                     variant="ghost"
                     size={sidebarCollapsed ? "icon" : "sm"}
-                    className={`w-full ${sidebarCollapsed ? 'justify-center' : 'justify-start'} hover:bg-muted/60`}
+                    className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'} hover:bg-muted/60`}
                   >
-                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-                    {!sidebarCollapsed && tool.name}
+                    <tool.icon className={`h-4 w-4 ${sidebarCollapsed ? '' : 'mr-2'} flex-shrink-0`} />
+                    {!sidebarCollapsed && (
+                      <span className="truncate">{tool.name}</span>
+                    )}
                   </Button>
                 ))}
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-border">
@@ -333,12 +419,12 @@ export default function Builder() {
                   return (
                     <CVSection
                       key={sectionType}
-                      sectionType={sectionType}
-                      data={cvData}
+                      title={section?.name || 'Unknown Section'}
                       onEdit={() => handleSectionEdit(sectionType)}
                       onDelete={() => handleSectionDelete(sectionType)}
-                      onUpdate={handleSectionUpdate}
-                    />
+                    >
+                      {renderSectionContent(sectionType)}
+                    </CVSection>
                   );
                 })
               )}
@@ -352,7 +438,11 @@ export default function Builder() {
             <h3 className="font-semibold">Live Preview</h3>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 transform scale-75 origin-top">
-            <CVTemplateRenderer cvData={cvData} templateId="modern" />
+            <CVTemplateRenderer 
+              cvData={cvData} 
+              templateId="modern" 
+              sections={activeSections}
+            />
           </div>
         </div>
       </div>
@@ -363,6 +453,7 @@ export default function Builder() {
           isOpen={true}
           onClose={() => setEditingSection(null)}
           sectionType={editingSection}
+          sectionTitle={availableSections.find(s => s.id === editingSection)?.name || 'Section'}
           cvData={cvData}
           onSave={handleSectionUpdate}
         />
@@ -373,7 +464,11 @@ export default function Builder() {
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
           cvData={cvData}
-          onUpdate={handleSectionUpdate}
+          onUpdate={async (name: string, description: string) => {
+            // Handle CV metadata update
+            console.log('Update CV metadata:', name, description);
+            return true;
+          }}
         />
       )}
 
@@ -388,11 +483,30 @@ export default function Builder() {
       {showEnhancer && (
         <AIResumeEnhancer
           open={showEnhancer}
-          onClose={() => setShowEnhancer(false)}
+          setOpen={setShowEnhancer}
           cvData={cvData}
-          onUpdate={handleSectionUpdate}
+          onEnhance={handleSectionUpdate}
         />
       )}
+
+      {/* Custom Scrollbar Styles */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: hsl(var(--muted));
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: hsl(var(--muted-foreground) / 0.3);
+          border-radius: 4px;
+          transition: background 0.2s;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: hsl(var(--muted-foreground) / 0.5);
+        }
+      `}</style>
     </div>
   );
 }
