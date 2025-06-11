@@ -255,42 +255,50 @@
     }
   }
 
-  /* Sidebar Scrollbar Styles */
-  .sidebar-scroll {
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  /* Modern Sidebar Scrollbar - Force Override All Existing Styles */
+  .sidebar-scrollable {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: hsl(var(--border)) transparent !important;
   }
 
-  .sidebar-scroll::-webkit-scrollbar {
-    width: 8px;
+  .sidebar-scrollable::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
   }
 
-  .sidebar-scroll::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
+  .sidebar-scrollable::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 3px !important;
   }
 
-  .sidebar-scroll::-webkit-scrollbar-thumb {
-    background: rgba(156, 163, 175, 0.3);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  .sidebar-scrollable::-webkit-scrollbar-thumb {
+    background: hsl(var(--border)) !important;
+    border-radius: 3px !important;
+    transition: all 0.2s ease !important;
   }
 
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.5);
+  .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground)) !important;
   }
 
-  /* Dark mode scrollbar support */
-  .dark .sidebar-scroll {
-    scrollbar-color: rgba(75, 85, 99, 0.3) transparent;
+  .sidebar-scrollable::-webkit-scrollbar-corner {
+    background: transparent !important;
   }
 
-  .dark .sidebar-scroll::-webkit-scrollbar-thumb {
-    background: rgba(75, 85, 99, 0.3);
+  /* Dark mode support */
+  .dark .sidebar-scrollable {
+    scrollbar-color: hsl(var(--border)) transparent !important;
   }
 
-  .dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.5);
+  .dark .sidebar-scrollable::-webkit-scrollbar-thumb {
+    background: hsl(var(--border)) !important;
+  }
+
+  .dark .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground)) !important;
   }
 }
