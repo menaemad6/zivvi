@@ -255,54 +255,42 @@
     }
   }
 
-  /* Modern Scrollbar Styles */
-  .scrollbar-thin {
+  /* Sidebar Scrollbar Styles */
+  .sidebar-scroll {
+    overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
   }
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 8px;
   }
 
-  .scrollbar-thin::-webkit-scrollbar-track {
+  .sidebar-scroll::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 3px;
+    border-radius: 4px;
   }
 
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(156, 163, 175, 0.5);
-    border-radius: 3px;
-    transition: background 0.2s ease;
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
 
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.7);
-  }
-
-  .scrollbar-track-gray-100::-webkit-scrollbar-track {
-    background: rgb(243, 244, 246);
-  }
-
-  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-    background: rgb(209, 213, 219);
-  }
-
-  .hover\:scrollbar-thumb-gray-400:hover::-webkit-scrollbar-thumb {
-    background: rgb(156, 163, 175);
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.5);
   }
 
   /* Dark mode scrollbar support */
-  .dark .scrollbar-thin {
-    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  .dark .sidebar-scroll {
+    scrollbar-color: rgba(75, 85, 99, 0.3) transparent;
   }
 
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(75, 85, 99, 0.5);
+  .dark .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.3);
   }
 
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.7);
+  .dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.5);
   }
 }

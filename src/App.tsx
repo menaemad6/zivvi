@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import Templates from "./pages/Templates";
 import Preview from "./pages/Preview";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Pricing from "./pages/Pricing";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "@/components/ui/PrivateRoute";
 
@@ -28,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/preview/:id" element={<Preview />} />
             <Route element={<PrivateRoute />}>
