@@ -16,10 +16,21 @@ const ScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Viewport 
       className="h-full w-full rounded-[inherit]"
       onWheel={(e) => {
-        e.stopPropagation();
+        // Let the scroll area handle its own scrolling
+        const target = e.currentTarget;
+        const { scrollTop, scrollHeight, clientHeight } = target;
+        
+        // Only stop propagation if we can actually scroll
+        if (scrollHeight > clientHeight) {
+          e.stopPropagation();
+        }
       }}
       onScroll={(e) => {
         e.stopPropagation();
+      }}
+      style={{
+        overscrollBehavior: 'contain',
+        scrollBehavior: 'smooth'
       }}
     >
       {children}
