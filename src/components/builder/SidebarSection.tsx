@@ -9,10 +9,20 @@ interface SectionProps {
 }
 
 export const SidebarSection: React.FC<SectionProps> = ({ title, icon, onDragStart }) => {
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleScroll = (e: React.UIEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div 
       draggable 
       onDragStart={onDragStart}
+      onWheel={handleWheel}
+      onScroll={handleScroll}
       className="cursor-grab active:cursor-grabbing hover:bg-muted/60 rounded-lg transition-all duration-200 group transform hover:scale-[1.02] hover:shadow-md"
     >
       <Button 
