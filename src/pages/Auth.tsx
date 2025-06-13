@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -24,18 +25,6 @@ const Auth = () => {
   const [isFormLoading, setIsFormLoading] = useState(false);
   
   console.log('Auth page - user:', user?.id, 'isLoading:', isLoading);
-  
-  // Redirect logged-in users to dashboard
-  useEffect(() => {
-    if (!isLoading && user) {
-      navigate('/dashboard');
-    }
-  }, [user, isLoading, navigate]);
-
-  // If user is logged in, redirect immediately
-  if (!isLoading && user) {
-    return <Navigate to="/dashboard" replace />;
-  }
   
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
