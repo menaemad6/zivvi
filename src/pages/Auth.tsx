@@ -26,6 +26,18 @@ const Auth = () => {
   
   console.log('Auth page - user:', user?.id, 'isLoading:', isLoading);
   
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, isLoading, navigate]);
+
+  // If user is logged in, show loading or redirect
+  if (!isLoading && user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsFormLoading(true);

@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X } from 'lucide-react';
+import { Check, X, Sparkles, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const pricingTiers = [
@@ -68,17 +68,34 @@ const pricingTiers = [
 
 export default function Pricing() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Enhanced Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-40 h-40 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full floating blur-2xl"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full floating blur-xl" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-40 left-1/4 w-28 h-28 bg-gradient-to-r from-emerald-400/20 to-blue-400/20 rounded-full floating blur-xl" style={{animationDelay: '4s'}}></div>
+        <div className="absolute bottom-20 right-1/3 w-36 h-36 bg-gradient-to-r from-pink-400/20 to-orange-400/20 rounded-full floating blur-2xl" style={{animationDelay: '1s'}}></div>
+        
+        {/* Additional decorative elements */}
+        <div className="absolute top-1/3 left-1/2 w-24 h-24 bg-gradient-to-r from-cyan-400/15 to-blue-400/15 rounded-full floating blur-xl" style={{animationDelay: '3s'}}></div>
+        <div className="absolute bottom-1/3 left-1/6 w-20 h-20 bg-gradient-to-r from-yellow-400/15 to-orange-400/15 rounded-full floating blur-lg" style={{animationDelay: '5s'}}></div>
+      </div>
+      
       <Navbar />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-24 pb-16 relative z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
           {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
+          <div className="text-center mb-16 fade-in-up">
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-xl">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
               Simple, transparent pricing
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Choose the perfect plan for your CV building needs. Start free and upgrade when you're ready.
             </p>
           </div>
@@ -88,50 +105,64 @@ export default function Pricing() {
             {pricingTiers.map((tier, index) => (
               <Card 
                 key={tier.name} 
-                className={`relative transition-all duration-200 hover:shadow-lg ${
+                className={`relative transition-all duration-300 hover:shadow-2xl hover:scale-105 fade-in-up bg-white/80 backdrop-blur-xl border border-white/30 ${
                   tier.popular 
-                    ? 'border-primary shadow-lg scale-105' 
-                    : 'border-border hover:border-primary/20'
+                    ? 'glow-border shadow-2xl scale-105' 
+                    : 'hover:border-blue-200'
                 }`}
+                style={{animationDelay: `${index * 0.2}s`}}
               >
                 {tier.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-6 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg">
+                      <Star className="w-4 h-4" />
                       Most Popular
-                    </span>
+                    </div>
                   </div>
                 )}
                 
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-foreground">{tier.price}</span>
-                    <span className="text-muted-foreground">/{tier.period}</span>
+                <CardHeader className="text-center pb-8">
+                  <CardTitle className="text-2xl font-bold text-gray-900">{tier.name}</CardTitle>
+                  <div className="mt-6">
+                    <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      {tier.price}
+                    </span>
+                    <span className="text-gray-600 text-lg">/{tier.period}</span>
                   </div>
-                  <CardDescription className="mt-2">{tier.description}</CardDescription>
+                  <CardDescription className="mt-4 text-gray-600 text-base">
+                    {tier.description}
+                  </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
                     {tier.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-700">{feature}</span>
                       </div>
                     ))}
                     {tier.limitations.map((limitation) => (
                       <div key={limitation} className="flex items-center gap-3">
-                        <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{limitation}</span>
+                        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                          <X className="h-3 w-3 text-gray-400" />
+                        </div>
+                        <span className="text-sm text-gray-400">{limitation}</span>
                       </div>
                     ))}
                   </div>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="pt-8">
                   <Button 
                     variant={tier.buttonVariant} 
-                    className="w-full"
+                    className={`w-full h-12 font-semibold transition-all duration-200 ${
+                      tier.popular 
+                        ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 hover:shadow-xl hover:scale-105' 
+                        : 'hover:bg-gradient-to-r hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 hover:text-white hover:border-transparent'
+                    }`}
                     size="lg"
                     asChild
                   >
@@ -145,44 +176,44 @@ export default function Pricing() {
           </div>
 
           {/* FAQ Section */}
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
+          <div className="max-w-3xl mx-auto fade-in-up stagger-2">
+            <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
               Frequently Asked Questions
             </h2>
             
             <div className="space-y-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/70 transition-all duration-200">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Can I change my plan later?
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600">
                   Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
                 </p>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/70 transition-all duration-200">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Is there a free trial?
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600">
                   Yes, we offer a 14-day free trial for the Pro plan. No credit card required to start.
                 </p>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/70 transition-all duration-200">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   What payment methods do you accept?
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600">
                   We accept all major credit cards, PayPal, and bank transfers for annual plans.
                 </p>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/70 transition-all duration-200">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Can I cancel anytime?
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600">
                   Absolutely. You can cancel your subscription at any time. You'll continue to have access until the end of your billing period.
                 </p>
               </div>
@@ -190,14 +221,23 @@ export default function Pricing() {
           </div>
 
           {/* CTA Section */}
-          <div className="text-center mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
-            <h2 className="text-2xl font-bold mb-4 text-foreground">
+          <div className="text-center mt-16 p-8 rounded-3xl bg-white/50 backdrop-blur-xl border border-white/30 shadow-2xl fade-in-up stagger-3">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
               Ready to create your perfect CV?
             </h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-gray-600 mb-6">
               Join thousands of professionals who have landed their dream jobs with CVBuilder.
             </p>
-            <Button size="lg" asChild>
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white border-0 px-8 py-6 text-lg font-semibold hover:shadow-xl hover:scale-105 transition-all duration-200"
+              asChild
+            >
               <Link to="/signup">
                 Start Building Today
               </Link>

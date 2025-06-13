@@ -255,29 +255,31 @@
     }
   }
 
-  /* Modern Sidebar Scrollbar - Force Override All Existing Styles */
+  /* Enhanced Sidebar Scrollbar - Fix for Builder Page Sidebar */
   .sidebar-scrollable {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     height: 100% !important;
     max-height: 100vh !important;
     scrollbar-width: thin !important;
-    scrollbar-color: hsl(var(--border)) transparent !important;
+    scrollbar-color: hsl(var(--border)) hsl(var(--background)) !important;
+    overscroll-behavior: contain !important;
   }
 
   .sidebar-scrollable::-webkit-scrollbar {
-    width: 6px !important;
-    height: 6px !important;
+    width: 8px !important;
+    height: 8px !important;
   }
 
   .sidebar-scrollable::-webkit-scrollbar-track {
-    background: transparent !important;
-    border-radius: 3px !important;
+    background: hsl(var(--background)) !important;
+    border-radius: 4px !important;
   }
 
   .sidebar-scrollable::-webkit-scrollbar-thumb {
     background: hsl(var(--border)) !important;
-    border-radius: 3px !important;
+    border-radius: 4px !important;
+    border: 1px solid hsl(var(--background)) !important;
     transition: all 0.2s ease !important;
   }
 
@@ -286,19 +288,44 @@
   }
 
   .sidebar-scrollable::-webkit-scrollbar-corner {
-    background: transparent !important;
+    background: hsl(var(--background)) !important;
+  }
+
+  /* Prevent scroll propagation for sidebar container */
+  .sidebar-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden !important;
+  }
+
+  .sidebar-container .sidebar-scrollable {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-right: 4px;
   }
 
   /* Dark mode support */
   .dark .sidebar-scrollable {
-    scrollbar-color: hsl(var(--border)) transparent !important;
+    scrollbar-color: hsl(var(--border)) hsl(var(--background)) !important;
+  }
+
+  .dark .sidebar-scrollable::-webkit-scrollbar-track {
+    background: hsl(var(--background)) !important;
   }
 
   .dark .sidebar-scrollable::-webkit-scrollbar-thumb {
     background: hsl(var(--border)) !important;
+    border-color: hsl(var(--background)) !important;
   }
 
   .dark .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground)) !important;
+  }
+
+  .dark .sidebar-scrollable::-webkit-scrollbar-corner {
+    background: hsl(var(--background)) !important;
   }
 }
