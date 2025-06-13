@@ -179,13 +179,21 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground sidebar-container",
+            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
             className
           )}
           ref={ref}
           {...props}
         >
-          <div className="flex h-full flex-col sidebar-scrollable">
+          <div 
+            className="flex h-full flex-col overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-background"
+            onWheel={(e) => {
+              e.stopPropagation()
+            }}
+            onScroll={(e) => {
+              e.stopPropagation()
+            }}
+          >
             {children}
           </div>
         </div>
@@ -198,7 +206,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden sidebar-container"
+            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -206,7 +214,15 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <div className="flex h-full w-full flex-col sidebar-scrollable">
+            <div 
+              className="flex h-full w-full flex-col overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-background"
+              onWheel={(e) => {
+                e.stopPropagation()
+              }}
+              onScroll={(e) => {
+                e.stopPropagation()
+              }}
+            >
               {children}
             </div>
           </SheetContent>
@@ -250,25 +266,34 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow sidebar-container"
+            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
           >
-            <div className="flex h-full flex-col sidebar-scrollable"
-                 onWheel={(e) => {
-                   // Prevent wheel event from propagating to parent if sidebar is scrolling
-                   const target = e.currentTarget;
-                   const isScrollable = target.scrollHeight > target.clientHeight;
-                   
-                   if (isScrollable) {
-                     // Allow scrolling within sidebar bounds
-                     const atTop = target.scrollTop === 0;
-                     const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight;
-                     
-                     // Prevent propagation if we're scrolling within the sidebar
-                     if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) {
-                       e.stopPropagation();
-                     }
-                   }
-                 }}>
+            <div 
+              className="flex h-full flex-col overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-background"
+              onWheel={(e) => {
+                // Prevent wheel event from bubbling up
+                e.stopPropagation()
+                
+                // Get the current scroll position
+                const target = e.currentTarget
+                const { scrollTop, scrollHeight, clientHeight } = target
+                
+                // Check if we're at the boundaries
+                const atTop = scrollTop === 0
+                const atBottom = scrollTop + clientHeight >= scrollHeight - 1
+                
+                // If we're scrolling up at the top or down at the bottom, prevent default
+                if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+                  e.preventDefault()
+                }
+              }}
+              onScroll={(e) => {
+                e.stopPropagation()
+              }}
+              style={{
+                overscrollBehavior: 'contain'
+              }}
+            >
               {children}
             </div>
           </div>

@@ -255,77 +255,40 @@
     }
   }
 
-  /* Enhanced Sidebar Scrollbar - Fix for Builder Page Sidebar */
-  .sidebar-scrollable {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: 100% !important;
-    max-height: 100vh !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: hsl(var(--border)) hsl(var(--background)) !important;
-    overscroll-behavior: contain !important;
+  /* Tailwind Scrollbar utilities */
+  .scrollbar-thin {
+    scrollbar-width: thin;
   }
 
-  .sidebar-scrollable::-webkit-scrollbar {
-    width: 8px !important;
-    height: 8px !important;
+  .scrollbar-thumb-border {
+    scrollbar-color: hsl(var(--border)) transparent;
   }
 
-  .sidebar-scrollable::-webkit-scrollbar-track {
-    background: hsl(var(--background)) !important;
-    border-radius: 4px !important;
+  .scrollbar-track-background {
+    /* This is handled by scrollbar-color above */
   }
 
-  .sidebar-scrollable::-webkit-scrollbar-thumb {
-    background: hsl(var(--border)) !important;
-    border-radius: 4px !important;
-    border: 1px solid hsl(var(--background)) !important;
-    transition: all 0.2s ease !important;
+  /* Webkit scrollbar styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground)) !important;
+  .scrollbar-thumb-border::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 4px;
+    border: 1px solid hsl(var(--background));
   }
 
-  .sidebar-scrollable::-webkit-scrollbar-corner {
-    background: hsl(var(--background)) !important;
+  .scrollbar-thumb-border::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
   }
 
-  /* Prevent scroll propagation for sidebar container */
-  .sidebar-container {
-    position: relative;
-    height: 100vh;
-    overflow: hidden !important;
+  .scrollbar-track-background::-webkit-scrollbar-track {
+    background: transparent;
   }
 
-  .sidebar-container .sidebar-scrollable {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding-right: 4px;
-  }
-
-  /* Dark mode support */
-  .dark .sidebar-scrollable {
-    scrollbar-color: hsl(var(--border)) hsl(var(--background)) !important;
-  }
-
-  .dark .sidebar-scrollable::-webkit-scrollbar-track {
-    background: hsl(var(--background)) !important;
-  }
-
-  .dark .sidebar-scrollable::-webkit-scrollbar-thumb {
-    background: hsl(var(--border)) !important;
-    border-color: hsl(var(--background)) !important;
-  }
-
-  .dark .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--muted-foreground)) !important;
-  }
-
-  .dark .sidebar-scrollable::-webkit-scrollbar-corner {
-    background: hsl(var(--background)) !important;
+  .scrollbar-thin::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
