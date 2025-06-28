@@ -751,10 +751,10 @@ const Builder = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
+      <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
         <TooltipProvider>
           {/* Enhanced Header */}
-          <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl">
+          <div className="fixed top-16 left-0 right-0 bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl z-30">
             <div className="container mx-auto py-8 px-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-8">
@@ -845,7 +845,7 @@ const Builder = () => {
           </div>
 
           {/* Main Content with Sidebar */}
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex w-full pt-32">
             {/* Left Sidebar */}
             <BuilderSidebar
               availableSections={availableSections}
@@ -876,7 +876,7 @@ const Builder = () => {
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-8 max-h-[600px] overflow-y-auto">
+                    <CardContent className="p-8">
                       <div 
                         className="min-h-[400px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
                         onDragOver={(e) => handleDragOver(e)}
@@ -933,7 +933,7 @@ const Builder = () => {
 
                 {/* Preview */}
                 <div className="lg:col-span-1">
-                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-8 rounded-3xl overflow-hidden">
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-40 rounded-3xl overflow-hidden">
                     <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -949,7 +949,7 @@ const Builder = () => {
                         )}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-6 max-h-[600px] overflow-y-auto">
+                    <CardContent className="p-6">
                       <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
                         <div id="cv-content">
                           {cvData && cvSections.length > 0 ? (
