@@ -395,69 +395,6 @@ const Builder = () => {
     !cvSections.includes(section.id) && !deletedSections.includes(section.id)
   );
 
-  const getTemplateStyles = (templateId: string) => {
-    const styles = {
-      modern: {
-        bgGradient: 'from-blue-50 to-cyan-50',
-        accentColor: 'text-blue-600',
-        borderColor: 'border-blue-200',
-        buttonColor: 'bg-blue-500 hover:bg-blue-600'
-      },
-      classic: {
-        bgGradient: 'from-gray-50 to-slate-50',
-        accentColor: 'text-slate-700',
-        borderColor: 'border-slate-300',
-        buttonColor: 'bg-slate-600 hover:bg-slate-700'
-      },
-      creative: {
-        bgGradient: 'from-purple-50 to-pink-50',
-        accentColor: 'text-purple-600',
-        borderColor: 'border-purple-200',
-        buttonColor: 'bg-purple-500 hover:bg-purple-600'
-      },
-      minimal: {
-        bgGradient: 'from-gray-50 to-white',
-        accentColor: 'text-gray-700',
-        borderColor: 'border-gray-200',
-        buttonColor: 'bg-gray-500 hover:bg-gray-600'
-      },
-      executive: {
-        bgGradient: 'from-slate-900 to-gray-900',
-        accentColor: 'text-yellow-400',
-        borderColor: 'border-yellow-200',
-        buttonColor: 'bg-yellow-600 hover:bg-yellow-700'
-      },
-      tech: {
-        bgGradient: 'from-emerald-50 to-teal-50',
-        accentColor: 'text-emerald-600',
-        borderColor: 'border-emerald-200',
-        buttonColor: 'bg-emerald-500 hover:bg-emerald-600'
-      },
-      artistic: {
-        bgGradient: 'from-orange-50 to-red-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      },
-      corporate: {
-        bgGradient: 'from-indigo-50 to-blue-50',
-        accentColor: 'text-indigo-600',
-        borderColor: 'border-indigo-200',
-        buttonColor: 'bg-indigo-500 hover:bg-indigo-600'
-      },
-      startup: {
-        bgGradient: 'from-orange-50 to-amber-50',
-        accentColor: 'text-orange-600',
-        borderColor: 'border-orange-200',
-        buttonColor: 'bg-orange-500 hover:bg-orange-600'
-      }
-    };
-    
-    return styles[templateId as keyof typeof styles] || styles.modern;
-  };
-
-  const templateStyle = getTemplateStyles(currentTemplate);
-
   const saveToHistory = (data: CVData) => {
     setUndoStack(prev => [...prev.slice(-9), data]);
     setRedoStack([]);
@@ -814,228 +751,226 @@ const Builder = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
         <TooltipProvider>
-          <div className="min-h-screen w-full relative">
-            {/* Enhanced Header */}
-            <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl">
-              <div className="container mx-auto py-8 px-8">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-8">
-                    <Button
-                      variant="outline"
-                      onClick={() => navigate('/dashboard')}
-                      className="border-2 border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-2xl transition-all duration-300 px-6 py-3"
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back to Dashboard
-                    </Button>
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl ring-4 ring-white/50">
-                        <Zap className="h-8 w-8 text-white" />
-                      </div>
-                      <div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
-                          {cvMetadata.name || 'Professional CV Builder'}
-                        </h1>
-                        {currentTemplateInfo && (
-                          <div className="flex items-center gap-4 mt-3">
-                            <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
-                              {currentTemplateInfo.name}
-                            </Badge>
-                            <Badge variant="outline" className="border-2 border-gray-300 px-4 py-2 text-sm">
-                              {currentTemplateInfo.category}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
+          {/* Enhanced Header */}
+          <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl">
+            <div className="container mx-auto py-8 px-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/dashboard')}
+                    className="border-2 border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-2xl transition-all duration-300 px-6 py-3"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Dashboard
+                  </Button>
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl ring-4 ring-white/50">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+                        {cvMetadata.name || 'Professional CV Builder'}
+                      </h1>
+                      {currentTemplateInfo && (
+                        <div className="flex items-center gap-4 mt-3">
+                          <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
+                            {currentTemplateInfo.name}
+                          </Badge>
+                          <Badge variant="outline" className="border-2 border-gray-300 px-4 py-2 text-sm">
+                            {currentTemplateInfo.category}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
-                      <Button 
-                        variant="outline"
-                        onClick={handleUndo}
-                        disabled={undoStack.length === 0}
-                        size="sm"
-                        title="Undo"
-                        className="border-0 hover:bg-white rounded-xl"
-                      >
-                        <Undo className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={handleRedo}
-                        disabled={redoStack.length === 0}
-                        size="sm"
-                        title="Redo"
-                        className="border-0 hover:bg-white rounded-xl"
-                      >
-                        <Redo className="h-4 w-4" />
-                      </Button>
-                    </div>
-
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
                     <Button 
                       variant="outline"
-                      onClick={() => setSettingsModal(true)}
-                      className="border-2 border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-xl px-4 py-2"
+                      onClick={handleUndo}
+                      disabled={undoStack.length === 0}
+                      size="sm"
+                      title="Undo"
+                      className="border-0 hover:bg-white rounded-xl"
                     >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-
-                    <Button 
-                      variant="outline"
-                      onClick={handlePreview}
-                      className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Preview
+                      <Undo className="h-4 w-4" />
                     </Button>
                     
                     <Button 
-                      onClick={handleSave} 
-                      disabled={isSaving} 
-                      className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3"
+                      variant="outline"
+                      onClick={handleRedo}
+                      disabled={redoStack.length === 0}
+                      size="sm"
+                      title="Redo"
+                      className="border-0 hover:bg-white rounded-xl"
                     >
-                      <Save className="h-4 w-4 mr-2" />
-                      {isSaving ? 'Saving...' : 'Save CV'}
+                      <Redo className="h-4 w-4" />
                     </Button>
                   </div>
+
+                  <Button 
+                    variant="outline"
+                    onClick={() => setSettingsModal(true)}
+                    className="border-2 border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-xl px-4 py-2"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+
+                  <Button 
+                    variant="outline"
+                    onClick={handlePreview}
+                    className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={isSaving} 
+                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {isSaving ? 'Saving...' : 'Save CV'}
+                  </Button>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Main Content with Sidebar */}
-            <div className="flex h-[calc(100vh-200px)]">
-              {/* Left Sidebar */}
-              <BuilderSidebar
-                availableSections={availableSections}
-                onDragStart={handleDragStart}
-                onAIAssist={handleAIAssist}
-                onAIOptimizer={handleAIOptimizer}
-                onAIEnhancer={handleAIEnhancer}
-                onTemplateNavigation={() => navigate('/templates')}
-                onSave={handleSave}
-              />
+          {/* Main Content with Sidebar */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left Sidebar */}
+            <BuilderSidebar
+              availableSections={availableSections}
+              onDragStart={handleDragStart}
+              onAIAssist={handleAIAssist}
+              onAIOptimizer={handleAIOptimizer}
+              onAIEnhancer={handleAIEnhancer}
+              onTemplateNavigation={() => navigate('/templates')}
+              onSave={handleSave}
+            />
 
-              {/* Main Content Area */}
-              <div className="flex-1 p-8 overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-                  {/* CV Builder Area */}
-                  <div className="lg:col-span-1">
-                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-3xl overflow-hidden h-full">
-                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
-                            <p className="text-gray-600 mt-2 text-lg">
-                              Drag to reorder • Click to edit content
+            {/* Main Content Area */}
+            <div className="flex-1 p-8 overflow-y-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* CV Builder Area */}
+                <div className="lg:col-span-1">
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
+                          <p className="text-gray-600 mt-2 text-lg">
+                            Drag to reorder • Click to edit content
+                          </p>
+                        </div>
+                        <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
+                          {cvSections.length} sections
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-8 max-h-[600px] overflow-y-auto">
+                      <div 
+                        className="min-h-[400px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
+                        onDragOver={(e) => handleDragOver(e)}
+                        onDrop={(e) => handleDrop(e)}
+                        onDragLeave={handleDragLeave}
+                      >
+                        {cvSections.map((sectionId, index) => {
+                          const baseId = sectionId.split('_')[0];
+                          const section = allSections.find(s => s.id === baseId);
+                          const isDragOver = dragOverIndex === index;
+                          
+                          return (
+                            <div key={sectionId}>
+                              {isDragOver && draggedSection && (
+                                <div className="h-4 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-6 animate-pulse shadow-xl" />
+                              )}
+                              {section ? (
+                                <div
+                                  onDragOver={(e) => handleDragOver(e, index)}
+                                  onDrop={(e) => handleDrop(e, index)}
+                                  onDragLeave={handleDragLeave}
+                                >
+                                  <CVSection
+                                    title={section.title}
+                                    onEdit={() => handleSectionEdit(baseId)}
+                                    onDelete={() => handleSectionDelete(sectionId)}
+                                    onDragStart={(e) => handleDragStart(e, sectionId)}
+                                  >
+                                    {renderSectionContent(sectionId)}
+                                  </CVSection>
+                                </div>
+                              ) : null}
+                            </div>
+                          );
+                        })}
+                        
+                        {cvSections.length === 0 && (
+                          <div className="text-center py-24">
+                            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                              <Plus className="h-16 w-16 text-white" />
+                            </div>
+                            <h3 className="text-3xl font-bold text-gray-900 mb-6">
+                              Start Building Your CV
+                            </h3>
+                            <p className="text-gray-600 text-xl max-w-md mx-auto leading-relaxed">
+                              Drag sections from the sidebar to begin creating your professional CV
                             </p>
                           </div>
-                          <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
-                            {cvSections.length} sections
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-8 h-full overflow-y-auto">
-                        <div 
-                          className="min-h-[400px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
-                          onDragOver={(e) => handleDragOver(e)}
-                          onDrop={(e) => handleDrop(e)}
-                          onDragLeave={handleDragLeave}
-                        >
-                          {cvSections.map((sectionId, index) => {
-                            const baseId = sectionId.split('_')[0];
-                            const section = allSections.find(s => s.id === baseId);
-                            const isDragOver = dragOverIndex === index;
-                            
-                            return (
-                              <div key={sectionId}>
-                                {isDragOver && draggedSection && (
-                                  <div className="h-4 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-6 animate-pulse shadow-xl" />
-                                )}
-                                {section ? (
-                                  <div
-                                    onDragOver={(e) => handleDragOver(e, index)}
-                                    onDrop={(e) => handleDrop(e, index)}
-                                    onDragLeave={handleDragLeave}
-                                  >
-                                    <CVSection
-                                      title={section.title}
-                                      onEdit={() => handleSectionEdit(baseId)}
-                                      onDelete={() => handleSectionDelete(sectionId)}
-                                      onDragStart={(e) => handleDragStart(e, sectionId)}
-                                    >
-                                      {renderSectionContent(sectionId)}
-                                    </CVSection>
-                                  </div>
-                                ) : null}
-                              </div>
-                            );
-                          })}
-                          
-                          {cvSections.length === 0 && (
-                            <div className="text-center py-24">
-                              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                                <Plus className="h-16 w-16 text-white" />
-                              </div>
-                              <h3 className="text-3xl font-bold text-gray-900 mb-6">
-                                Start Building Your CV
-                              </h3>
-                              <p className="text-gray-600 text-xl max-w-md mx-auto leading-relaxed">
-                                Drag sections from the sidebar to begin creating your professional CV
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                  {/* Preview */}
-                  <div className="lg:col-span-1">
-                    <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-8 rounded-3xl overflow-hidden h-full">
-                      <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
-                              <Eye className="h-6 w-6 text-white" />
-                            </div>
-                            <CardTitle className="text-2xl font-bold text-gray-900">Live Preview</CardTitle>
+                {/* Preview */}
+                <div className="lg:col-span-1">
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-8 rounded-3xl overflow-hidden">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
+                            <Eye className="h-6 w-6 text-white" />
                           </div>
-                          {currentTemplateInfo && (
-                            <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-5 py-2 text-sm font-semibold">
-                              {currentTemplateInfo.name}
-                            </Badge>
+                          <CardTitle className="text-2xl font-bold text-gray-900">Live Preview</CardTitle>
+                        </div>
+                        {currentTemplateInfo && (
+                          <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-5 py-2 text-sm font-semibold">
+                            {currentTemplateInfo.name}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 max-h-[600px] overflow-y-auto">
+                      <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
+                        <div id="cv-content">
+                          {cvData && cvSections.length > 0 ? (
+                            <CVTemplateRenderer
+                              cvData={cvData}
+                              templateId={currentTemplate}
+                              sections={cvSections}
+                            />
+                          ) : (
+                            <div className="text-center text-gray-400 py-24">
+                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
+                                <FileText className="h-12 w-12 text-gray-500" />
+                              </div>
+                              <p className="text-2xl font-semibold mb-4 text-gray-600">Your CV Preview</p>
+                              <p className="text-gray-500 text-lg">Add sections to see your CV come to life</p>
+                            </div>
                           )}
                         </div>
-                      </CardHeader>
-                      <CardContent className="p-6 h-full overflow-y-auto">
-                        <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
-                          <div id="cv-content">
-                            {cvData && cvSections.length > 0 ? (
-                              <CVTemplateRenderer
-                                cvData={cvData}
-                                templateId={currentTemplate}
-                                sections={cvSections}
-                              />
-                            ) : (
-                              <div className="text-center text-gray-400 py-24">
-                                <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
-                                  <FileText className="h-12 w-12 text-gray-500" />
-                                </div>
-                                <p className="text-2xl font-semibold mb-4 text-gray-600">Your CV Preview</p>
-                                <p className="text-gray-500 text-lg">Add sections to see your CV come to life</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
