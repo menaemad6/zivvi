@@ -77,7 +77,7 @@ export function Navbar() {
                     <User className="h-3 w-3 text-primary-foreground" />
                   </div>
                   <span className="text-sm font-medium">
-                    {user.email?.split('@')[0] || "User"}
+                    {user.user_metadata?.full_name || user.email || "User"}
                   </span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>

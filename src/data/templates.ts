@@ -3,6 +3,30 @@ import { CVTemplate } from '@/types/cv';
 
 export const cvTemplates: CVTemplate[] = [
   {
+    id: 'classicTemp',
+    name: 'Classic Template',
+    description: '(File-based template component)',
+    thumbnail: '/placeholder.svg',
+    category: 'classic'
+    // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
+  },
+  {
+    id: 'elegantTemp',
+    name: 'Elegant Template',
+    description: '(File-based template component)',
+    thumbnail: '/placeholder.svg',
+    category: 'classic'
+    // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
+  },
+  {
+    id: 'timelineTemp',
+    name: 'Timeline Template',
+    description: '(File-based template component)',
+    thumbnail: '/placeholder.svg',
+    category: 'classic'
+    // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
+  },
+  {
     id: 'modern',
     name: 'Modern Professional',
     description: 'Clean and modern design with blue accents, perfect for tech professionals',
@@ -12,9 +36,10 @@ export const cvTemplates: CVTemplate[] = [
   {
     id: 'classic',
     name: 'Classic Business',
-    description: 'Traditional corporate format with serif fonts, ideal for business environments',
+    description: 'Traditional corporate format with serif fonts, ideal for business environments. (File-based template component)',
     thumbnail: '/placeholder.svg',
     category: 'classic'
+    // Uses file-based template: src/components/cv/templates/Classic.tsx
   },
   {
     id: 'creative',

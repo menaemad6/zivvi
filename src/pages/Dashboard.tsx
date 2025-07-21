@@ -16,6 +16,8 @@ import { getTimeAgo } from '@/utils/timeUtils';
 interface CV {
   id: string;
   title: string;
+  name: string | null;
+  description: string | null;
   template: string;
   created_at: string;
   updated_at: string;
@@ -45,7 +47,7 @@ const Dashboard = () => {
     try {
       const { data, error } = await supabase
         .from('cvs')
-        .select('*')
+        .select('id, title, name, description, template, created_at, updated_at')
         .eq('user_id', user!.id)
         .order('updated_at', { ascending: false });
 
@@ -147,32 +149,32 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
         <div className="container mx-auto py-12 px-6">
           {/* Enhanced Hero Section */}
-          <div className="text-center mb-16 relative">
+          <div className="text-center mb-12 sm:mb-16 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-12 border border-white/20 shadow-xl">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                  <Sparkles className="h-8 w-8 text-white" />
+            <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 shadow-xl">
+              <div className="flex items-center justify-center mb-4 sm:mb-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
+                  <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
               </div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
                 Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
               </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
                 Ready to create something amazing? Your professional journey continues here.
               </p>
               <Button 
                 onClick={() => navigate('/templates')} 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto"
               >
-                <Plus className="mr-3 h-6 w-6" />
+                <Plus className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Create New CV
               </Button>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
             <Card className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">Total CVs</CardTitle>
@@ -233,14 +235,14 @@ const Dashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* CVs List */}
             <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold text-gray-900">Your CVs</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Your CVs</h2>
                 <Button 
                   onClick={() => navigate('/templates')} 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
                 >
                   <Plus className="mr-2 h-5 w-5" />
                   New CV
@@ -268,47 +270,54 @@ const Dashboard = () => {
                 <div className="space-y-6">
                   {cvs.map((cv) => (
                     <Card key={cv.id} className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-1">
-                      <CardContent className="p-8">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-6">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                              {cv.title.charAt(0).toUpperCase()}
+                      <CardContent className="p-4 sm:p-6 lg:p-8">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="flex items-start sm:items-center gap-4 sm:gap-6">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0">
+                              {(cv.name || cv.title).charAt(0).toUpperCase()}
                             </div>
-                            <div>
-                              <h3 className="font-bold text-xl text-gray-900 mb-2">{cv.title}</h3>
-                              <div className="flex items-center space-x-4">
-                                <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-3 py-1">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-1">
+                                {cv.name || cv.title}
+                              </h3>
+                              {cv.description && (
+                                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                  {cv.description}
+                                </p>
+                              )}
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-2 py-1 text-xs sm:text-sm w-fit">
                                   {cv.template}
                                 </Badge>
-                                <span className="flex items-center text-sm text-gray-500">
-                                  <Clock className="h-4 w-4 mr-2" />
+                                <span className="flex items-center text-xs sm:text-sm text-gray-500">
+                                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                   {getTimeAgo(cv.updated_at)}
                                 </span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center justify-end gap-2 sm:gap-3">
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => navigate(`/preview?id=${cv.id}`)}
-                              className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 rounded-xl"
+                              onClick={() => navigate(`/preview/${cv.id}`)}
+                              className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                             <Button 
                               size="sm"
                               onClick={() => navigate(`/builder/${cv.id}`)}
-                              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm"
                             >
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden sm:inline">Edit</span>
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="border-2 border-gray-200 hover:border-gray-300 rounded-xl">
-                                  <MoreVertical className="h-4 w-4" />
+                                <Button variant="outline" size="sm" className="border-2 border-gray-200 hover:border-gray-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3">
+                                  <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="bg-white border-0 shadow-xl rounded-xl">

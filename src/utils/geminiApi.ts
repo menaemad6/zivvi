@@ -61,22 +61,35 @@ export async function getGeminiResponse(prompt: string): Promise<string> {
  */
 export function parseAIResponse(aiResponse: string, sectionType: string) {
   try {
-    // Find JSON-like content in the response
-    const jsonMatch = aiResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    // Clean the response first
+    const cleanedResponse = aiResponse.trim();
+    
+    // Try to find JSON content in the response
+    const jsonMatch = cleanedResponse.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    const arrayMatch = cleanedResponse.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+    const inlineJsonMatch = cleanedResponse.match(/(\{[\s\S]*?\}|\[[\s\S]*?\])/);
+    
     let parsedData;
     
     if (jsonMatch && jsonMatch[1]) {
-      // Try parsing the JSON content
+      // Try parsing the JSON content from code blocks
       parsedData = JSON.parse(jsonMatch[1]);
+    } else if (arrayMatch && arrayMatch[1]) {
+      // Try parsing array content from code blocks
+      parsedData = JSON.parse(arrayMatch[1]);
+    } else if (inlineJsonMatch && inlineJsonMatch[1]) {
+      // Try parsing inline JSON
+      parsedData = JSON.parse(inlineJsonMatch[1]);
     } else {
       // If no JSON format is found, try to extract structured data
-      return extractStructuredData(aiResponse, sectionType);
+      return extractStructuredData(cleanedResponse, sectionType);
     }
     
     return parsedData;
   } catch (error) {
     console.error("Error parsing AI response:", error);
-    return null;
+    // Fallback to structured data extraction
+    return extractStructuredData(aiResponse, sectionType);
   }
 }
 
@@ -84,52 +97,121 @@ export function parseAIResponse(aiResponse: string, sectionType: string) {
  * Extract structured data from unformatted AI text response
  */
 function extractStructuredData(text: string, sectionType: string) {
-  switch (sectionType) {
-    case 'about':
-      // Basic extraction for about section
-      const nameMatch = text.match(/name:?\s*([^\n]+)/i);
-      const roleMatch = text.match(/role:?\s*([^\n]+)/i) || text.match(/position:?\s*([^\n]+)/i);
-      const emailMatch = text.match(/email:?\s*([^\n]+)/i);
-      const phoneMatch = text.match(/phone:?\s*([^\n]+)/i);
-      const locationMatch = text.match(/location:?\s*([^\n]+)/i);
-      const summaryMatch = text.match(/summary:?\s*([^\n]+(?:\n[^\n]+)*)/i) || 
-                          text.match(/about:?\s*([^\n]+(?:\n[^\n]+)*)/i);
-      
-      return {
-        name: nameMatch ? nameMatch[1].trim() : '',
-        role: roleMatch ? roleMatch[1].trim() : '',
-        email: emailMatch ? emailMatch[1].trim() : '',
-        phone: phoneMatch ? phoneMatch[1].trim() : '',
-        location: locationMatch ? locationMatch[1].trim() : '',
-        summary: summaryMatch ? summaryMatch[1].trim() : ''
-      };
-
-    case 'experience':
-      // Attempt to extract experience items
-      const experiences = [];
-      const expBlocks = text.split(/experience\s*\d*:|work\s*\d*:/i).slice(1);
-      
-      for (const block of expBlocks) {
-        const companyMatch = block.match(/company:?\s*([^\n]+)/i) || block.match(/employer:?\s*([^\n]+)/i);
-        const positionMatch = block.match(/position:?\s*([^\n]+)/i) || block.match(/role:?\s*([^\n]+)/i);
-        const periodMatch = block.match(/period:?\s*([^\n]+)/i) || block.match(/date:?\s*([^\n]+)/i);
-        const descMatch = block.match(/description:?\s*([^\n]+(?:\n[^\n]+)*)/i);
+  try {
+    switch (sectionType) {
+      case 'about': {
+        // Basic extraction for about section
+        const nameMatch = text.match(/name:?\s*([^\n]+)/i);
+        const roleMatch = text.match(/role:?\s*([^\n]+)/i) || text.match(/position:?\s*([^\n]+)/i);
+        const emailMatch = text.match(/email:?\s*([^\n]+)/i);
+        const phoneMatch = text.match(/phone:?\s*([^\n]+)/i);
+        const locationMatch = text.match(/location:?\s*([^\n]+)/i);
+        const summaryMatch = text.match(/summary:?\s*([^\n]+(?:\n[^\n]+)*)/i) || 
+                            text.match(/about:?\s*([^\n]+(?:\n[^\n]+)*)/i);
         
-        if (companyMatch || positionMatch) {
-          experiences.push({
-            id: crypto.randomUUID(),
-            company: companyMatch ? companyMatch[1].trim() : 'Unknown Company',
-            role: positionMatch ? positionMatch[1].trim() : 'Unknown Position',
-            period: periodMatch ? periodMatch[1].trim() : '20xx - Present',
-            description: descMatch ? descMatch[1].trim() : 'Responsibilities and achievements...'
-          });
-        }
+        return {
+          name: nameMatch ? nameMatch[1].trim() : '',
+          role: roleMatch ? roleMatch[1].trim() : '',
+          email: emailMatch ? emailMatch[1].trim() : '',
+          phone: phoneMatch ? phoneMatch[1].trim() : '',
+          location: locationMatch ? locationMatch[1].trim() : '',
+          summary: summaryMatch ? summaryMatch[1].trim() : ''
+        };
       }
-      
-      return experiences.length > 0 ? experiences : null;
 
-    // Add similar extraction logic for other section types
-    default:
-      return null;
+      case 'experience': {
+        // Attempt to extract experience items
+        const experiences = [];
+        const expBlocks = text.split(/experience\s*\d*:|work\s*\d*:/i).slice(1);
+        
+        for (const block of expBlocks) {
+          const companyMatch = block.match(/company:?\s*([^\n]+)/i) || block.match(/employer:?\s*([^\n]+)/i);
+          const positionMatch = block.match(/position:?\s*([^\n]+)/i) || block.match(/role:?\s*([^\n]+)/i);
+          const periodMatch = block.match(/period:?\s*([^\n]+)/i) || block.match(/date:?\s*([^\n]+)/i);
+          const descMatch = block.match(/description:?\s*([^\n]+(?:\n[^\n]+)*)/i);
+          
+          if (companyMatch || positionMatch) {
+            experiences.push({
+              id: crypto.randomUUID(),
+              company: companyMatch ? companyMatch[1].trim() : 'Unknown Company',
+              role: positionMatch ? positionMatch[1].trim() : 'Unknown Position',
+              period: periodMatch ? periodMatch[1].trim() : '20xx - Present',
+              description: descMatch ? descMatch[1].trim() : 'Responsibilities and achievements...'
+            });
+          }
+        }
+        
+        return experiences.length > 0 ? experiences : null;
+      }
+
+      case 'skills': {
+        // Extract skills from text
+        const skillMatches = text.match(/(?:skill|technology):?\s*([^\n]+)/gi);
+        if (skillMatches) {
+          return skillMatches.map(match => {
+            const skill = match.replace(/(?:skill|technology):?\s*/i, '').trim();
+            return skill;
+          }).filter(skill => skill.length > 0);
+        }
+        return null;
+      }
+
+      case 'education': {
+        // Attempt to extract education items
+        const education = [];
+        const eduBlocks = text.split(/education\s*\d*:|degree\s*\d*:/i).slice(1);
+        
+        for (const block of eduBlocks) {
+          const degreeMatch = block.match(/degree:?\s*([^\n]+)/i);
+          const schoolMatch = block.match(/school:?\s*([^\n]+)/i) || block.match(/institution:?\s*([^\n]+)/i);
+          const periodMatch = block.match(/period:?\s*([^\n]+)/i) || block.match(/date:?\s*([^\n]+)/i);
+          
+          if (degreeMatch || schoolMatch) {
+            education.push({
+              id: crypto.randomUUID(),
+              degree: degreeMatch ? degreeMatch[1].trim() : 'Unknown Degree',
+              school: schoolMatch ? schoolMatch[1].trim() : 'Unknown Institution',
+              startDate: '2020-01',
+              endDate: '2024-01'
+            });
+          }
+        }
+        
+        return education.length > 0 ? education : null;
+      }
+
+      case 'projects': {
+        // Attempt to extract project items
+        const projects = [];
+        const projBlocks = text.split(/project\s*\d*:/i).slice(1);
+        
+        for (const block of projBlocks) {
+          const nameMatch = block.match(/name:?\s*([^\n]+)/i);
+          const techMatch = block.match(/technologies:?\s*([^\n]+)/i) || block.match(/tech:?\s*([^\n]+)/i);
+          const descMatch = block.match(/description:?\s*([^\n]+(?:\n[^\n]+)*)/i);
+          
+          if (nameMatch) {
+            projects.push({
+              id: crypto.randomUUID(),
+              name: nameMatch[1].trim(),
+              description: descMatch ? descMatch[1].trim() : 'Project description...',
+              technologies: techMatch ? techMatch[1].trim() : 'Various technologies',
+              link: '',
+              startDate: '2020-01',
+              endDate: 'Present'
+            });
+          }
+        }
+        
+        return projects.length > 0 ? projects : null;
+      }
+
+      // Add similar extraction logic for other section types
+      default:
+        return null;
+    }
+  } catch (error) {
+    console.error('Error extracting structured data:', error);
+    return null;
   }
 }

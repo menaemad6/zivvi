@@ -56,6 +56,7 @@ export const useProfile = () => {
     if (!user) return false;
 
     try {
+      // Update the public profiles table
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -65,6 +66,14 @@ export const useProfile = () => {
         .eq('id', user.id);
 
       if (error) throw error;
+
+      // Also update the auth user_metadata if full_name is present
+      if (updates.full_name) {
+        const { error: authError } = await supabase.auth.updateUser({
+          data: { full_name: updates.full_name }
+        });
+        if (authError) throw authError;
+      }
 
       setProfile(prev => prev ? { ...prev, ...updates } : null);
       

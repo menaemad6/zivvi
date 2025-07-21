@@ -66,9 +66,9 @@ const Profile = () => {
     setShowOnboarding(false);
   };
 
-  const userInitials = user?.user_metadata?.full_name 
-    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-    : user?.email?.charAt(0).toUpperCase() || 'U';
+  const userInitials = profile?.full_name
+    ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+    : profile?.email?.charAt(0).toUpperCase() || 'U';
 
   const joinDate = user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
     year: 'numeric', 
@@ -99,11 +99,11 @@ const Profile = () => {
               
               <div className="text-center md:text-left flex-1">
                 <h1 className="text-4xl md:text-5xl font-bold mb-3">
-                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Your Profile'}
+                  {profile?.full_name || profile?.email?.split('@')[0] || 'Your Profile'}
                 </h1>
                 <p className="text-xl text-blue-100 mb-4 flex items-center justify-center md:justify-start gap-2">
                   <Mail className="w-5 h-5" />
-                  {user?.email}
+                  {profile?.email}
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                   <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">

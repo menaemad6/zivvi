@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star } from 'lucide-react';
 import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -66,6 +66,13 @@ const Builder = () => {
   const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
   const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
   const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Check if we're on a mobile screen (width < 768px)
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
     if (cvData && id && id !== 'new') {
@@ -73,7 +80,7 @@ const Builder = () => {
       fetchCVTemplate();
       
       // Load sections configuration from database
-      const content = cvData as any;
+      const content = cvData as CVData & { _deletedSections?: string[]; _sections?: string[] };
       if (content._deletedSections && Array.isArray(content._deletedSections)) {
         setDeletedSections(content._deletedSections);
       }
@@ -115,6 +122,20 @@ const Builder = () => {
       setDeletedSections([]);
     }
   }, [cvData, id]);
+
+  // Handle responsive sidebar collapse
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      setSidebarCollapsed(isMobile);
+    };
+
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Auto-save preview data whenever cvData changes
   useEffect(() => {
@@ -296,23 +317,48 @@ const Builder = () => {
   };
 
   const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
-    // Save current state to history
-    if (cvData) {
-      saveToHistory(cvData);
-    }
-    
-    // Update CV data
-    setCVData(updatedCVData);
-    
-    // Add new sections to the CV structure if they're not already there
-    const sectionsToAdd = newSectionIds.filter(sectionId => !cvSections.includes(sectionId));
-    if (sectionsToAdd.length > 0) {
-      setCVSections(prev => [...prev, ...sectionsToAdd]);
-    }
-    
-    // Auto-save the changes
-    if (updatedCVData) {
-      saveCV(updatedCVData, deletedSections, [...cvSections, ...sectionsToAdd]);
+    try {
+      // Save current state to history
+      if (cvData) {
+        saveToHistory(cvData);
+      }
+      
+      // Validate the updated CV data structure
+      const validatedCVData: CVData = {
+        personalInfo: updatedCVData.personalInfo || {
+          fullName: '',
+          email: '',
+          phone: '',
+          location: '',
+          summary: ''
+        },
+        experience: Array.isArray(updatedCVData.experience) ? updatedCVData.experience : [],
+        education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
+        skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
+        projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
+        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : []
+      };
+      
+      // Update CV data
+      setCVData(validatedCVData);
+      
+      // Add new sections to the CV structure if they're not already there
+      const sectionsToAdd = newSectionIds.filter(sectionId => !cvSections.includes(sectionId));
+      if (sectionsToAdd.length > 0) {
+        setCVSections(prev => [...prev, ...sectionsToAdd]);
+      }
+      
+      // Auto-save the changes
+      if (validatedCVData) {
+        saveCV(validatedCVData, deletedSections, [...cvSections, ...sectionsToAdd]);
+      }
+    } catch (error) {
+      console.error('Error handling AI sections generated:', error);
+      toast({
+        title: "Error",
+        description: "Failed to apply AI-generated sections. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -621,6 +667,47 @@ const Builder = () => {
     });
   };
 
+  const handleCVMetadataUpdate = async (name: string, description: string): Promise<boolean> => {
+    try {
+      // Update local state immediately for real-time UI update
+      setCVMetadata({ name, description });
+      
+      // Call the original update function
+      const success = await updateCVMetadata(name, description);
+      
+      if (success) {
+        // Refresh metadata from database to ensure consistency
+        await fetchCVMetadata();
+        toast({
+          title: "CV Updated",
+          description: "Your CV details have been saved successfully."
+        });
+      }
+      
+      return success;
+    } catch (error) {
+      console.error('Error updating CV metadata:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update CV details.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const handleRealTimeMetadataUpdate = (name: string, description: string) => {
+    // Only update local state for real-time UI update, don't persist yet
+    // This will be reverted if the user cancels the modal
+    setCVMetadata({ name, description });
+  };
+
+  const handleSettingsModalClose = () => {
+    // Refresh metadata from database to restore original values if modal was cancelled
+    fetchCVMetadata();
+    setSettingsModal(false);
+  };
+
   const renderSectionContent = (sectionId: string): React.ReactNode => {
     if (!cvData) return null;
 
@@ -751,54 +838,72 @@ const Builder = () => {
   return (
     <>
       <Navbar />
-      <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-16">
+      <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-8 sm:pt-14 md:pt-12 ">
         <TooltipProvider>
           {/* Enhanced Header */}
           <div className="fixed top-16 left-0 right-0 bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl z-30">
-            <div className="container mx-auto py-8 px-8">
+            <div className="container mx-auto py-2 px-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-8">
+                {/* Left Section */}
+                <div className="flex items-center gap-2 sm:gap-4">
                   <Button
                     variant="outline"
                     onClick={() => navigate('/dashboard')}
-                    className="border-2 border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-2xl transition-all duration-300 px-6 py-3"
+                    className="border border-gray-300 hover:border-violet-500 hover:bg-violet-50 rounded-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs sm:text-sm"
                   >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Dashboard
+                    <ArrowLeft className="mr-1 h-3 w-3" />
+                    <span className="hidden sm:inline">Back</span>
                   </Button>
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl ring-4 ring-white/50">
-                      <Zap className="h-8 w-8 text-white" />
+                  
+                  {/* Title Section - Responsive */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-md ring-1 ring-white/50">
+                      <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                     </div>
-                    <div>
-                      <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+                    <div className="hidden sm:block">
+                      <h1 className="text-sm sm:text-lg font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
                         {cvMetadata.name || 'Professional CV Builder'}
                       </h1>
-                      {currentTemplateInfo && (
-                        <div className="flex items-center gap-4 mt-3">
-                          <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
-                            {currentTemplateInfo.name}
-                          </Badge>
-                          <Badge variant="outline" className="border-2 border-gray-300 px-4 py-2 text-sm">
-                            {currentTemplateInfo.category}
-                          </Badge>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {cvMetadata.description && (
+                          <span className="text-xs text-gray-600 max-w-xs truncate">
+                            {cvMetadata.description}
+                          </span>
+                        )}
+                        {currentTemplateInfo && (
+                          <>
+                            <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-2 py-0.5 text-xs font-semibold">
+                              {currentTemplateInfo.name}
+                            </Badge>
+                            <Badge variant="outline" className="border border-gray-300 px-2 py-0.5 text-xs">
+                              {currentTemplateInfo.category}
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {/* Mobile Title */}
+                    <div className="sm:hidden">
+                      <h1 className="text-sm font-bold bg-gradient-to-r from-violet-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+                        {cvMetadata.name || 'CV Builder'}
+                      </h1>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
+                {/* Right Section - Responsive */}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  {/* Undo/Redo - Hidden on very small screens */}
+                  <div className="hidden sm:flex items-center gap-0.5 bg-gray-50 rounded-lg p-0.5">
                     <Button 
                       variant="outline"
                       onClick={handleUndo}
                       disabled={undoStack.length === 0}
                       size="sm"
                       title="Undo"
-                      className="border-0 hover:bg-white rounded-xl"
+                      className="border-0 hover:bg-white rounded-md h-6 w-6 p-0"
                     >
-                      <Undo className="h-4 w-4" />
+                      <Undo className="h-2.5 w-2.5" />
                     </Button>
                     
                     <Button 
@@ -807,37 +912,43 @@ const Builder = () => {
                       disabled={redoStack.length === 0}
                       size="sm"
                       title="Redo"
-                      className="border-0 hover:bg-white rounded-xl"
+                      className="border-0 hover:bg-white rounded-md h-6 w-6 p-0"
                     >
-                      <Redo className="h-4 w-4" />
+                      <Redo className="h-2.5 w-2.5" />
                     </Button>
                   </div>
 
+                  {/* Settings - Icon only on mobile */}
                   <Button 
                     variant="outline"
                     onClick={() => setSettingsModal(true)}
-                    className="border-2 border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-xl px-4 py-2"
+                    className="border border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-md px-2 py-1 h-7 text-xs"
+                    title="Settings"
                   >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
+                    <Settings className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">Settings</span>
                   </Button>
 
+                  {/* Preview - Icon only on mobile */}
                   <Button 
                     variant="outline"
                     onClick={handlePreview}
-                    className="border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-xl px-4 py-2"
+                    className="border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-md px-2 py-1 h-7 text-xs"
+                    title="Preview"
                   >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Preview
+                    <Eye className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">Preview</span>
                   </Button>
                   
+                  {/* Save - Compact on mobile */}
                   <Button 
                     onClick={handleSave} 
                     disabled={isSaving} 
-                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 px-6 py-3"
+                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs"
                   >
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSaving ? 'Saving...' : 'Save CV'}
+                    <Save className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save CV'}</span>
+                    <span className="sm:hidden">{isSaving ? '...' : 'Save'}</span>
                   </Button>
                 </div>
               </div>
@@ -845,40 +956,97 @@ const Builder = () => {
           </div>
 
           {/* Main Content with Sidebar */}
-          <div className="flex w-full pt-32">
+          <div className="flex w-full pt-20">
             {/* Left Sidebar */}
-            <BuilderSidebar
-              availableSections={availableSections}
-              onDragStart={handleDragStart}
-              onAIAssist={handleAIAssist}
-              onAIOptimizer={handleAIOptimizer}
-              onAIEnhancer={handleAIEnhancer}
-              onTemplateNavigation={() => navigate('/templates')}
-              onSave={handleSave}
-            />
+            <div className="transition-all duration-300 ease-in-out">
+              <BuilderSidebar
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                onAIAssist={handleAIAssist}
+                onAIOptimizer={handleAIOptimizer}
+                onAIEnhancer={handleAIEnhancer}
+                onTemplateNavigation={() => navigate('/templates')}
+                onSave={handleSave}
+              />
+            </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 p-8 overflow-y-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                 {/* CV Builder Area */}
-                <div className="lg:col-span-1">
-                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
-                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50">
+                <div className="xl:col-span-1">
+                  {/* Add Sections Section - Moved from sidebar */}
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 py-3 sm:py-4">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-2xl font-bold text-gray-900">CV Structure</CardTitle>
-                          <p className="text-gray-600 mt-2 text-lg">
-                            Drag to reorder • Click to edit content
-                          </p>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
+                            <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base sm:text-lg font-bold text-gray-900">Add Sections</CardTitle>
+                            <p className="text-xs sm:text-sm text-gray-600">Drag to CV structure</p>
+                          </div>
                         </div>
-                        <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-4 py-2 text-sm font-semibold">
+                        <Badge className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-0 px-2 sm:px-3 py-1 text-xs font-semibold">
+                          {availableSections.length} available
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-4">
+                      {availableSections.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                          {availableSections.map((section) => (
+                            <div
+                              key={section.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, section.id)}
+                              className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 cursor-grab active:cursor-grabbing transition-all duration-200 group"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center shadow-sm">
+                                  {React.cloneElement(section.icon as React.ReactElement, { className: "h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" })}
+                                </div>
+                                <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-indigo-700 truncate">
+                                  {section.title}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-3 sm:py-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
+                            <Star className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                          </div>
+                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-1">All sections added!</h3>
+                          <p className="text-gray-600 text-xs">Your CV is complete ✨</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* CV Structure Section */}
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50 py-3 sm:py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg">
+                            <Layout className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base sm:text-lg font-bold text-gray-900">CV Structure</CardTitle>
+                            <p className="text-xs sm:text-sm text-gray-600">Drag to reorder • Click to edit content</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border-0 px-2 sm:px-3 py-1 text-xs font-semibold">
                           {cvSections.length} sections
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-8">
+                    <CardContent className="p-3 sm:p-4">
                       <div 
-                        className="min-h-[400px] space-y-6 p-8 border-2 border-dashed border-gray-300 rounded-3xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
+                        className="min-h-[250px] sm:min-h-[300px] space-y-2 sm:space-y-3 p-3 sm:p-4 border-2 border-dashed border-gray-300 rounded-2xl bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-400"
                         onDragOver={(e) => handleDragOver(e)}
                         onDrop={(e) => handleDrop(e)}
                         onDragLeave={handleDragLeave}
@@ -891,7 +1059,7 @@ const Builder = () => {
                           return (
                             <div key={sectionId}>
                               {isDragOver && draggedSection && (
-                                <div className="h-4 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-6 animate-pulse shadow-xl" />
+                                <div className="h-1.5 sm:h-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full mb-2 sm:mb-3 animate-pulse shadow-lg" />
                               )}
                               {section ? (
                                 <div
@@ -914,15 +1082,15 @@ const Builder = () => {
                         })}
                         
                         {cvSections.length === 0 && (
-                          <div className="text-center py-24">
-                            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                              <Plus className="h-16 w-16 text-white" />
+                          <div className="text-center py-8 sm:py-12">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-xl">
+                              <Plus className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
                             </div>
-                            <h3 className="text-3xl font-bold text-gray-900 mb-6">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
                               Start Building Your CV
                             </h3>
-                            <p className="text-gray-600 text-xl max-w-md mx-auto leading-relaxed">
-                              Drag sections from the sidebar to begin creating your professional CV
+                            <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+                              Drag sections from above to begin creating your professional CV
                             </p>
                           </div>
                         )}
@@ -932,25 +1100,25 @@ const Builder = () => {
                 </div>
 
                 {/* Preview */}
-                <div className="lg:col-span-1">
-                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl sticky top-40 rounded-3xl overflow-hidden">
-                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
+                <div className="xl:col-span-1">
+                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 py-3 sm:py-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
-                            <Eye className="h-6 w-6 text-white" />
+                        <div className="flex items-center gap-2 sm:gap-4">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
+                            <Eye className="h-3 w-3 sm:h-6 sm:w-6 text-white" />
                           </div>
-                          <CardTitle className="text-2xl font-bold text-gray-900">Live Preview</CardTitle>
+                          <CardTitle className="text-base sm:text-2xl font-bold text-gray-900">Live Preview</CardTitle>
                         </div>
                         {currentTemplateInfo && (
-                          <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-5 py-2 text-sm font-semibold">
+                          <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-3 sm:px-5 py-1 sm:py-2 text-xs sm:text-sm font-semibold">
                             {currentTemplateInfo.name}
                           </Badge>
                         )}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="bg-white rounded-3xl shadow-2xl min-h-[600px] overflow-hidden border-2 border-gray-100">
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="bg-white rounded-2xl shadow-2xl min-h-[250px] sm:min-h-[400px] overflow-hidden border-2 border-gray-100">
                         <div id="cv-content">
                           {cvData && cvSections.length > 0 ? (
                             <CVTemplateRenderer
@@ -959,12 +1127,12 @@ const Builder = () => {
                               sections={cvSections}
                             />
                           ) : (
-                            <div className="text-center text-gray-400 py-24">
-                              <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-8">
-                                <FileText className="h-12 w-12 text-gray-500" />
+                            <div className="text-center text-gray-400 py-8 sm:py-24">
+                              <div className="w-12 h-12 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-4 sm:mb-8">
+                                <FileText className="h-6 w-6 sm:h-12 sm:w-12 text-gray-500" />
                               </div>
-                              <p className="text-2xl font-semibold mb-4 text-gray-600">Your CV Preview</p>
-                              <p className="text-gray-500 text-lg">Add sections to see your CV come to life</p>
+                              <p className="text-lg sm:text-2xl font-semibold mb-2 sm:mb-4 text-gray-600">Your CV Preview</p>
+                              <p className="text-gray-500 text-sm sm:text-lg">Add sections to see your CV come to life</p>
                             </div>
                           )}
                         </div>
@@ -1020,11 +1188,12 @@ const Builder = () => {
         {id && id !== 'new' && (
           <CVSettingsModal
             isOpen={settingsModal}
-            onClose={() => setSettingsModal(false)}
+            onClose={handleSettingsModalClose}
             cvId={id}
             currentName={cvMetadata.name}
             currentDescription={cvMetadata.description}
-            onUpdate={updateCVMetadata}
+            onUpdate={handleCVMetadataUpdate}
+            onRealTimeUpdate={handleRealTimeMetadataUpdate}
           />
         )}
       </div>

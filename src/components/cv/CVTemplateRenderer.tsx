@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { CVData } from '@/types/cv';
+import { templateComponentRegistry } from "./templates";
 
 interface CVTemplateRendererProps {
   cvData: CVData;
@@ -13,6 +14,12 @@ export const CVTemplateRenderer: React.FC<CVTemplateRendererProps> = ({
   templateId,
   sections
 }) => {
+  // Check for file-based template
+  if (templateComponentRegistry[templateId]) {
+    const TemplateComponent = templateComponentRegistry[templateId];
+    return <TemplateComponent cvData={cvData} sections={sections} />;
+  }
+
   const getTemplateStyles = (templateId: string) => {
     const styles = {
       modern: {

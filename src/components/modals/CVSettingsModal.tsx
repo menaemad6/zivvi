@@ -17,6 +17,7 @@ interface CVSettingsModalProps {
   currentName: string;
   currentDescription: string;
   onUpdate?: (name: string, description: string) => Promise<boolean>;
+  onRealTimeUpdate?: (name: string, description: string) => void;
 }
 
 export const CVSettingsModal = ({ 
@@ -25,7 +26,8 @@ export const CVSettingsModal = ({
   cvId, 
   currentName, 
   currentDescription, 
-  onUpdate 
+  onUpdate,
+  onRealTimeUpdate
 }: CVSettingsModalProps) => {
   const [name, setName] = useState(currentName);
   const [description, setDescription] = useState(currentDescription);
@@ -38,8 +40,18 @@ export const CVSettingsModal = ({
     if (isOpen) {
       setName(currentName);
       setDescription(currentDescription);
+      setHasUserTyped(false);
     }
   }, [isOpen, currentName, currentDescription]);
+
+  // Real-time updates - only trigger when user actually types, not on initial load
+  const [hasUserTyped, setHasUserTyped] = useState(false);
+  
+  React.useEffect(() => {
+    if (onRealTimeUpdate && isOpen && hasUserTyped) {
+      onRealTimeUpdate(name, description);
+    }
+  }, [name, description, onRealTimeUpdate, isOpen, hasUserTyped]);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -78,6 +90,13 @@ export const CVSettingsModal = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Restore original values
+    setName(currentName);
+    setDescription(currentDescription);
+    onClose();
   };
 
   const handleDelete = async () => {
@@ -127,7 +146,10 @@ export const CVSettingsModal = ({
             <Input
               id="cv-name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setHasUserTyped(true);
+                setName(e.target.value);
+              }}
               placeholder="Enter CV name"
             />
           </div>
@@ -137,7 +159,10 @@ export const CVSettingsModal = ({
             <Textarea
               id="cv-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setHasUserTyped(true);
+                setDescription(e.target.value);
+              }}
               placeholder="Enter CV description"
               rows={3}
             />
@@ -155,7 +180,7 @@ export const CVSettingsModal = ({
           </Button>
           
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
             <Button onClick={handleSave} disabled={isLoading}>

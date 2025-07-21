@@ -129,6 +129,74 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
     return prompts[sectionType as keyof typeof prompts] || '';
   };
 
+  // Enhanced data validation function
+  const validateAndSanitizeData = (data: unknown, sectionType: string) => {
+    try {
+      switch (sectionType) {
+        case 'experience':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const expItem = item as Record<string, unknown>;
+            return {
+              id: (expItem.id as string) || uuidv4(),
+              title: (expItem.title as string) || 'Unknown Position',
+              company: (expItem.company as string) || 'Unknown Company',
+              startDate: (expItem.startDate as string) || '2020-01',
+              endDate: (expItem.endDate as string) || 'Present',
+              description: (expItem.description as string) || 'Responsibilities and achievements...'
+            };
+          }).filter((item: Record<string, unknown>) => item.title && item.company);
+
+        case 'education':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const eduItem = item as Record<string, unknown>;
+            return {
+              id: (eduItem.id as string) || uuidv4(),
+              degree: (eduItem.degree as string) || 'Unknown Degree',
+              school: (eduItem.school as string) || 'Unknown Institution',
+              startDate: (eduItem.startDate as string) || '2020-01',
+              endDate: (eduItem.endDate as string) || '2024-01'
+            };
+          }).filter((item: Record<string, unknown>) => item.degree && item.school);
+
+        case 'skills':
+          if (!Array.isArray(data)) return null;
+          return data
+            .filter((skill: unknown) => typeof skill === 'string' && skill.trim().length > 0)
+            .map((skill: string) => skill.trim())
+            .filter((skill: string, index: number, arr: string[]) => arr.indexOf(skill) === index); // Remove duplicates
+
+        case 'projects':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const projItem = item as Record<string, unknown>;
+            return {
+              id: (projItem.id as string) || uuidv4(),
+              name: (projItem.name as string) || 'Unknown Project',
+              description: (projItem.description as string) || 'Project description...',
+              technologies: (projItem.technologies as string) || 'Various technologies',
+              link: (projItem.link as string) || '',
+              startDate: (projItem.startDate as string) || '2020-01',
+              endDate: (projItem.endDate as string) || 'Present'
+            };
+          }).filter((item: Record<string, unknown>) => item.name);
+
+        case 'summary':
+          if (typeof data === 'string') {
+            return data.trim();
+          }
+          return null;
+
+        default:
+          return null;
+      }
+    } catch (error) {
+      console.error(`Error validating ${sectionType} data:`, error);
+      return null;
+    }
+  };
+
   const parseAIResponse = (response: string, sectionType: string) => {
     try {
       // Extract JSON from response
@@ -139,15 +207,14 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
       
       const parsed = JSON.parse(jsonMatch[0]);
       
-      // Add UUIDs if missing
-      if (Array.isArray(parsed)) {
-        return parsed.map(item => ({
-          ...item,
-          id: item.id || uuidv4()
-        }));
+      // Validate and sanitize the parsed data
+      const validatedData = validateAndSanitizeData(parsed, sectionType);
+      
+      if (!validatedData) {
+        throw new Error(`Invalid data structure for ${sectionType}`);
       }
       
-      return parsed;
+      return validatedData;
     } catch (error) {
       console.error('Error parsing AI response:', error);
       return null;
@@ -256,47 +323,104 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
       return;
     }
 
-    let updatedCVData = { ...cvData };
-    const newSectionIds: string[] = [];
+    try {
+      // Create a deep copy of the current CV data
+      const updatedCVData: CVData = {
+        personalInfo: { ...cvData.personalInfo },
+        experience: [...(cvData.experience || [])],
+        education: [...(cvData.education || [])],
+        skills: [...(cvData.skills || [])],
+        projects: [...(cvData.projects || [])],
+        references: [...(cvData.references || [])]
+      };
 
-    selectedSections.forEach(section => {
-      switch (section.type) {
-        case 'experience':
-          updatedCVData.experience = [...(updatedCVData.experience || []), ...section.data];
-          if (!newSectionIds.includes('experience')) newSectionIds.push('experience');
-          break;
-        case 'education':
-          updatedCVData.education = [...(updatedCVData.education || []), ...section.data];
-          if (!newSectionIds.includes('education')) newSectionIds.push('education');
-          break;
-        case 'skills':
-          const existingSkills = updatedCVData.skills || [];
-          const newSkills = section.data.filter((skill: string) => !existingSkills.includes(skill));
-          updatedCVData.skills = [...existingSkills, ...newSkills];
-          if (!newSectionIds.includes('skills')) newSectionIds.push('skills');
-          break;
-        case 'projects':
-          updatedCVData.projects = [...(updatedCVData.projects || []), ...section.data];
-          if (!newSectionIds.includes('projects')) newSectionIds.push('projects');
-          break;
-        case 'summary':
-          updatedCVData.personalInfo = {
-            ...updatedCVData.personalInfo,
-            summary: section.data
-          };
-          break;
-      }
-    });
+      const newSectionIds: string[] = [];
 
-    onSectionsGenerated(updatedCVData, newSectionIds);
-    setOpen(false);
-    setStep('analyzing');
-    setGeneratedSections([]);
-    
-    toast({
-      title: "Sections Applied!",
-      description: `${selectedSections.length} sections have been added to your CV.`
-    });
+      selectedSections.forEach(section => {
+        try {
+          switch (section.type) {
+            case 'experience':
+              if (Array.isArray(section.data)) {
+                updatedCVData.experience = [...updatedCVData.experience, ...section.data];
+                if (!newSectionIds.includes('experience')) newSectionIds.push('experience');
+              }
+              break;
+
+            case 'education':
+              if (Array.isArray(section.data)) {
+                updatedCVData.education = [...updatedCVData.education, ...section.data];
+                if (!newSectionIds.includes('education')) newSectionIds.push('education');
+              }
+              break;
+
+            case 'skills':
+              if (Array.isArray(section.data)) {
+                const existingSkills = updatedCVData.skills || [];
+                const newSkills = section.data.filter((skill: string) => 
+                  typeof skill === 'string' && !existingSkills.includes(skill)
+                );
+                updatedCVData.skills = [...existingSkills, ...newSkills];
+                if (!newSectionIds.includes('skills')) newSectionIds.push('skills');
+              }
+              break;
+
+            case 'projects':
+              if (Array.isArray(section.data)) {
+                updatedCVData.projects = [...updatedCVData.projects, ...section.data];
+                if (!newSectionIds.includes('projects')) newSectionIds.push('projects');
+              }
+              break;
+
+            case 'summary':
+              if (typeof section.data === 'string') {
+                updatedCVData.personalInfo = {
+                  ...updatedCVData.personalInfo,
+                  summary: section.data
+                };
+              }
+              break;
+
+            default:
+              console.warn(`Unknown section type: ${section.type}`);
+          }
+        } catch (error) {
+          console.error(`Error applying section ${section.type}:`, error);
+        }
+      });
+
+      // Validate the final CV data structure
+      const finalCVData: CVData = {
+        personalInfo: updatedCVData.personalInfo || {
+          fullName: '',
+          email: '',
+          phone: '',
+          location: '',
+          summary: ''
+        },
+        experience: Array.isArray(updatedCVData.experience) ? updatedCVData.experience : [],
+        education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
+        skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
+        projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
+        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : []
+      };
+
+      onSectionsGenerated(finalCVData, newSectionIds);
+      setOpen(false);
+      setStep('analyzing');
+      setGeneratedSections([]);
+      
+      toast({
+        title: "Sections Applied!",
+        description: `${selectedSections.length} sections have been added to your CV.`
+      });
+    } catch (error) {
+      console.error('Error applying sections:', error);
+      toast({
+        title: "Application Failed",
+        description: "An error occurred while applying the sections. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const resetGeneration = () => {

@@ -28,23 +28,29 @@ const Preview = () => {
   const [cvName, setCVName] = useState('');
 
   useEffect(() => {
-    const storedData = localStorage.getItem('previewCVData');
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        setCVData(parsedData.cvData);
-        setTemplate(parsedData.template || 'modern');
-        setSections(parsedData.sections || []);
-        setIsOwner(true); // If from localStorage, it's the user's CV
-      } catch (error) {
-        console.error('Error parsing stored CV data:', error);
-      } finally {
+    if (id && id !== 'new') {
+      // Always fetch from Supabase if id is present and not 'new'
+      fetchCVData(id);
+      // Clear localStorage preview data to avoid confusion
+      localStorage.removeItem('previewCVData');
+    } else {
+      // Fallback to localStorage for new/unsaved CVs
+      const storedData = localStorage.getItem('previewCVData');
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+          setCVData(parsedData.cvData);
+          setTemplate(parsedData.template || 'modern');
+          setSections(parsedData.sections || []);
+          setIsOwner(true);
+        } catch (error) {
+          console.error('Error parsing stored CV data:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
         setIsLoading(false);
       }
-    } else if (id && id !== 'new') {
-      fetchCVData(id);
-    } else {
-      setIsLoading(false);
     }
   }, [id, user]);
 
@@ -174,7 +180,7 @@ const Preview = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24">
         {/* Floating Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full floating blur-xl"></div>
@@ -183,84 +189,88 @@ const Preview = () => {
           <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-r from-pink-400/20 to-orange-400/20 rounded-full floating blur-xl" style={{animationDelay: '1s'}}></div>
         </div>
 
-        {/* Enhanced Header */}
-        <div className="glass border-b backdrop-blur-xl sticky top-16 z-40 bg-white/60">
-          <div className="container mx-auto py-6 px-6">
+        {/* Responsive Fixed Header (Builder style) */}
+        <div className="fixed top-16 left-0 right-0 bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl z-30">
+          <div className="container mx-auto py-2 px-4 sm:px-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
+              {/* Left Section */}
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => navigate(-1)}
-                  className="hover:bg-white/30 group transition-all duration-200 border border-white/20 backdrop-blur-sm"
+                  className="border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs sm:text-sm"
                 >
-                  <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                  Back
+                  <ArrowLeft className="mr-1 h-3 w-3" />
+                  <span className="hidden sm:inline">Back</span>
                 </Button>
-                <div>
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                        <Eye className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                        <Sparkles className="h-2 w-2 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                        {cvName || 'CV Preview'}
-                      </h1>
-                      <p className="text-sm text-gray-600">Professional CV Showcase</p>
+                {/* Title Section - Responsive */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md ring-1 ring-white/50 relative">
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                      <Sparkles className="h-2 w-2 sm:h-2.5 sm:w-2.5 text-white" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {currentTemplateInfo && (
-                      <>
-                        <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 shadow-sm">
-                          <Palette className="w-3 h-3 mr-1" />
-                          {currentTemplateInfo.name}
+                  <div className="hidden sm:block">
+                    <h1 className="text-sm sm:text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                      {cvName || 'CV Preview'}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {currentTemplateInfo && (
+                        <>
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 shadow-sm px-2 py-0.5 text-xs font-semibold">
+                            <Palette className="w-3 h-3 mr-1" />
+                            {currentTemplateInfo.name}
+                          </Badge>
+                          <Badge variant="outline" className="border border-gray-300 px-2 py-0.5 text-xs">
+                            {currentTemplateInfo.category}
+                          </Badge>
+                        </>
+                      )}
+                      {!isOwner && authorName && (
+                        <Badge variant="outline" className="bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200 shadow-sm px-2 py-0.5 text-xs">
+                          <Star className="w-3 h-3 mr-1" />
+                          by {authorName}
                         </Badge>
-                        <Badge variant="outline" className="text-xs bg-white/50 border-gray-200 shadow-sm">
-                          {currentTemplateInfo.category}
-                        </Badge>
-                      </>
-                    )}
-                    {!isOwner && authorName && (
-                      <Badge variant="outline" className="text-xs bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200 shadow-sm">
-                        <Star className="w-3 h-3 mr-1" />
-                        by {authorName}
-                      </Badge>
-                    )}
+                      )}
+                    </div>
+                  </div>
+                  {/* Mobile Title */}
+                  <div className="sm:hidden">
+                    <h1 className="text-sm font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                      {cvName || 'CV Preview'}
+                    </h1>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <Button 
+              {/* Right Section - Responsive */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button
                   variant="outline"
                   onClick={handleDownload}
-                  className="hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:scale-105 group"
+                  className="border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
+                  title="Download PDF"
                 >
-                  <Download className="h-4 w-4 mr-2 group-hover:animate-bounce" />
-                  Download PDF
+                  <Download className="h-3 w-3 sm:mr-1" />
+                  <span className="hidden sm:inline">Download PDF</span>
                 </Button>
-                
-                <Button 
+                <Button
                   variant="outline"
                   onClick={handleShare}
-                  className="hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-200 hover:bg-white hover:scale-105 group"
+                  className="border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-md px-2 py-1 h-7 text-xs"
+                  title="Share"
                 >
-                  <Share2 className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
-                  Share
+                  <Share2 className="h-3 w-3 sm:mr-1" />
+                  <span className="hidden sm:inline">Share</span>
                 </Button>
-                
                 {isOwner && id && id !== 'new' && (
-                  <Button 
+                  <Button
                     onClick={() => navigate(`/builder/${id}`)}
-                    className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 hover:shadow-xl transition-all duration-200 text-white border-0 hover:scale-105 group"
+                    className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs border-0"
                   >
-                    <Edit className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
-                    Edit CV
+                    <Edit className="h-3 w-3 sm:mr-1" />
+                    <span className="hidden sm:inline">Edit CV</span>
+                    <span className="sm:hidden">Edit</span>
                   </Button>
                 )}
               </div>
@@ -291,7 +301,7 @@ const Preview = () => {
 
             <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
               <CardContent className="p-0">
-                <div id="cv-content" className="bg-white">
+                <div className="bg-white">
                   {cvData && sections && sections.length > 0 ? (
                     <CVTemplateRenderer
                       cvData={cvData}
