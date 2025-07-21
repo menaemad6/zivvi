@@ -6,7 +6,7 @@ export const cvTemplates: CVTemplate[] = [
     id: 'classicTemp',
     name: 'Classic Template',
     description: '(File-based template component)',
-    thumbnail: '/placeholder.svg',
+    thumbnail: '/templates/classic-template.png',
     category: 'classic'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
@@ -14,7 +14,7 @@ export const cvTemplates: CVTemplate[] = [
     id: 'elegantTemp',
     name: 'Elegant Template',
     description: '(File-based template component)',
-    thumbnail: '/placeholder.svg',
+    thumbnail: '/templates/elegant-template.png',
     category: 'classic'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
@@ -22,7 +22,15 @@ export const cvTemplates: CVTemplate[] = [
     id: 'timelineTemp',
     name: 'Timeline Template',
     description: '(File-based template component)',
-    thumbnail: '/placeholder.svg',
+    thumbnail: '/templates/timeline-template.png',
+    category: 'classic'
+    // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
+  },
+  {
+    id: 'compactTemp',
+    name: 'Compact Template',
+    description: '(File-based template component)',
+    thumbnail: '/templates/compact-template.png',
     category: 'classic'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },

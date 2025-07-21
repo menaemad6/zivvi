@@ -297,7 +297,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             {proj.technologies && (
               <div className="text-blue-700 font-semibold">{proj.technologies}</div>
             )}
-            <p className="text-gray-800 text-sm mt-2">{proj.description || ""}</p>
+            <p className="text-gray-800 text-sm mt-1">{proj.description || ""}</p>
           </div>
         )) : <div className="text-gray-500 italic">No projects added yet</div>}
       </div>
@@ -326,7 +326,6 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </div>
   );
 };
-
 
 const TimelineTemplate = ({ cvData }: { cvData: Partial<CVData> }) => {
   // Helper for contact icons
@@ -466,6 +465,191 @@ const TimelineTemplate = ({ cvData }: { cvData: Partial<CVData> }) => {
   );
 };
 
+const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
+  const sectionMap: Record<string, boolean> = {};
+  (sections || [
+    "personalInfo", "summary", "experience", "projects", "education", "achievements", "skills", "courses", "passions"
+  ]).forEach(s => { sectionMap[s] = true; });
+
+  // Header (matches image)
+  const renderHeader = () => (
+    <div className="px-8 pt-8 pb-2 bg-white">
+      <h1 className="text-4xl font-bold text-gray-900 mb-1">{cvData.personalInfo?.fullName || "Mia Ward"}</h1>
+      <div className="text-xl font-semibold text-blue-600 mb-2">
+        Data Scientist | Machine Learning | AI Innovation
+      </div>
+      <div className="flex flex-wrap items-center gap-4 text-gray-700 text-base mb-2">
+        <span className="flex items-center gap-1"><span role="img" aria-label="phone">📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}</span>
+        <span className="flex items-center gap-1"><span role="img" aria-label="email">✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}</span>
+        <span className="flex items-center gap-1"><span role="img" aria-label="linkedin">🔗</span> linkedin.com</span>
+        <span className="flex items-center gap-1"><span role="img" aria-label="location">📍</span> {cvData.personalInfo?.location || "Reading, UK"}</span>
+      </div>
+    </div>
+  );
+
+  // Summary (always shows, matches image)
+  const renderSummary = () => (
+    <section className="px-8 mb-2">
+      <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Summary</div>
+      <div className="border-t border-gray-300 mb-2"></div>
+      <p className="text-base text-gray-800 leading-relaxed">
+        {cvData.personalInfo?.summary || "Enthusiastic Data Scientist with a proven track record in leading innovative AI and machine learning projects. Experienced in developing predictive analytics models, improving data processing efficiency, and enhancing customer insights. Skilled in team leadership and collaborating across functions to drive strategic decision-making. MSc in Data Science from a prestigious university. Passionate about predictive analytics, AI for social good, and data-driven storytelling, aligning with the mission of leveraging data for impactful solutions."}
+      </p>
+    </section>
+  );
+
+  // Experience (matches image)
+  const renderExperience = () => (
+    <section className="px-8 mb-2">
+      <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Experience</div>
+      <div className="space-y-6">
+        {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
+          <div key={idx} className="mb-2">
+            <div className="font-bold text-lg text-gray-900 leading-tight">{exp.title || "Job Title"}</div>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <a href="#" className="text-blue-600 font-medium hover:underline text-base">{exp.company || "Company"}</a>
+              <span className="text-gray-500 text-sm">{exp.startDate || "MM/YYYY"} - {exp.endDate || "MM/YYYY"}</span>
+            </div>
+            <ul className="list-disc pl-5 text-gray-800 text-base space-y-0.5">
+              {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : <li>Job description</li>}
+            </ul>
+          </div>
+        )) : <div className="text-gray-500 italic">No experience added yet</div>}
+      </div>
+    </section>
+  );
+
+  // Projects (under experience, keep as before)
+  const renderProjects = () => (
+    <section className="px-8 mb-2">
+      <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Projects</div>
+      <div className="space-y-6">
+        {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
+          <div key={idx} className="mb-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+              <div className="font-bold text-gray-900 text-base">{proj.name || "Project Name"}</div>
+              <div className="text-sm text-gray-600">{proj.startDate || ""} - {proj.endDate || ""}</div>
+            </div>
+            <p className="text-gray-800 text-sm mt-1">{proj.description || ""}</p>
+          </div>
+        )) : <div className="text-gray-500 italic">No projects added yet</div>}
+      </div>
+    </section>
+  );
+
+  // Sidebar sections (unchanged)
+  const renderEducation = () => (
+    <section className="mb-6">
+      <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Education</div>
+      <div className="border-t border-blue-200 mb-2"></div>
+      <div className="space-y-4">
+        {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
+          <div key={idx}>
+            <div className="font-bold text-gray-900 text-base">{edu.degree || "MSc in Data Science"}</div>
+            <div className="text-blue-700 font-semibold">{edu.school || "University College London"}</div>
+            <div className="text-sm text-gray-600">{edu.startDate || "01/2014"} - {edu.endDate || "01/2015"}</div>
+          </div>
+        )) : <div className="text-gray-500 italic">No education added yet</div>}
+      </div>
+    </section>
+  );
+
+  const renderAchievements = () => (
+    <section className="mb-6">
+      <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Achievements</div>
+      <div className="border-t border-blue-200 mb-2"></div>
+      <ul className="space-y-2">
+        <li>
+          <div className="font-bold text-gray-900">Team Leadership</div>
+          <div className="text-gray-700 text-sm">Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">Machine Downtime Reduction</div>
+          <div className="text-gray-700 text-sm">Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">Sales Campaign Enhancement</div>
+          <div className="text-gray-700 text-sm">Applied cluster analysis in customer segmentation, increasing conversion rates by 17% in targeted marketing campaigns.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">Forecasting Model Development</div>
+          <div className="text-gray-700 text-sm">Created an AI-driven forecast model that increased predictive accuracy by 20%, significantly impacting strategic planning.</div>
+        </li>
+      </ul>
+    </section>
+  );
+
+  const renderSkills = () => (
+    <section className="mb-6">
+      <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Skills</div>
+      <div className="border-t border-blue-200 mb-2"></div>
+      <div className="flex flex-wrap gap-2">
+        {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
+          <span key={idx} className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded text-xs">{skill}</span>
+        )) : <span className="text-gray-400 italic">No skills added yet</span>}
+      </div>
+    </section>
+  );
+
+  const renderCourses = () => (
+    <section className="mb-6">
+      <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Courses</div>
+      <div className="border-t border-blue-200 mb-2"></div>
+      <ul className="space-y-2">
+        <li>
+          <div className="font-bold text-gray-900">Applied Data Science with Python</div>
+          <div className="text-gray-700 text-sm">Acquired advanced Python programming skills for data science through this course offered by the University of Michigan.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">Machine Learning Specialization</div>
+          <div className="text-gray-700 text-sm">Completed a series of courses focused on machine learning techniques, provided by Stanford University online.</div>
+        </li>
+      </ul>
+    </section>
+  );
+
+  const renderPassions = () => (
+    <section className="mb-6">
+      <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Passions</div>
+      <div className="border-t border-blue-200 mb-2"></div>
+      <ul className="space-y-2">
+        <li>
+          <div className="font-bold text-gray-900">Predictive Analytics</div>
+          <div className="text-gray-700 text-sm">Passionate about uncovering trends and making accurate predictions that drive business success through data analysis.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">AI for Social Good</div>
+          <div className="text-gray-700 text-sm">Interested in applying AI for solving complex societal challenges and contributing to community-centric projects.</div>
+        </li>
+        <li>
+          <div className="font-bold text-gray-900">Data-Driven Storytelling</div>
+          <div className="text-gray-700 text-sm">Enjoy exploring the narrative potential of data and translating complex insights into compelling stories for diverse audiences.</div>
+        </li>
+      </ul>
+    </section>
+  );
+
+  return (
+    <div id="cv-content" className="flex flex-col md:flex-row bg-white min-h-screen">
+      {/* Main Column */}
+      <div className="flex-1">
+        {renderHeader()}
+        {renderSummary()}
+        {renderExperience()}
+        {renderProjects()}
+      </div>
+      {/* Right Sidebar */}
+      <aside className="w-full md:w-96 bg-gray-50 border-l border-gray-200 p-8 flex flex-col gap-4">
+        {sectionMap["education"] && renderEducation()}
+        {sectionMap["achievements"] && renderAchievements()}
+        {sectionMap["skills"] && renderSkills()}
+        {sectionMap["courses"] && renderCourses()}
+        {sectionMap["passions"] && renderPassions()}
+      </aside>
+    </div>
+  );
+};
+
 const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections, templateId }) => {
   switch (templateId) {
     case "classicTemp":
@@ -475,6 +659,8 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
     case "timelineTemp":
       return <TimelineTemplate cvData={cvData} />;
     // Add more cases for other templates here
+    case "compactTemp":
+      return <CompactTemplate cvData={cvData} sections={sections} />;
     default:
       return <div>Template not found.</div>;
   }

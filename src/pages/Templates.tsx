@@ -198,24 +198,28 @@ const Templates = () => {
                     onMouseEnter={() => setHoveredTemplate(template.id)}
                     onMouseLeave={() => setHoveredTemplate(null)}
                   >
-                    <div className="relative">
-                      <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-500 ${hoveredTemplate === template.id ? 'scale-105' : ''}`}>
-                        <div className="text-center p-8 text-white">
-                          <Flame className="h-12 w-12 mx-auto mb-6 opacity-80" />
-                          <div className="text-3xl font-bold mb-4">{template.name}</div>
-                          <div className="text-lg opacity-90 mb-8">Premium Template</div>
-                          <div className="space-y-3">
-                            <div className="h-4 bg-white/30 rounded-full"></div>
-                            <div className="h-4 bg-white/20 rounded-full w-3/4 mx-auto"></div>
-                            <div className="h-4 bg-white/20 rounded-full w-1/2 mx-auto"></div>
+                    <div className="relative aspect-[3/4] flex items-center justify-center bg-white">
+                      {template.thumbnail && template.thumbnail !== '/placeholder.svg' ? (
+                        <img src={template.thumbnail} alt={template.name} className="object-cover w-full h-full" />
+                      ) : (
+                        <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-500 ${hoveredTemplate === template.id ? 'scale-105' : ''}`}>
+                          <div className="text-center p-8 text-white">
+                            <Flame className="h-12 w-12 mx-auto mb-6 opacity-80" />
+                            <div className="text-3xl font-bold mb-4">{template.name}</div>
+                            <div className="text-lg opacity-90 mb-8">Premium Template</div>
+                            <div className="space-y-3">
+                              <div className="h-4 bg-white/30 rounded-full"></div>
+                              <div className="h-4 bg-white/20 rounded-full w-3/4 mx-auto"></div>
+                              <div className="h-4 bg-white/20 rounded-full w-1/2 mx-auto"></div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <Badge className="absolute top-6 right-6 bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-0 px-3 py-2">
-                        <Star className="h-4 w-4 mr-1" />
-                        Featured
-                      </Badge>
+                      )}
                     </div>
+                    <Badge className="absolute top-6 right-6 bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-0 px-3 py-2">
+                      <Star className="h-4 w-4 mr-1" />
+                      Featured
+                    </Badge>
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-2xl text-gray-900">{template.name}</CardTitle>
@@ -261,18 +265,22 @@ const Templates = () => {
                   onMouseEnter={() => setHoveredTemplate(template.id)}
                   onMouseLeave={() => setHoveredTemplate(null)}
                 >
-                  <div className="relative">
-                    <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-300 ${hoveredTemplate === template.id ? 'scale-110' : ''}`}>
-                      <div className="text-center p-6 text-white">
-                        <div className="text-2xl font-bold mb-3">{template.name}</div>
-                        <div className="text-sm opacity-80 mb-6">CV Template</div>
-                        <div className="space-y-2">
-                          <div className="h-3 bg-white/30 rounded"></div>
-                          <div className="h-3 bg-white/20 rounded w-3/4 mx-auto"></div>
-                          <div className="h-3 bg-white/20 rounded w-1/2 mx-auto"></div>
+                  <div className="relative aspect-[3/4] flex items-center justify-center bg-white">
+                    {template.thumbnail && template.thumbnail !== '/placeholder.svg' ? (
+                      <img src={template.thumbnail} alt={template.name} className="object-cover w-full h-full" />
+                    ) : (
+                      <div className={`aspect-[3/4] bg-gradient-to-br ${getTemplateGradient(template.id)} flex items-center justify-center transition-all duration-300 ${hoveredTemplate === template.id ? 'scale-110' : ''}`}>
+                        <div className="text-center p-6 text-white">
+                          <div className="text-2xl font-bold mb-3">{template.name}</div>
+                          <div className="text-sm opacity-80 mb-6">CV Template</div>
+                          <div className="space-y-2">
+                            <div className="h-3 bg-white/30 rounded"></div>
+                            <div className="h-3 bg-white/20 rounded w-3/4 mx-auto"></div>
+                            <div className="h-3 bg-white/20 rounded w-1/2 mx-auto"></div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
