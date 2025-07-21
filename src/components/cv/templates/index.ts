@@ -7,4 +7,5 @@ export const templateComponentRegistry: Record<string, any> = {
   timelineTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "timelineTemp" }),
   // Add more mappings as you add more templates
   compactTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "compactTemp" }),
+  headerTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "headerTemp" }),
 }; 

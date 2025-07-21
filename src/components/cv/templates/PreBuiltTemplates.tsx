@@ -144,11 +144,11 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const renderHeader = () => (
     <div className="px-8 pt-8 pb-4 bg-white">
       <h1 className="text-3xl font-bold tracking-wide text-gray-900 mb-1 uppercase">{cvData.personalInfo?.fullName || "SAMUEL CAMPBELL"}</h1>
-      <div className="text-lg text-blue-700 font-semibold mb-2">{"Seasoned IT Project Manager | Agile & Waterfall Expertise"}</div>
+      {/* <div className="text-lg text-blue-700 font-semibold mb-2">{"Seasoned IT Project Manager | Agile & Waterfall Expertise"}</div> */}
       <div className="flex flex-wrap items-center gap-4 text-gray-700 text-sm mb-2">
         <span>📞 {cvData.personalInfo?.phone || "+44 20 7123 4567"}</span>
         <span>✉️ {cvData.personalInfo?.email || "help@enhancv.com"}</span>
-        <span>🔗 linkedin.com</span>
+        {/* <span>🔗 linkedin.com</span> */}
         <span>📍 {cvData.personalInfo?.location || "Manchester"}</span>
       </div>
     </div>
@@ -239,12 +239,15 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div className="uppercase text-xs tracking-widest text-white font-semibold mb-2">Skills</div>
       <div className="border-t border-blue-200 mb-2"></div>
       <div className="flex flex-wrap gap-2">
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">Agile Scrum</span>
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">Waterfall</span>
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">Kanban</span>
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">Prince2</span>
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">MSP</span>
-        <span className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">PMBoK</span>
+        {cvData.skills && cvData.skills.length > 0 ? (
+          cvData.skills.map((skill, idx) => (
+            <span key={idx} className="bg-blue-700 text-white px-3 py-1 rounded-full text-xs">
+              {skill}
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-200 italic">No skills added yet</span>
+        )}
       </div>
     </section>
   );
@@ -310,7 +313,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div className="flex-1 bg-white p-0 md:p-8">
         {renderHeader()}
         <div className="p-8 pt-4">
-          {sectionMap["summary"] && renderSummary()}
+          {cvData.personalInfo?.summary && renderSummary()}
           {sectionMap["experience"] && renderExperience()}
           {sectionMap["projects"] && renderProjects()}
         </div>
@@ -327,7 +330,12 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 };
 
-const TimelineTemplate = ({ cvData }: { cvData: Partial<CVData> }) => {
+const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
+  const sectionMap: Record<string, boolean> = {};
+  (sections || [
+    "header", "summary", "experience", "projects", "education", "achievements", "skills"
+  ]).forEach(s => { sectionMap[s] = true; });
+
   // Helper for contact icons
   const ContactIcon = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
     <span className="flex items-center gap-1 text-gray-700 text-sm">
@@ -455,12 +463,12 @@ const TimelineTemplate = ({ cvData }: { cvData: Partial<CVData> }) => {
   return (
     <div id="cv-content" className="mx-auto bg-white w-[794px] min-h-[1123px] p-6 font-sans text-gray-900 text-base" style={{ boxShadow: "none", border: "none" }}>
       {renderHeader()}
-      {renderSummary()}
-      {renderExperience()}
-      {renderProjects()}
-      {renderEducation()}
-      {renderAchievements()}
-      {renderSkills()}
+      {cvData.personalInfo?.summary && renderSummary()}
+      {sectionMap["experience"] && renderExperience()}
+      {sectionMap["projects"] && renderProjects()}
+      {sectionMap["education"] && renderEducation()}
+      {sectionMap["achievements"] && renderAchievements()}
+      {sectionMap["skills"] && renderSkills()}
     </div>
   );
 };
@@ -634,9 +642,10 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       {/* Main Column */}
       <div className="flex-1">
         {renderHeader()}
-        {renderSummary()}
-        {renderExperience()}
-        {renderProjects()}
+        {cvData.personalInfo?.summary && renderSummary()}
+        {sectionMap["experience"] && renderExperience()}
+        {sectionMap["projects"] && renderProjects()}
+
       </div>
       {/* Right Sidebar */}
       <aside className="w-full md:w-96 bg-gray-50 border-l border-gray-200 p-8 flex flex-col gap-4">
@@ -650,6 +659,120 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 };
 
+const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
+  // Section order: personalInfo, summary, experience, projects, education, skills
+  const sectionMap: Record<string, boolean> = {};
+  (sections || [
+    "personalInfo", "summary", "experience", "projects", "education", "skills"
+  ]).forEach(s => { sectionMap[s] = true; });
+
+  // Header (green background, left-aligned)
+  const renderHeader = () => (
+    <div className="rounded-t-lg bg-green-100 border border-green-200 px-8 pt-6 pb-2 flex flex-col md:flex-row md:justify-between md:items-center">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">{cvData.personalInfo?.fullName || "Kane Jones"}</h1>
+        <div className="text-sm text-gray-700 mb-1">{cvData.personalInfo?.email || "kjn_77es14@yahoo.com"} &bull; {cvData.personalInfo?.phone || "(512)701-9215"}</div>
+        <div className="text-sm text-gray-700">{cvData.personalInfo?.location || "88 Lorenzo Road, Austin, United States, TX 73301"}</div>
+      </div>
+    </div>
+  );
+
+  // Summary (Bookkeeper)
+  const renderSummary = () => (
+    <section className="mt-6 mb-8">
+      <div className="uppercase text-xs tracking-widest text-green-700 font-semibold mb-2">Summary</div>
+      <div className="border-t border-green-200 mb-2"></div>
+      {/* Only render summary, do not attempt to show job title from profile_data to avoid linter errors */}
+      <p className="text-gray-700 text-base leading-relaxed">
+        {cvData.personalInfo?.summary ||
+          "Knowledgeable and experienced Bookkeeper with extensive knowledge handling and documenting financial transactions according to policies and preferred procedures. Experienced in maintaining accounts, processing accounts payable and receivable, managing invoices, and delegating payroll. Bringing forth excellent customer service skills, strong organizational skills, and the ability to communicate well with others."}
+      </p>
+    </section>
+  );
+
+  // Experience
+  const renderExperience = () => (
+    <section className="mb-8">
+      <div className="text-2xl font-semibold text-green-700 mb-2">Career Experience</div>
+      <div className="space-y-6">
+        {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
+          <div key={idx}>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+              <div className="font-semibold text-gray-800">
+                {exp.title || "Bookkeeper"} at {exp.company || "Company"}
+              </div>
+              <div className="text-gray-500 text-sm mt-1 md:mt-0">{exp.startDate || "Start"} — {exp.endDate || "End"}</div>
+            </div>
+            <ul className="list-disc pl-6 text-gray-700 text-base mt-1 space-y-1">
+              {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : <li>Job description</li>}
+            </ul>
+          </div>
+        )) : <div className="text-gray-500 italic">No experience added yet</div>}
+      </div>
+    </section>
+  );
+
+  // Projects (empty state if none)
+  const renderProjects = () => (
+    <section className="mb-8">
+      <div className="text-2xl font-semibold text-green-700 mb-2">Projects</div>
+      <div className="space-y-6">
+        {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
+          <div key={idx}>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+              <div className="font-semibold text-gray-800">{proj.name || "Project Name"}</div>
+              <div className="text-gray-500 text-sm mt-1 md:mt-0">{proj.startDate || "Start"} — {proj.endDate || "End"}</div>
+            </div>
+            <p className="text-gray-700 text-base mt-1">{proj.description || ""}</p>
+          </div>
+        )) : <div className="text-gray-500 italic">No projects added yet</div>}
+      </div>
+    </section>
+  );
+
+  // Education
+  const renderEducation = () => (
+    <section className="mb-8">
+      <div className="text-2xl font-semibold text-green-700 mb-2">Education</div>
+      <div className="space-y-6">
+        {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
+          <div key={idx}>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+              <div className="font-semibold text-gray-800">{edu.degree || "Degree"}, {edu.school || "School"}</div>
+              <div className="text-gray-500 text-sm mt-1 md:mt-0">{edu.startDate || "Start"} — {edu.endDate || "End"}</div>
+            </div>
+          </div>
+        )) : <div className="text-gray-500 italic">No education added yet</div>}
+      </div>
+    </section>
+  );
+
+  // Skills
+  const renderSkills = () => (
+    <section className="mb-8">
+      <div className="text-2xl font-semibold text-green-700 mb-2">Skills</div>
+      <div className="flex flex-wrap gap-2">
+        {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
+          <span key={idx} className="bg-green-100 text-green-900 px-3 py-1 rounded text-base">{typeof skill === "string" ? skill : "Skill"}</span>
+        )) : <span className="text-gray-400 italic">No skills added yet</span>}
+      </div>
+    </section>
+  );
+
+  return (
+    <div id="cv-content" className="max-w-3xl mx-auto bg-white border border-green-200 shadow font-sans text-gray-900 text-base rounded-lg overflow-hidden">
+      {renderHeader()}
+      <div className="px-8 pb-8">
+        {cvData.personalInfo?.summary && renderSummary()}
+        {sectionMap["experience"] && renderExperience()}
+        {sectionMap["projects"] && renderProjects()}
+        {sectionMap["education"] && renderEducation()}
+        {sectionMap["skills"] && renderSkills()}
+      </div>
+    </div>
+  );
+};
+
 const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections, templateId }) => {
   switch (templateId) {
     case "classicTemp":
@@ -657,12 +780,14 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
     case "elegantTemp":
       return <ElegantTemplate cvData={cvData} sections={sections} />;
     case "timelineTemp":
-      return <TimelineTemplate cvData={cvData} />;
+      return <TimelineTemplate cvData={cvData} sections={sections} />;
     // Add more cases for other templates here
     case "compactTemp":
       return <CompactTemplate cvData={cvData} sections={sections} />;
+    case "headerTemp":
+      return <HeaderTemplate cvData={cvData} sections={sections} />;
     default:
-      return <div>Template not found.</div>;
+      return <ClassicTemplate cvData={cvData} sections={sections} />;
   }
 };
 

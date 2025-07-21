@@ -11,10 +11,12 @@ import { User, Mail, Calendar, Briefcase } from 'lucide-react';
 interface ProfileFormProps {
   profile: any;
   onUpdate: (updates: any) => Promise<boolean>;
+  onEditProfessionalInfo: () => void;
 }
 
-export const ProfileForm = ({ profile, onUpdate }: ProfileFormProps) => {
+export const ProfileForm = ({ profile, onUpdate, onEditProfessionalInfo }: ProfileFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     email: profile?.email || ''
@@ -25,6 +27,14 @@ export const ProfileForm = ({ profile, onUpdate }: ProfileFormProps) => {
     if (success) {
       setIsEditing(false);
     }
+  };
+  
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData({
+      full_name: profile?.full_name || '',
+      email: profile?.email || '',
+    });
   };
 
   const profileData = profile?.profile_data || {};
@@ -68,7 +78,7 @@ export const ProfileForm = ({ profile, onUpdate }: ProfileFormProps) => {
           <div className="flex justify-end gap-2">
             {isEditing ? (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={handleCancel}>
                   Cancel
                 </Button>
                 <Button onClick={handleSave}>
@@ -135,6 +145,11 @@ export const ProfileForm = ({ profile, onUpdate }: ProfileFormProps) => {
                 <p className="text-gray-900">{profileData.career_goals}</p>
               </div>
             )}
+            <div className="flex justify-end gap-2 mt-4">
+              <Button onClick={onEditProfessionalInfo}>
+                Edit Professional Info
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

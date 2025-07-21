@@ -182,7 +182,11 @@ const Profile = () => {
                   <p className="text-gray-600">Manage your account information and preferences</p>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <ProfileForm profile={profile} onUpdate={updateProfile} />
+                  <ProfileForm 
+                    profile={profile} 
+                    onUpdate={updateProfile}
+                    onEditProfessionalInfo={() => setShowOnboarding(true)}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -194,6 +198,7 @@ const Profile = () => {
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
+        initialData={profile?.profile_data}
       />
       
       <Footer />

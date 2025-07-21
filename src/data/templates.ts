@@ -35,6 +35,13 @@ export const cvTemplates: CVTemplate[] = [
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
   {
+    id: 'headerTemp',
+    name: 'Header Template',
+    description: '(File-based template component)',
+    thumbnail: '/templates/header-template.png',
+    category: 'modern'
+  },
+  {
     id: 'modern',
     name: 'Modern Professional',
     description: 'Clean and modern design with blue accents, perfect for tech professionals',
@@ -139,5 +146,6 @@ export const cvTemplates: CVTemplate[] = [
     description: 'Visually striking layout perfect for showcasing design skills',
     thumbnail: '/placeholder.svg',
     category: 'creative'
-  }
+  },
+
 ];

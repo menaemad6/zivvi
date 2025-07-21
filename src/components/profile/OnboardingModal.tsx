@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getGeminiResponse } from '@/utils/geminiApi';
 
 interface OnboardingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (data: any) => void;
+  onComplete: (data: Record<string, unknown>) => void;
+  initialData?: Partial<QuestionData>;
 }
 
 interface QuestionData {
@@ -52,10 +54,67 @@ const COMMON_SKILLS = [
   'Data Analysis', 'Marketing', 'Sales', 'Design', 'Writing'
 ];
 
-export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModalProps) => {
+export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: OnboardingModalProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [data, setData] = useState<QuestionData>({});
+  const [data, setData] = useState<QuestionData>(initialData || {});
   const [customSkills, setCustomSkills] = useState('');
+  const [recommendedSkills, setRecommendedSkills] = useState<string[]>([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const debounceRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [lastClickedSkill, setLastClickedSkill] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const existingData = initialData || {};
+      setData(existingData);
+      const commonSkillSet = new Set(COMMON_SKILLS);
+      const existingSkills = existingData.skills || [];
+      const custom = existingSkills.filter(skill => !commonSkillSet.has(skill)).join(', ');
+      setCustomSkills(custom);
+      setLastClickedSkill(null);
+      setCurrentStep(0);
+      setRecommendedSkills([]);
+      setLoadingRecommendations(false);
+    }
+  }, [isOpen, initialData]);
+
+  // Debounced Gemini fetch for skill recommendations
+  React.useEffect(() => {
+    if (currentStep !== 3) return; // Only on skills step
+    if (!lastClickedSkill) {
+      setRecommendedSkills([]);
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setLoadingRecommendations(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const prompt = `Given the skill: "${lastClickedSkill}"${data.industry ? ` and industry: ${data.industry}` : ''}, recommend 5 more relevant professional skills as a JSON array of strings, no explanation.`;
+        const response = await getGeminiResponse(prompt);
+        let skills: string[] = [];
+        try {
+          // Extract JSON array from code block if present
+          const codeBlockMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+          const jsonToParse = codeBlockMatch ? codeBlockMatch[1] : response;
+          skills = JSON.parse(jsonToParse);
+        } catch {
+          // Fallback: try to split by comma
+          skills = response.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        // Remove already selected skills
+        skills = skills.filter(s => !(data.skills || []).includes(s));
+        setRecommendedSkills(skills.slice(0, 5));
+      } catch (e) {
+        setRecommendedSkills([]);
+      } finally {
+        setLoadingRecommendations(false);
+      }
+    }, 600);
+    // Cleanup
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [lastClickedSkill, data.industry, currentStep]);
 
   const questions = [
     {
@@ -63,7 +122,10 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
       title: 'What industry do you work in?',
       description: 'This helps us recommend relevant CV templates and sections.',
       component: (
-        <Select onValueChange={(value) => setData(prev => ({ ...prev, industry: value }))}>
+        <Select 
+          onValueChange={(value) => setData(prev => ({ ...prev, industry: value }))}
+          value={data.industry}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select your industry" />
           </SelectTrigger>
@@ -80,7 +142,10 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
       title: 'What\'s your experience level?',
       description: 'This helps us tailor suggestions for your career stage.',
       component: (
-        <Select onValueChange={(value) => setData(prev => ({ ...prev, experience_level: value }))}>
+        <Select 
+          onValueChange={(value) => setData(prev => ({ ...prev, experience_level: value }))}
+          value={data.experience_level}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select your experience level" />
           </SelectTrigger>
@@ -126,30 +191,69 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
       component: (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
+            {/* Render checked skills first, in order */}
+            {(data.skills || []).map((skill) => (
+              <div key={skill} className="flex items-center space-x-2">
+                <Checkbox
+                  id={skill}
+                  checked={true}
+                  onCheckedChange={(checked) => {
+                    if (!checked) {
+                      setData(prev => ({
+                        ...prev,
+                        skills: prev.skills?.filter(s => s !== skill) || []
+                      }));
+                      // Do not set lastClickedSkill when unchecking
+                    }
+                  }}
+                />
+                <Label htmlFor={skill} className="text-sm">{skill}</Label>
+              </div>
+            ))}
+            {/* Insert recommended skills as checkboxes after checked ones */}
+            {recommendedSkills.map((skill) => (
+              <div key={skill} className="flex items-center space-x-2 opacity-90">
+                <Checkbox
+                  id={skill}
+                  checked={false}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setData(prev => ({
+                        ...prev,
+                        skills: [...(prev.skills || []), skill]
+                      }));
+                      setRecommendedSkills(prev => prev.filter(s => s !== skill));
+                      setLastClickedSkill(skill);
+                    }
+                  }}
+                />
+                <Label htmlFor={skill} className="text-sm font-medium text-blue-700">{skill}</Label>
+              </div>
+            ))}
+            {/* Render remaining common skills that are not selected or recommended */}
             {COMMON_SKILLS
-              .filter(skill => 
-                !data.industry || 
-                (data.industry === 'Technology' && ['JavaScript', 'Python', 'Java', 'React', 'Node.js', 'SQL'].includes(skill)) ||
-                (data.industry === 'Marketing' && ['Marketing', 'Communication', 'Data Analysis', 'Writing'].includes(skill)) ||
-                (data.industry === 'Management' && ['Project Management', 'Leadership', 'Communication', 'Problem Solving'].includes(skill)) ||
-                ['Communication', 'Problem Solving', 'Leadership'].includes(skill)
+              .filter(skill =>
+                !((data.skills || []).includes(skill)) &&
+                !recommendedSkills.includes(skill) &&
+                (!data.industry ||
+                  (data.industry === 'Technology' && ['JavaScript', 'Python', 'Java', 'React', 'Node.js', 'SQL'].includes(skill)) ||
+                  (data.industry === 'Marketing' && ['Marketing', 'Communication', 'Data Analysis', 'Writing'].includes(skill)) ||
+                  (data.industry === 'Management' && ['Project Management', 'Leadership', 'Communication', 'Problem Solving'].includes(skill)) ||
+                  ['Communication', 'Problem Solving', 'Leadership'].includes(skill)
+                )
               )
               .map((skill) => (
                 <div key={skill} className="flex items-center space-x-2">
                   <Checkbox
                     id={skill}
-                    checked={data.skills?.includes(skill) || false}
+                    checked={false}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        setData(prev => ({ 
-                          ...prev, 
-                          skills: [...(prev.skills || []), skill] 
+                        setData(prev => ({
+                          ...prev,
+                          skills: [...(prev.skills || []), skill]
                         }));
-                      } else {
-                        setData(prev => ({ 
-                          ...prev, 
-                          skills: prev.skills?.filter(s => s !== skill) || [] 
-                        }));
+                        setLastClickedSkill(skill);
                       }
                     }}
                   />
@@ -157,6 +261,9 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
                 </div>
               ))}
           </div>
+          {loadingRecommendations && (
+            <div className="text-xs text-gray-500">Fetching recommendations...</div>
+          )}
           <div>
             <Label htmlFor="custom_skills">Additional Skills (comma separated)</Label>
             <Input
@@ -174,7 +281,10 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
       title: 'What\'s your education level?',
       description: 'This helps us format your education section appropriately.',
       component: (
-        <Select onValueChange={(value) => setData(prev => ({ ...prev, education_level: value }))}>
+        <Select 
+          onValueChange={(value) => setData(prev => ({ ...prev, education_level: value }))}
+          value={data.education_level}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select your education level" />
           </SelectTrigger>
@@ -215,15 +325,15 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete }: OnboardingModal
 
   const handleComplete = () => {
     // Merge custom skills with selected skills
-    const allSkills = [...(data.skills || [])];
+    const allSkills = new Set(data.skills || []);
     if (customSkills.trim()) {
       const additionalSkills = customSkills.split(',').map(s => s.trim()).filter(s => s);
-      allSkills.push(...additionalSkills);
+      additionalSkills.forEach(skill => allSkills.add(skill));
     }
 
     const finalData = {
       ...data,
-      skills: allSkills,
+      skills: Array.from(allSkills),
       completed_at: new Date().toISOString()
     };
 
