@@ -121,12 +121,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   action: () => toast({ title: "Coming Soon!", description: "Smart tips feature is in development." }), 
                   gradient: 'from-yellow-600 to-orange-600'
                 },
-                { 
-                  icon: Scan, 
-                  label: 'CV Analyzer', 
-                  action: () => toast({ title: "Coming Soon!", description: "CV analyzer feature is in development." }), 
-                  gradient: 'from-emerald-600 to-cyan-600'
-                },
+                
                 { 
                   icon: Languages, 
                   label: 'Multi-Language', 
@@ -197,12 +192,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
                   color: 'from-purple-500 to-pink-500'
                 },
-                { 
-                  icon: RefreshCw, 
-                  label: 'Auto-Save', 
-                  action: onSave,
-                  color: 'from-orange-500 to-red-500'
-                }
+                
               ].map((tool, index) => (
                 <button
                   key={index}
