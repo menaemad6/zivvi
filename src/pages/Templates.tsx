@@ -157,17 +157,17 @@ const Templates = () => {
               </p>
               
               {/* Search and Filter */}
-              <div className="flex flex-col md:flex-row gap-6 max-w-3xl mx-auto mb-12">
-                <div className="relative flex-1">
+              <div className="flex flex-col gap-4 max-w-3xl mx-auto mb-12">
+                <div className="relative w-full">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
                     placeholder="Search templates..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 h-14 text-lg bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-xl focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-12 h-14 text-lg bg-white/80 backdrop-blur-lg border-0 shadow-lg rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="flex gap-3 flex-wrap justify-center">
+                <div className="flex gap-3 flex-wrap justify-center w-full">
                   {categories.map((category) => (
                     <Button
                       key={category}

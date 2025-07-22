@@ -108,7 +108,7 @@ export function Navbar() {
                 </Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button>
                   Start building
                 </Button>
               </Link>

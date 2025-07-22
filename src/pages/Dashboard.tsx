@@ -60,10 +60,10 @@ const Dashboard = () => {
         viewsThisMonth: Math.floor(Math.random() * 100) + 50,
         downloadsThisMonth: Math.floor(Math.random() * 50) + 20
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error fetching CVs",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive"
       });
     } finally {
@@ -97,10 +97,10 @@ const Dashboard = () => {
         title: "CV Duplicated!",
         description: "A copy of your CV has been created."
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error duplicating CV",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive"
       });
     }
@@ -120,10 +120,10 @@ const Dashboard = () => {
         title: "CV Deleted",
         description: "Your CV has been deleted successfully."
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error deleting CV",
-        description: error.message,
+        description: (error as Error).message,
         variant: "destructive"
       });
     }
@@ -256,7 +256,6 @@ const Dashboard = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Your CVs</h2>
                 <Button 
                   onClick={() => navigate('/templates')} 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
                 >
                   <Plus className="mr-2 h-5 w-5" />
                   New CV
@@ -272,8 +271,7 @@ const Dashboard = () => {
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">No CVs yet</h3>
                     <p className="text-gray-600 mb-8 text-lg">Create your first professional CV to get started on your career journey</p>
                     <Button 
-                      onClick={() => navigate('/templates')} 
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      onClick={() => navigate('/templates')}
                     >
                       <Plus className="mr-3 h-6 w-6" />
                       Create Your First CV
@@ -323,7 +321,6 @@ const Dashboard = () => {
                             <Button 
                               size="sm"
                               onClick={() => navigate(`/builder/${cv.id}`)}
-                              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm"
                             >
                               <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                               <span className="hidden sm:inline">Edit</span>
@@ -367,14 +364,14 @@ const Dashboard = () => {
                   </CardTitle>
                   <CardDescription className="text-gray-600">Common tasks and shortcuts</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button 
-                    onClick={() => navigate('/templates')}
-                    className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Plus className="mr-3 h-5 w-5" />
-                    Create New CV
-                  </Button>
+                <CardContent>
+                    <Button
+                      onClick={() => navigate('/templates')}
+                      className="w-full justify-start"
+                    >
+                      <Plus className="mr-3 h-5 w-5" />
+                      Create New CV
+                    </Button>
                   <Button 
                     onClick={() => navigate('/profile')}
                     variant="outline"
