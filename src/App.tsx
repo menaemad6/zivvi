@@ -14,12 +14,14 @@ import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "@/components/ui/PrivateRoute";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
