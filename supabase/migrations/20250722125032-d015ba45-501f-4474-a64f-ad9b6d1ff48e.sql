@@ -28,6 +28,15 @@ ON public.cv_analytics
 FOR INSERT 
 WITH CHECK (true);
 
+-- Enable Row Level Security for cvs table
+ALTER TABLE public.cvs ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to select their own CVs
+CREATE POLICY "Users can view their own CVs" 
+ON public.cvs 
+FOR SELECT 
+USING (user_id = auth.uid());
+
 -- Create index for better performance
 CREATE INDEX idx_cv_analytics_cv_id ON public.cv_analytics(cv_id);
 CREATE INDEX idx_cv_analytics_action_type ON public.cv_analytics(action_type);

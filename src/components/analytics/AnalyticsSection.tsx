@@ -5,14 +5,25 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, Download, Share2, Edit, Calendar, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { UAParser } from 'ua-parser-js';
 
 interface AnalyticsData {
   id: string;
   action_type: string;
   timestamp: string;
-  metadata: any;
+  metadata: unknown;
   cv_id: string;
   user_id: string | null;
+  user_agent?: string | null; // Added for user agent
+  cvs?: {
+    id: string;
+    name?: string | null;
+    title?: string | null;
+    user_id: string;
+    profiles?: {
+      full_name?: string | null;
+    };
+  };
 }
 
 interface CVAnalytics {
@@ -25,18 +36,33 @@ interface CVAnalytics {
   recentActivity: AnalyticsData[];
 }
 
-interface AnalyticsDashboardProps {
+interface AnalyticsSectionProps {
   cvId?: string;
   showAllCVs?: boolean;
 }
 
-export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ 
+// Helper to parse user agent string
+const getUserAgentInfo = (ua: string | null | undefined) => {
+  if (!ua) return null;
+  try {
+    const parser = new UAParser(ua);
+    const browser = parser.getBrowser();
+    const os = parser.getOS();
+    return `${browser.name || ''} ${browser.version || ''} on ${os.name || ''} ${os.version || ''}`.trim();
+  } catch {
+    return ua;
+  }
+};
+
+export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ 
   cvId, 
   showAllCVs = false 
 }) => {
   const [analytics, setAnalytics] = useState<CVAnalytics[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('30d');
+  // State to track which CVs are expanded to show all activity
+  const [expandedCVs, setExpandedCVs] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchAnalytics();
@@ -64,7 +90,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           cvs!cv_analytics_cv_id_fkey (
             id,
             name,
-            user_id
+            title,
+            user_id,
+            profiles:profiles!cvs_user_id_fkey (
+              full_name
+            )
           )
         `)
         .eq('cvs.user_id', user.id)
@@ -84,9 +114,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       // Group by CV and calculate totals
       const cvAnalyticsMap = new Map<string, CVAnalytics>();
 
-      analyticsData?.forEach((item: any) => {
+      analyticsData?.forEach((item: AnalyticsData) => {
         const cvId = item.cv_id;
-        const cvName = item.cvs?.name || 'Untitled CV';
+        const cvName = item.cvs?.name || item.cvs?.title || 'Untitled CV';
 
         if (!cvAnalyticsMap.has(cvId)) {
           cvAnalyticsMap.set(cvId, {
@@ -130,6 +160,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleViewAll = (cvId: string) => {
+    setExpandedCVs((prev) => ({ ...prev, [cvId]: true }));
   };
 
   const getActionIcon = (actionType: string) => {
@@ -187,7 +221,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Time Range Filter */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
         <span className="text-sm font-medium text-gray-700">Time Range:</span>
         <div className="flex gap-1">
           {[
@@ -211,14 +245,14 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       {analytics.map((cvAnalytics) => (
         <Card key={cvAnalytics.cvId} className="overflow-hidden">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <span>{cvAnalytics.cvName}</span>
               <Badge variant="outline">{cvAnalytics.cvId}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-3 bg-blue-50 rounded-lg">
                 <Eye className="h-5 w-5 text-blue-500 mx-auto mb-1" />
                 <div className="text-2xl font-bold text-blue-600">{cvAnalytics.totalViews}</div>
@@ -246,8 +280,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
               <div>
                 <h4 className="font-semibold mb-3 text-gray-900">Recent Activity</h4>
                 <div className="space-y-2">
-                  {cvAnalytics.recentActivity.slice(0, 5).map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  {(expandedCVs[cvAnalytics.cvId] ? cvAnalytics.recentActivity : cvAnalytics.recentActivity.slice(0, 5)).map((activity) => (
+                    <div key={activity.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 bg-gray-50 rounded-lg gap-2">
                       <div className="flex items-center gap-3">
                         {getActionIcon(activity.action_type)}
                         <div>
@@ -255,15 +289,47 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                             <Badge className={getActionColor(activity.action_type)}>
                               {activity.action_type}
                             </Badge>
-                            {activity.user_id && (
-                              <User className="h-3 w-3 text-gray-400" />
+                            {activity.user_id && activity.cvs ? (
+                              <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <User className="h-3 w-3 text-gray-400" />
+                                {activity.cvs.profiles?.full_name ?? null}
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1 text-xs text-gray-400 italic">
+                                <User className="h-3 w-3 text-gray-300" />
+                                Unregistered User
+                              </span>
                             )}
                           </div>
+                          {/* Extra info for view/edit actions */}
+                          <div className="text-xs text-gray-500 mt-1">
+                            {activity.action_type === 'view' && activity.user_agent && (
+                              <span>Device: {getUserAgentInfo(activity.user_agent)}</span>
+                            )}
+                            {activity.action_type === 'edit' && typeof activity.metadata === 'object' && activity.metadata !== null && (() => {
+                              const meta = activity.metadata as Record<string, unknown>;
+                              return (
+                                <>
+                                  {meta.action && <span>Action: {String(meta.action)}</span>}
+                                  {meta.section && <span>{meta.action ? ' • ' : ''}Section: {String(meta.section)}</span>}
+                                </>
+                              );
+                            })()}
+                          </div>
+                          {/* Existing metadata info */}
                           {activity.metadata && (
                             <div className="text-xs text-gray-500 mt-1">
-                              {activity.metadata.source && `Source: ${activity.metadata.source}`}
-                              {activity.metadata.template && ` • Template: ${activity.metadata.template}`}
-                              {activity.metadata.fileName && ` • File: ${activity.metadata.fileName}`}
+                              {(() => {
+                                if (typeof activity.metadata === 'object' && activity.metadata !== null) {
+                                  const meta = activity.metadata as Record<string, unknown>;
+                                  return [
+                                    meta.source ? `Source: ${meta.source}` : '',
+                                    // meta.template ? ` • Template: ${meta.template}` : '',
+                                    meta.fileName ? ` • File: ${meta.fileName}` : ''
+                                  ].filter(Boolean).join('');
+                                }
+                                return null;
+                              })()}
                             </div>
                           )}
                         </div>
@@ -274,6 +340,16 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                     </div>
                   ))}
                 </div>
+                {!expandedCVs[cvAnalytics.cvId] && cvAnalytics.recentActivity.length > 5 && (
+                  <div className="flex justify-center mt-3">
+                    <button
+                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition"
+                      onClick={() => handleViewAll(cvAnalytics.cvId)}
+                    >
+                      View All
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

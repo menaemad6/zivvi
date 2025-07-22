@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,8 @@ import { Plus, FileText, MoreVertical, Edit, Copy, Trash2, Download, Eye, Calend
 import { toast } from '@/hooks/use-toast';
 import { getTimeAgo } from '@/utils/timeUtils';
 import { Helmet } from 'react-helmet-async';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { AnalyticsSection } from '@/components/analytics/AnalyticsSection';
 
 interface CV {
   id: string;
@@ -34,16 +36,26 @@ const Dashboard = () => {
     viewsThisMonth: 0,
     downloadsThisMonth: 0
   });
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const { trackEvent } = useAnalytics();
+  const analyticsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) {
       navigate('/login');
     } else {
-      fetchCVs();
+      fetchCVsAndAnalytics();
     }
   }, [user, navigate]);
 
-  const fetchCVs = async () => {
+  // Scroll to analytics section when showing analytics
+  useEffect(() => {
+    if (showAnalytics && analyticsRef.current) {
+      analyticsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [showAnalytics]);
+
+  const fetchCVsAndAnalytics = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -53,16 +65,37 @@ const Dashboard = () => {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-
       setCvs(data || []);
+      const totalCVs = data?.length || 0;
+      let viewsThisMonth = 0;
+      let downloadsThisMonth = 0;
+      if (data && data.length > 0) {
+        // Get the first and last day of the current month
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        // Query analytics for all user's CVs
+        const { data: analytics, error: analyticsError } = await supabase
+          .from('cv_analytics')
+          .select('action_type, timestamp, cv_id')
+          .in('cv_id', data.map((cv: CV) => cv.id));
+        if (analyticsError) throw analyticsError;
+        // Filter for current month
+        const filtered = (analytics || []).filter((event) => {
+          const eventDate = new Date(event.timestamp);
+          return eventDate >= firstDay && eventDate <= lastDay;
+        });
+        viewsThisMonth = filtered.filter((event) => event.action_type === 'view').length;
+        downloadsThisMonth = filtered.filter((event) => event.action_type === 'download').length;
+      }
       setStats({
-        totalCVs: data?.length || 0,
-        viewsThisMonth: Math.floor(Math.random() * 100) + 50,
-        downloadsThisMonth: Math.floor(Math.random() * 50) + 20
+        totalCVs,
+        viewsThisMonth,
+        downloadsThisMonth
       });
     } catch (error) {
       toast({
-        title: "Error fetching CVs",
+        title: "Error fetching CVs or analytics",
         description: (error as Error).message,
         variant: "destructive"
       });
@@ -92,7 +125,7 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      fetchCVs();
+      fetchCVsAndAnalytics();
       toast({
         title: "CV Duplicated!",
         description: "A copy of your CV has been created."
@@ -115,7 +148,7 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      fetchCVs();
+      fetchCVsAndAnalytics();
       toast({
         title: "CV Deleted",
         description: "Your CV has been deleted successfully."
@@ -252,105 +285,110 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* CVs List */}
             <div className="lg:col-span-2">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Your CVs</h2>
-                <Button 
-                  onClick={() => navigate('/templates')} 
-                >
-                  <Plus className="mr-2 h-5 w-5" />
-                  New CV
-                </Button>
-              </div>
-
-              {cvs.length === 0 ? (
-                <Card className="text-center py-16 bg-white/80 backdrop-blur-lg border-0 shadow-lg">
-                  <CardContent>
-                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-6">
-                      <FileText className="h-12 w-12 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">No CVs yet</h3>
-                    <p className="text-gray-600 mb-8 text-lg">Create your first professional CV to get started on your career journey</p>
-                    <Button 
-                      onClick={() => navigate('/templates')}
-                    >
-                      <Plus className="mr-3 h-6 w-6" />
-                      Create Your First CV
-                    </Button>
-                  </CardContent>
-                </Card>
+              {showAnalytics ? (
+                <div ref={analyticsRef}><AnalyticsSection showAllCVs /></div>
               ) : (
-                <div className="space-y-6">
-                  {cvs.map((cv) => (
-                    <Card key={cv.id} className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-1">
-                      <CardContent className="p-4 sm:p-6 lg:p-8">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                          <div className="flex items-start sm:items-center gap-4 sm:gap-6">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0">
-                              {(cv.name || cv.title).charAt(0).toUpperCase()}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-1">
-                                {cv.name || cv.title}
-                              </h3>
-                              {cv.description && (
-                                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                                  {cv.description}
-                                </p>
-                              )}
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-2 py-1 text-xs sm:text-sm w-fit">
-                                  {cv.template}
-                                </Badge>
-                                <span className="flex items-center text-xs sm:text-sm text-gray-500">
-                                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                                  {getTimeAgo(cv.updated_at)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-end gap-2 sm:gap-3">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => navigate(`/preview/${cv.id}`)}
-                              className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3"
-                            >
-                              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                            <Button 
-                              size="sm"
-                              onClick={() => navigate(`/builder/${cv.id}`)}
-                            >
-                              <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden sm:inline">Edit</span>
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="border-2 border-gray-200 hover:border-gray-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3">
-                                  <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-white border-0 shadow-xl rounded-xl">
-                                <DropdownMenuItem onClick={() => duplicateCV(cv)} className="hover:bg-gray-50 rounded-lg">
-                                  <Copy className="mr-2 h-4 w-4" />
-                                  Duplicate
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => deleteCV(cv.id)}
-                                  className="text-red-600 hover:bg-red-50 rounded-lg"
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
+                <>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Your CVs</h2>
+                    <Button 
+                      onClick={() => navigate('/templates')} 
+                    >
+                      <Plus className="mr-2 h-5 w-5" />
+                      New CV
+                    </Button>
+                  </div>
+                  {cvs.length === 0 ? (
+                    <Card className="text-center py-16 bg-white/80 backdrop-blur-lg border-0 shadow-lg">
+                      <CardContent>
+                        <div className="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-6">
+                          <FileText className="h-12 w-12 text-white" />
                         </div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">No CVs yet</h3>
+                        <p className="text-gray-600 mb-8 text-lg">Create your first professional CV to get started on your career journey</p>
+                        <Button 
+                          onClick={() => navigate('/templates')}
+                        >
+                          <Plus className="mr-3 h-6 w-6" />
+                          Create Your First CV
+                        </Button>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {cvs.map((cv) => (
+                        <Card key={cv.id} className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:-translate-y-1">
+                          <CardContent className="p-4 sm:p-6 lg:p-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                              <div className="flex items-start sm:items-center gap-4 sm:gap-6">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0">
+                                  {(cv.name || cv.title).charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-2 line-clamp-1">
+                                    {cv.name || cv.title}
+                                  </h3>
+                                  {cv.description && (
+                                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                      {cv.description}
+                                    </p>
+                                  )}
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                    <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-2 py-1 text-xs sm:text-sm w-fit">
+                                      {cv.template}
+                                    </Badge>
+                                    <span className="flex items-center text-xs sm:text-sm text-gray-500">
+                                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                      {getTimeAgo(cv.updated_at)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center justify-end gap-2 sm:gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => navigate(`/preview/${cv.id}`)}
+                                  className="border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3"
+                                >
+                                  <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                                </Button>
+                                <Button 
+                                  size="sm"
+                                  onClick={() => navigate(`/builder/${cv.id}`)}
+                                >
+                                  <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                  <span className="hidden sm:inline">Edit</span>
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="border-2 border-gray-200 hover:border-gray-300 rounded-lg sm:rounded-xl h-8 sm:h-9 px-2 sm:px-3">
+                                      <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="bg-white border-0 shadow-xl rounded-xl">
+                                    <DropdownMenuItem onClick={() => duplicateCV(cv)} className="hover:bg-gray-50 rounded-lg">
+                                      <Copy className="mr-2 h-4 w-4" />
+                                      Duplicate
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => deleteCV(cv.id)}
+                                      className="text-red-600 hover:bg-red-50 rounded-lg"
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -364,10 +402,10 @@ const Dashboard = () => {
                   </CardTitle>
                   <CardDescription className="text-gray-600">Common tasks and shortcuts</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent >
                     <Button
                       onClick={() => navigate('/templates')}
-                      className="w-full justify-start"
+                      className="w-full justify-start mb-2"
                     >
                       <Plus className="mr-3 h-5 w-5" />
                       Create New CV
@@ -375,18 +413,31 @@ const Dashboard = () => {
                   <Button 
                     onClick={() => navigate('/profile')}
                     variant="outline"
-                    className="w-full justify-start border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                    className="w-full mb-2 justify-start border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
                   >
                     <Users className="mr-3 h-5 w-5" />
                     Update Profile
                   </Button>
                   <Button 
                     variant="outline"
-                    className="w-full justify-start border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
+                    className="w-full mb-2 justify-start border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 rounded-xl transition-all duration-300"
                   >
                     <Download className="mr-3 h-5 w-5" />
                     Export All CVs
                   </Button>
+                  <button
+                    onClick={() => setShowAnalytics((v) => !v)}
+                    className={
+                      `w-full mb-2 justify-start flex items-center px-4 py-3 rounded-2xl transition-all duration-300
+                      ${showAnalytics
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg hover:from-orange-600 hover:to-red-600'
+                        : 'bg-white border-2 border-gray-200 text-gray-900 hover:border-orange-500 hover:bg-orange-50'}
+                      font-bold text-base`}
+                    style={{ boxShadow: showAnalytics ? '0 4px 24px 0 rgba(255, 94, 0, 0.15)' : undefined }}
+                  >
+                    <Eye className={`mr-3 h-5 w-5 ${showAnalytics ? 'text-white' : 'text-orange-500'}`} />
+                    {showAnalytics ? 'Hide Analytics' : 'View Analytics'}
+                  </button>
                 </CardContent>
               </Card>
 

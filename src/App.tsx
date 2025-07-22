@@ -15,6 +15,7 @@ import Pricing from "./pages/Pricing";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "@/components/ui/PrivateRoute";
 import ScrollToTop from "@/components/ScrollToTop";
+import { AnalyticsDashboard } from "@/components/analytics/AnalyticsSection";
 
 const queryClient = new QueryClient();
 

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +29,7 @@ const Preview = () => {
   const [isOwner, setIsOwner] = useState(false);
   const [authorName, setAuthorName] = useState('');
   const [cvName, setCVName] = useState('');
+  const lastTrackedCVId = useRef<string | null>(null);
 
   useEffect(() => {
     if (id && id !== 'new') {
@@ -100,13 +101,14 @@ const Preview = () => {
         console.error('Invalid CV content format');
       }
 
-      // Track CV view
-      if (cvId) {
+      // Track CV view only once per page load for this CV
+      if (cvId && lastTrackedCVId.current !== cvId) {
         trackCVView(cvId, {
           template: cvDataResponse.template,
           isOwner: currentUserId === cvOwnerId,
           viewerType: currentUserId ? 'authenticated' : 'anonymous'
         });
+        lastTrackedCVId.current = cvId;
       }
     } catch (error) {
       console.error('Error fetching CV data:', error);
