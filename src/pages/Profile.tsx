@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Mail, Calendar, MapPin, Briefcase, Shield, Settings, Edit3, Camera } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const Profile = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -77,6 +78,19 @@ const Profile = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Profile | AI CV Builder</title>
+        <meta name="description" content="Manage your profile, update your information, and track your CV stats on AI CV Builder." />
+        <meta property="og:title" content="Profile | AI CV Builder" />
+        <meta property="og:description" content="Manage your profile, update your information, and track your CV stats on AI CV Builder." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://your-website-url.com/profile" />
+        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Profile | AI CV Builder" />
+        <meta name="twitter:description" content="Manage your profile, update your information, and track your CV stats on AI CV Builder." />
+        <meta name="twitter:image" content="/templates/elegant-template.png" />
+      </Helmet>
       <Navbar />
       <div className="min-h-screen pt-16 bg-gradient-to-br from-gray-50 via-white to-blue-50">
         {/* Hero Section */}

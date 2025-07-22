@@ -10,7 +10,7 @@ import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight, Shield, Zap, Heart } from 'lucide-react';
-
+import { Helmet } from 'react-helmet-async';
 const Auth = () => {
   const { user, isLoading, signIn, signUp } = useAuth();
   const location = useLocation();
@@ -102,6 +102,19 @@ const Auth = () => {
   
   return (
     <>
+    <Helmet>
+        <title>Login or Sign Up | AI CV Builder</title>
+        <meta name="description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
+        <meta property="og:title" content="Login or Sign Up | AI CV Builder" />
+        <meta property="og:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://your-website-url.com/login" />
+        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Login or Sign Up | AI CV Builder" />
+        <meta name="twitter:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
+        <meta name="twitter:image" content="/templates/elegant-template.png" />
+      </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
         {/* Enhanced Floating Background Elements */}

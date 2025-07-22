@@ -14,6 +14,7 @@ import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { Helmet } from 'react-helmet-async';
 
 const Preview = () => {
   const { id } = useParams();
@@ -179,6 +180,19 @@ const Preview = () => {
 
   return (
     <>
+      <Helmet>
+        <title>CV Preview | AI CV Builder</title>
+        <meta name="description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
+        <meta property="og:title" content="CV Preview | AI CV Builder" />
+        <meta property="og:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://your-website-url.com/preview" />
+        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CV Preview | AI CV Builder" />
+        <meta name="twitter:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
+        <meta name="twitter:image" content="/templates/elegant-template.png" />
+      </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24">
         {/* Floating Background Elements */}

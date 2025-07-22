@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, Sparkles, Briefcase, Palette, Zap, Search, Filter, Star, Crown, Flame } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -108,6 +109,19 @@ const Templates = () => {
 
   return (
     <>
+      <Helmet>
+        <title>CV Templates | AI CV Builder</title>
+        <meta name="description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
+        <meta property="og:title" content="CV Templates | AI CV Builder" />
+        <meta property="og:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://your-website-url.com/templates" />
+        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CV Templates | AI CV Builder" />
+        <meta name="twitter:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
+        <meta name="twitter:image" content="/templates/elegant-template.png" />
+      </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
         {/* Hero Section */}

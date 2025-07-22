@@ -26,6 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Helmet } from 'react-helmet-async';
 
 const Builder = () => {
   const { id } = useParams();
@@ -837,6 +838,19 @@ const Builder = () => {
 
   return (
     <>
+      <Helmet>
+        <title>CV Builder | AI CV Builder</title>
+        <meta name="description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
+        <meta property="og:title" content="CV Builder | AI CV Builder" />
+        <meta property="og:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://your-website-url.com/builder" />
+        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CV Builder | AI CV Builder" />
+        <meta name="twitter:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
+        <meta name="twitter:image" content="/templates/elegant-template.png" />
+      </Helmet>
       <Navbar />
       <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-8 sm:pt-14 md:pt-12 ">
         <TooltipProvider>
