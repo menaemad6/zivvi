@@ -72,10 +72,18 @@ export function Navbar() {
           ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 px-3 gap-2">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary">
-                    <User className="h-3 w-3 text-primary-foreground" />
-                  </div>
+                <Button variant="ghost" className="h-8 px-3 gap-2 " >
+                  {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                    <img
+                      src={user.user_metadata.avatar_url || user.user_metadata.picture}
+                      alt="User Avatar"
+                      className="h-6 w-6 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                      <User className="h-3 w-3 text-primary-foreground" />
+                    </div>
+                  )}
                   <span className="text-sm font-medium">
                     {user.user_metadata?.full_name || user.email || "User"}
                   </span>
@@ -87,6 +95,9 @@ export function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" className="w-full cursor-pointer">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/templates" className="w-full cursor-pointer">Templates</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="w-full cursor-pointer">Profile</Link>

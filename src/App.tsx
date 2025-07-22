@@ -15,7 +15,7 @@ import Pricing from "./pages/Pricing";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "@/components/ui/PrivateRoute";
 import ScrollToTop from "@/components/ScrollToTop";
-import { AnalyticsDashboard } from "@/components/analytics/AnalyticsSection";
+import PrintCV from './pages/PrintCV';
 
 const queryClient = new QueryClient();
 
@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/preview/:id" element={<Preview />} />
+            <Route path="/print/:id" element={<PrintCV />} />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />

@@ -44,7 +44,19 @@ const Dashboard = () => {
     if (!user) {
       navigate('/login');
     } else {
-      fetchCVsAndAnalytics();
+      // Check onboarding status after login (for Google and email signups)
+      (async () => {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+        if (!profile || !profile.onboarding_completed) {
+          navigate('/profile?data=true');
+        } else {
+          fetchCVsAndAnalytics();
+        }
+      })();
     }
   }, [user, navigate]);
 

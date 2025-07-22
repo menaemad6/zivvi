@@ -175,7 +175,7 @@ const Index = () => {
           />
           
           <div className="container mx-auto px-6 relative z-20">
-            <div className="text-center max-w-5xl mx-auto">
+            <div className="text-center max-w-5xl mx-auto pt-10">
               <div className="fade-in-up">
                 <Badge variant="secondary" className="mb-6 bg-blue-50 text-blue-700 border-blue-200 backdrop-blur-sm hover:bg-blue-100 transition-colors">
                   <Star className="w-4 h-4 mr-2" />

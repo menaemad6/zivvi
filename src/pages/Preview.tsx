@@ -292,12 +292,12 @@ const Preview = () => {
               <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="outline"
-                  onClick={handleDownload}
+                  onClick={() => navigate(`/print/${id}`)}
                   className="border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
-                  title="Download PDF"
+                  title="Download/Print CV"
                 >
                   <Download className="h-3 w-3 sm:mr-1" />
-                  <span className="hidden sm:inline">Download PDF</span>
+                  <span className="hidden sm:inline">Download/Print CV</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -344,9 +344,9 @@ const Preview = () => {
               </div>
             )}
 
-            <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
+            <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300 cv-print-container">
               <CardContent className="p-0">
-                <div className="bg-white">
+                <div className="bg-white cv-print-container">
                   {cvData && sections && sections.length > 0 ? (
                     <CVTemplateRenderer
                       cvData={cvData}

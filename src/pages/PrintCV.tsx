@@ -1,0 +1,99 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
+import { cvTemplates } from '@/data/templates';
+import { supabase } from '@/integrations/supabase/client';
+
+const PrintCV = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [cvData, setCVData] = useState(null);
+  const [template, setTemplate] = useState('');
+  const [sections, setSections] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id && id !== 'new') {
+      fetchCVData(id);
+    } else {
+      // Fallback to localStorage for new/unsaved CVs
+      const storedData = localStorage.getItem('previewCVData');
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+          setCVData(parsedData.cvData);
+          setTemplate(parsedData.template || 'modern');
+          setSections(parsedData.sections || []);
+        } catch (error) {
+          // ignore
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [id]);
+
+  const fetchCVData = async (cvId) => {
+    setIsLoading(true);
+    try {
+      const { data: cvDataResponse, error } = await supabase
+        .from('cvs')
+        .select('*')
+        .eq('id', cvId)
+        .single();
+      if (error || !cvDataResponse) {
+        setIsLoading(false);
+        return;
+      }
+      const content = cvDataResponse.content;
+      if (content && typeof content === 'object' && !Array.isArray(content)) {
+        setCVData(content);
+        setTemplate(cvDataResponse.template || 'modern');
+        const contentWithSections = content;
+        const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
+        setSections(contentSections);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      setTimeout(() => {
+        window.print();
+      }, 100);
+      const handleAfterPrint = () => {
+        navigate(`/preview/${id}`);
+      };
+      window.addEventListener('afterprint', handleAfterPrint);
+      return () => {
+        window.removeEventListener('afterprint', handleAfterPrint);
+      };
+    }
+  }, [isLoading, id, navigate]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <div className="cv-print-container" style={{ minHeight: '100vh', background: '#fff' }}>
+      {cvData && sections && sections.length > 0 ? (
+        <CVTemplateRenderer
+          cvData={cvData}
+          templateId={template || 'modern'}
+          sections={sections}
+        />
+      ) : (
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <h3>No CV Data Available</h3>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PrintCV; 
