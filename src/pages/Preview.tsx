@@ -15,11 +15,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const Preview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { trackCVView, trackCVDownload, trackCVShare } = useAnalytics();
   const [cvData, setCVData] = useState(null);
   const [template, setTemplate] = useState('');
   const [sections, setSections] = useState([]);
@@ -97,6 +99,15 @@ const Preview = () => {
       } else {
         console.error('Invalid CV content format');
       }
+
+      // Track CV view
+      if (cvId) {
+        trackCVView(cvId, {
+          template: cvDataResponse.template,
+          isOwner: currentUserId === cvOwnerId,
+          viewerType: currentUserId ? 'authenticated' : 'anonymous'
+        });
+      }
     } catch (error) {
       console.error('Error fetching CV data:', error);
     } finally {
@@ -119,6 +130,15 @@ const Preview = () => {
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
           const fileName = cvName ? `${cvName}.pdf` : 'cv.pdf';
           pdf.save(fileName);
+          
+          // Track download
+          if (id && id !== 'new') {
+            trackCVDownload(id, 'pdf', { 
+              fileName, 
+              template,
+              isOwner 
+            });
+          }
         });
     }
   };
@@ -142,6 +162,9 @@ const Preview = () => {
           text: 'Check out this CV',
           url: shareUrl,
         });
+        
+        // Track share via native sharing
+        trackCVShare(id, 'native', { shareUrl, cvName });
       } catch (error) {
         // Fallback to clipboard
         await navigator.clipboard.writeText(shareUrl);
@@ -149,6 +172,9 @@ const Preview = () => {
           title: "Link Copied",
           description: "CV link has been copied to clipboard."
         });
+        
+        // Track share via clipboard
+        trackCVShare(id, 'clipboard', { shareUrl, cvName });
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
@@ -156,6 +182,9 @@ const Preview = () => {
         title: "Link Copied",
         description: "CV link has been copied to clipboard."
       });
+      
+      // Track share via clipboard
+      trackCVShare(id, 'clipboard', { shareUrl, cvName });
     }
   };
 

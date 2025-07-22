@@ -27,11 +27,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Helmet } from 'react-helmet-async';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const Builder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { cvData, setCVData, isLoading, isSaving, cvExists, saveCV, updateCVMetadata } = useCV(id);
+  const { trackCVDownload, trackCVShare, trackCVEdit } = useAnalytics();
   
   // Check if CV exists and redirect if not
   useEffect(() => {
@@ -200,6 +202,15 @@ const Builder = () => {
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
           const fileName = cvMetadata.name ? `${cvMetadata.name}.pdf` : 'cv.pdf';
           pdf.save(fileName);
+          
+          // Track download from builder
+          if (id && id !== 'new') {
+            trackCVDownload(id, 'pdf', { 
+              fileName, 
+              template: currentTemplate,
+              source: 'builder'
+            });
+          }
         });
     }
   };
@@ -223,6 +234,13 @@ const Builder = () => {
           text: 'Check out my CV',
           url: shareUrl,
         });
+        
+        // Track share from builder
+        trackCVShare(id, 'native', { 
+          shareUrl, 
+          cvName: cvMetadata.name,
+          source: 'builder' 
+        });
       } catch (error) {
         // Fallback to clipboard
         await navigator.clipboard.writeText(shareUrl);
@@ -230,12 +248,26 @@ const Builder = () => {
           title: "Link Copied",
           description: "CV link has been copied to clipboard."
         });
+        
+        // Track share from builder
+        trackCVShare(id, 'clipboard', { 
+          shareUrl, 
+          cvName: cvMetadata.name,
+          source: 'builder' 
+        });
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
       toast({
         title: "Link Copied",
         description: "CV link has been copied to clipboard."
+      });
+      
+      // Track share from builder
+      trackCVShare(id, 'clipboard', { 
+        shareUrl, 
+        cvName: cvMetadata.name,
+        source: 'builder' 
       });
     }
   };
@@ -535,6 +567,11 @@ const Builder = () => {
         sectionType: sectionId,
         sectionTitle: section.title
       });
+      
+      // Track section edit start
+      if (id && id !== 'new') {
+        trackCVEdit(id, sectionId, { action: 'start_edit' });
+      }
     }
   };
 
@@ -666,6 +703,11 @@ const Builder = () => {
       title: "Changes Applied",
       description: "Section updated and saved successfully!",
     });
+    
+    // Track section edit completion
+    if (id && id !== 'new') {
+      trackCVEdit(id, 'section_updated', { action: 'complete_edit' });
+    }
   };
 
   const handleCVMetadataUpdate = async (name: string, description: string): Promise<boolean> => {
