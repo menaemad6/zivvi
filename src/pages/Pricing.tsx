@@ -106,7 +106,7 @@ export default function Pricing() {
   return (
     <>
       <Helmet>
-        <title>Pricing | {LOGO_NAME}</title>
+        <title>{LOGO_NAME} | Pricing</title>
         <meta name="description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
         <meta property="og:title" content={`Pricing | ${LOGO_NAME}`} />
         <meta property="og:description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />

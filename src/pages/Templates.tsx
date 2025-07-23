@@ -152,15 +152,15 @@ const Templates = () => {
   return (
     <>
       <Helmet>
-        <title>{LOGO_NAME} CV Templates | {WEBSITE_URL}</title>
+        <title>{LOGO_NAME} | CV Templates </title>
         <meta name="description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
-        <meta property="og:title" content={`${LOGO_NAME} CV Templates | ${WEBSITE_URL}`} />
+        <meta property="og:title" content={`${LOGO_NAME} | CV Templates`} />
         <meta property="og:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/templates`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${LOGO_NAME} CV Templates | ${WEBSITE_URL}`} />
+        <meta name="twitter:title" content={`{LOGO_NAME} | CV Templates`} />
         <meta name="twitter:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>

@@ -104,7 +104,7 @@ const Auth = () => {
   return (
     <>
     <Helmet>
-        <title>Login or Sign Up | {LOGO_NAME}</title>
+        <title>{LOGO_NAME} | Login or Sign Up</title>
         <meta name="description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
         <meta property="og:title" content="Login or Sign Up | {LOGO_NAME}" />
         <meta property="og:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
@@ -112,7 +112,7 @@ const Auth = () => {
         <meta property="og:url" content={`${WEBSITE_URL}/login`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Login or Sign Up | {LOGO_NAME}" />
+        <meta name="twitter:title" content="Login or Sign Up" />
         <meta name="twitter:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>

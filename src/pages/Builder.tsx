@@ -921,7 +921,7 @@ const Builder = () => {
   return (
     <>
       <Helmet>
-        <title>{LOGO_NAME} CV Builder | AI CV Builder</title>
+        <title>{LOGO_NAME} | CV Builder</title>
         <meta name="description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
         <meta property="og:title" content={`${LOGO_NAME} CV Builder | AI CV Builder`} />
         <meta property="og:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />

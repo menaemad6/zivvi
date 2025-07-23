@@ -239,9 +239,9 @@ const Preview = () => {
   return (
     <>
       <Helmet>
-        <title>{LOGO_NAME} CV Preview | {WEBSITE_URL}</title>
+        <title>{LOGO_NAME} | CV Preview</title>
         <meta name="description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
-        <meta property="og:title" content={`${LOGO_NAME} CV Preview | ${WEBSITE_URL}`} />
+        <meta property="og:title" content={`${LOGO_NAME} CV Preview`} />
         <meta property="og:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/preview`} />

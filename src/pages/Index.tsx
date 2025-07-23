@@ -8,7 +8,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Star, Users, Download, ArrowRight, Zap, Layout, FileText, Play, Shield, Clock, Sparkles, ChevronRight, Check, Globe, Award, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { LOGO_NAME } from "@/lib/constants";
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 const Index = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -117,7 +117,7 @@ const Index = () => {
         <meta name="theme-color" content="#ffffff" />
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/" />
+        <meta property="og:url" content={WEBSITE_URL} />
         <meta property="og:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta property="og:description" content="Build and optimize beautiful, professional CVs with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
         <meta property="og:image" content="/templates/elegant-template.png" />

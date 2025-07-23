@@ -193,9 +193,9 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>{LOGO_NAME} Dashboard | {WEBSITE_URL}</title>
+        <title>{LOGO_NAME} | Dashboard</title>
         <meta name="description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
-        <meta property="og:title" content="{LOGO_NAME} Dashboard | {WEBSITE_URL}" />
+        <meta property="og:title" content={`${LOGO_NAME} Dashboard`} />
         <meta property="og:description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/dashboard`} />
