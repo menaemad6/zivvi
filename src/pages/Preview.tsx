@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 const Preview = () => {
   const { id } = useParams();
@@ -212,15 +213,15 @@ const Preview = () => {
   return (
     <>
       <Helmet>
-        <title>CV Preview | AI CV Builder</title>
+        <title>{LOGO_NAME} CV Preview | {WEBSITE_URL}</title>
         <meta name="description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
-        <meta property="og:title" content="CV Preview | AI CV Builder" />
+        <meta property="og:title" content={`${LOGO_NAME} CV Preview | ${WEBSITE_URL}`} />
         <meta property="og:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/preview" />
+        <meta property="og:url" content={`${WEBSITE_URL}/preview`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="CV Preview | AI CV Builder" />
+        <meta name="twitter:title" content={`${LOGO_NAME} CV Preview | ${WEBSITE_URL}`} />
         <meta name="twitter:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
@@ -324,56 +325,32 @@ const Preview = () => {
         </div>
 
         {/* Enhanced CV Preview */}
-        <div className="container mx-auto py-12 px-6 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            {/* Stats Bar */}
-            {!isOwner && (
-              <div className="mb-8 flex items-center justify-center gap-8 text-center">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Heart className="h-4 w-4 text-red-500" />
-                  <span className="text-sm font-medium">Professional CV</span>
+        <div className="cv-preview-outer pt-16">
+          <div className="cv-preview-scaler">
+            {cvData && sections && sections.length > 0 ? (
+              <CVTemplateRenderer
+                cvData={cvData}
+                templateId={template || 'modern'}
+                sections={sections}
+              />
+            ) : (
+              <div className="text-center py-24 px-8">
+                <div className="relative mb-8">
+                  <div className="floating">
+                    <FileText className="h-32 w-32 mx-auto text-gray-300" />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-24 h-24 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Eye className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Public Preview</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Download className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium">Downloadable</span>
-                </div>
+                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+                  No CV Data Available
+                </h3>
+                <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+                  This CV doesn't contain any content or the content couldn't be loaded properly.
+                </p>
               </div>
             )}
-
-            <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300 cv-print-container">
-              <CardContent className="p-0">
-                <div className="bg-white cv-print-container">
-                  {cvData && sections && sections.length > 0 ? (
-                    <CVTemplateRenderer
-                      cvData={cvData}
-                      templateId={template || 'modern'}
-                      sections={sections}
-                    />
-                  ) : (
-                    <div className="text-center py-24 px-8">
-                      <div className="relative mb-8">
-                        <div className="floating">
-                          <FileText className="h-32 w-32 mx-auto text-gray-300" />
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-24 h-24 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full animate-pulse"></div>
-                        </div>
-                      </div>
-                      <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-                        No CV Data Available
-                      </h3>
-                      <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
-                        This CV doesn't contain any content or the content couldn't be loaded properly.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

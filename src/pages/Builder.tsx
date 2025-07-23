@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 const Builder = () => {
   const { id } = useParams();
@@ -881,15 +882,15 @@ const Builder = () => {
   return (
     <>
       <Helmet>
-        <title>CV Builder | AI CV Builder</title>
+        <title>{LOGO_NAME} CV Builder | AI CV Builder</title>
         <meta name="description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
-        <meta property="og:title" content="CV Builder | AI CV Builder" />
+        <meta property="og:title" content={`${LOGO_NAME} CV Builder | AI CV Builder`} />
         <meta property="og:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/builder" />
+        <meta property="og:url" content={`${WEBSITE_URL}/builder`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="CV Builder | AI CV Builder" />
+        <meta name="twitter:title" content={`${LOGO_NAME} CV Builder | AI CV Builder`} />
         <meta name="twitter:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>

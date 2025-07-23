@@ -15,6 +15,7 @@ import { getTimeAgo } from '@/utils/timeUtils';
 import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { AnalyticsSection } from '@/components/analytics/AnalyticsSection';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 interface CV {
   id: string;
@@ -192,16 +193,16 @@ const Dashboard = () => {
   return (
     <>
       <Helmet>
-        <title>Dashboard | AI CV Builder</title>
-        <meta name="description" content="Manage your CVs, track analytics, and access professional tools on your AI CV Builder dashboard." />
-        <meta property="og:title" content="Dashboard | AI CV Builder" />
-        <meta property="og:description" content="Manage your CVs, track analytics, and access professional tools on your AI CV Builder dashboard." />
+        <title>{LOGO_NAME} Dashboard | {WEBSITE_URL}</title>
+        <meta name="description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
+        <meta property="og:title" content="{LOGO_NAME} Dashboard | {WEBSITE_URL}" />
+        <meta property="og:description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/dashboard" />
+        <meta property="og:url" content={`${WEBSITE_URL}/dashboard`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Dashboard | AI CV Builder" />
-        <meta name="twitter:description" content="Manage your CVs, track analytics, and access professional tools on your AI CV Builder dashboard." />
+        <meta name="twitter:title" content="{LOGO_NAME} Dashboard | {WEBSITE_URL}" />
+        <meta name="twitter:description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
       <Navbar />

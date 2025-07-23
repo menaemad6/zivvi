@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, ChevronDown } from 'lucide-react';
+import { LOGO_NAME } from "@/lib/constants";
 
 export function Navbar() {
   const { user, signOut, isLoading } = useAuth();
@@ -23,10 +24,10 @@ export function Navbar() {
     <header className="w-full h-16 px-6 md:px-12 lg:px-24 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed top-0 z-50">
       <div className="flex items-center justify-between h-full">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+          {/* <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">CV</span>
-          </div>
-          <span className="font-semibold text-xl text-foreground">CVBuilder</span>
+          </div> */}
+          <span className="font-extrabold text-2xl text-foreground tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 bg-clip-text text-transparent drop-shadow-lg">{LOGO_NAME}</span>
         </Link>
         
         <nav className="hidden md:flex items-center space-x-8">

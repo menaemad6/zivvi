@@ -308,18 +308,25 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   return (
-    <div id="cv-content" className="flex flex-col md:flex-row bg-gray-100 min-h-screen">
+    <div
+      id="cv-content"
+      className="elegant-cv-responsive grid grid-cols-[1fr_minmax(180px,28vw)] gap-0 bg-gray-100 w-full max-w-[100vw] min-h-[100vh]"
+      style={{ boxSizing: 'border-box' }}
+    >
       {/* Left/Main Column */}
-      <div className="flex-1 bg-white p-0 md:p-8">
+      <div className="bg-white min-w-0 flex flex-col px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-12 lg:py-12 xl:px-16 xl:py-16">
         {renderHeader()}
-        <div className="p-8 pt-4">
+        <div className="flex-1 flex flex-col gap-6 pt-2">
           {cvData.personalInfo?.summary && renderSummary()}
           {sectionMap["experience"] && renderExperience()}
           {sectionMap["projects"] && renderProjects()}
         </div>
       </div>
       {/* Right/Sidebar */}
-      <aside className="w-full md:w-96 bg-blue-900 text-white p-8 flex flex-col gap-4">
+      <aside
+        className="bg-blue-900 text-white flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-8 lg:py-12 xl:px-10 xl:py-16"
+        style={{ minWidth: 0 }}
+      >
         {sectionMap["achievements"] && renderAchievements()}
         {sectionMap["education"] && renderEducation()}
         {sectionMap["skills"] && renderSkills()}
@@ -479,7 +486,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     "personalInfo", "summary", "experience", "projects", "education", "achievements", "skills", "courses", "passions"
   ]).forEach(s => { sectionMap[s] = true; });
 
-  // Header (matches image)
+  // Helper renderers for each section (unchanged)
   const renderHeader = () => (
     <div className="px-8 pt-8 pb-2 bg-white">
       <h1 className="text-4xl font-bold text-gray-900 mb-1">{cvData.personalInfo?.fullName || "Mia Ward"}</h1>
@@ -495,7 +502,6 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </div>
   );
 
-  // Summary (always shows, matches image)
   const renderSummary = () => (
     <section className="px-8 mb-2">
       <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Summary</div>
@@ -506,7 +512,6 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </section>
   );
 
-  // Experience (matches image)
   const renderExperience = () => (
     <section className="px-8 mb-2">
       <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Experience</div>
@@ -527,7 +532,6 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </section>
   );
 
-  // Projects (under experience, keep as before)
   const renderProjects = () => (
     <section className="px-8 mb-2">
       <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Projects</div>
@@ -545,7 +549,6 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </section>
   );
 
-  // Sidebar sections (unchanged)
   const renderEducation = () => (
     <section className="mb-6">
       <div className="uppercase text-xs tracking-widest text-blue-700 font-semibold mb-2">Education</div>
@@ -638,17 +641,23 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   return (
-    <div id="cv-content" className="flex flex-col md:flex-row bg-white min-h-screen">
+    <div
+      id="cv-content"
+      className="compact-cv-responsive grid grid-cols-[1fr_minmax(180px,28vw)] gap-0 bg-white w-full max-w-[100vw] min-h-[100vh]"
+      style={{ boxSizing: 'border-box' }}
+    >
       {/* Main Column */}
-      <div className="flex-1">
+      <div className="bg-white min-w-0 flex flex-col px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-12 lg:py-12 xl:px-16 xl:py-16">
         {renderHeader()}
         {cvData.personalInfo?.summary && renderSummary()}
         {sectionMap["experience"] && renderExperience()}
         {sectionMap["projects"] && renderProjects()}
-
       </div>
       {/* Right Sidebar */}
-      <aside className="w-full md:w-96 bg-gray-50 border-l border-gray-200 p-8 flex flex-col gap-4">
+      <aside
+        className="bg-gray-50 border-l border-gray-200 flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6 md:px-8 md:py-8 lg:px-8 lg:py-12 xl:px-10 xl:py-16"
+        style={{ minWidth: 0 }}
+      >
         {sectionMap["education"] && renderEducation()}
         {sectionMap["achievements"] && renderAchievements()}
         {sectionMap["skills"] && renderSkills()}

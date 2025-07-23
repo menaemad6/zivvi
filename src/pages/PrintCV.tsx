@@ -64,7 +64,7 @@ const PrintCV = () => {
     if (!isLoading) {
       setTimeout(() => {
         window.print();
-      }, 100);
+      }, 1000);
       const handleAfterPrint = () => {
         navigate(`/preview/${id}`);
       };
@@ -80,18 +80,20 @@ const PrintCV = () => {
   }
 
   return (
-    <div className="cv-print-container" style={{ minHeight: '100vh', background: '#fff' }}>
-      {cvData && sections && sections.length > 0 ? (
-        <CVTemplateRenderer
-          cvData={cvData}
-          templateId={template || 'modern'}
-          sections={sections}
-        />
-      ) : (
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <h3>No CV Data Available</h3>
-        </div>
-      )}
+    <div className="cv-preview-outer" style={{ minHeight: '100vh', background: '#fff' }}>
+      <div className="cv-preview-scaler">
+        {cvData && sections && sections.length > 0 ? (
+          <CVTemplateRenderer
+            cvData={cvData}
+            templateId={template || 'modern'}
+            sections={sections}
+          />
+        ) : (
+          <div style={{ textAlign: 'center', padding: '4rem' }}>
+            <h3>No CV Data Available</h3>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

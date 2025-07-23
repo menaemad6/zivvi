@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, Sparkles, Briefcase, Palette, Zap, Search, Filter, Star, Crown, Flame } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -110,15 +111,15 @@ const Templates = () => {
   return (
     <>
       <Helmet>
-        <title>CV Templates | AI CV Builder</title>
+        <title>{LOGO_NAME} CV Templates | {WEBSITE_URL}</title>
         <meta name="description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
-        <meta property="og:title" content="CV Templates | AI CV Builder" />
+        <meta property="og:title" content={`${LOGO_NAME} CV Templates | ${WEBSITE_URL}`} />
         <meta property="og:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/templates" />
+        <meta property="og:url" content={`${WEBSITE_URL}/templates`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="CV Templates | AI CV Builder" />
+        <meta name="twitter:title" content={`${LOGO_NAME} CV Templates | ${WEBSITE_URL}`} />
         <meta name="twitter:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
@@ -127,7 +128,7 @@ const Templates = () => {
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
-          <div className="container mx-auto py-20 px-6 relative">
+          <div className="container mx-auto py-8 px-6 relative">
             <Button
               variant="outline"
               onClick={() => navigate('/dashboard')}
@@ -191,7 +192,7 @@ const Templates = () => {
 
         <div className="container mx-auto py-12 px-6">
           {/* Featured Templates */}
-          {selectedCategory === 'all' && searchTerm === '' && (
+          {/* {selectedCategory === 'all' && searchTerm === '' && (
             <div className="mb-20">
               <div className="text-center mb-12">
                 <div className="flex items-center justify-center gap-4 mb-6">
@@ -258,7 +259,7 @@ const Templates = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* All Templates */}
           <div>

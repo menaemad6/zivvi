@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight, Shield, Zap, Heart } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 const Auth = () => {
   const { user, isLoading, signIn, signUp } = useAuth();
   const location = useLocation();
@@ -103,15 +104,15 @@ const Auth = () => {
   return (
     <>
     <Helmet>
-        <title>Login or Sign Up | AI CV Builder</title>
+        <title>Login or Sign Up | {LOGO_NAME}</title>
         <meta name="description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
-        <meta property="og:title" content="Login or Sign Up | AI CV Builder" />
+        <meta property="og:title" content="Login or Sign Up | {LOGO_NAME}" />
         <meta property="og:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/login" />
+        <meta property="og:url" content={`${WEBSITE_URL}/login`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Login or Sign Up | AI CV Builder" />
+        <meta name="twitter:title" content="Login or Sign Up | {LOGO_NAME}" />
         <meta name="twitter:description" content="Log in or create a free account to start building your professional, AI-optimized CV in minutes." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
@@ -145,7 +146,7 @@ const Auth = () => {
                   </div>
                   <div>
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                      CVBuilder
+                      {LOGO_NAME}
                     </h1>
                     <p className="text-gray-600 font-medium">Professional CV Creation Platform</p>
                   </div>
@@ -194,7 +195,7 @@ const Auth = () => {
 
               {/* Testimonial */}
               <div className="mt-12 p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg fade-in-up stagger-2">
-                <p className="text-gray-700 italic mb-3">"CVBuilder helped me land my dream job in just 2 weeks!"</p>
+                <p className="text-gray-700 italic mb-3">"{LOGO_NAME} helped me land my dream job in just 2 weeks!"</p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
                   <div>
@@ -216,7 +217,7 @@ const Auth = () => {
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                    CVBuilder
+                    {LOGO_NAME}
                   </h1>
                 </div>
                 <p className="text-gray-600 text-lg">Create your perfect CV today</p>

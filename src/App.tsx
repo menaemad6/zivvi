@@ -32,13 +32,13 @@ const App = () => (
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/pricing" element={<Pricing />} />
+              <Route path="/templates" element={<Templates />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/preview/:id" element={<Preview />} />
             <Route path="/print/:id" element={<PrintCV />} />
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/templates" element={<Templates />} />
               <Route path="/builder/:id" element={<Builder />} />
               <Route path="/builder/new" element={<Builder />} />
             </Route>

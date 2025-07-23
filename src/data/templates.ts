@@ -5,7 +5,7 @@ export const cvTemplates: CVTemplate[] = [
   {
     id: 'classicTemp',
     name: 'Classic Template',
-    description: '(File-based template component)',
+    description: 'A timeless, professional layout with clearly separated sections and traditional formatting. Ideal for formal job applications.',
     thumbnail: '/templates/classic-template.png',
     category: 'classic'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
@@ -13,139 +13,140 @@ export const cvTemplates: CVTemplate[] = [
   {
     id: 'elegantTemp',
     name: 'Elegant Template',
-    description: '(File-based template component)',
+    description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
     thumbnail: '/templates/elegant-template.png',
-    category: 'classic'
+    category: 'modern'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
   {
     id: 'timelineTemp',
     name: 'Timeline Template',
-    description: '(File-based template component)',
+    description: 'Showcases your career path using a visual timeline. Perfect for emphasizing growth and progression over time.',
     thumbnail: '/templates/timeline-template.png',
-    category: 'classic'
+    category: 'minimal'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
   {
     id: 'compactTemp',
     name: 'Compact Template',
-    description: '(File-based template component)',
+    description: 'A space-efficient layout that fits all essential information on a single page without clutter. Great for experienced professionals.',
     thumbnail: '/templates/compact-template.png',
-    category: 'classic'
+    category: 'modern'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },
   {
     id: 'headerTemp',
     name: 'Header Template',
-    description: '(File-based template component)',
+    description: 'Features a bold, modern header section that highlights your name and title. Ideal for personal branding and standout resumes.',
     thumbnail: '/templates/header-template.png',
-    category: 'modern'
-  },
-  {
-    id: 'modern',
-    name: 'Modern Professional',
-    description: 'Clean and modern design with blue accents, perfect for tech professionals',
-    thumbnail: '/placeholder.svg',
-    category: 'modern'
-  },
-  {
-    id: 'classic',
-    name: 'Classic Business',
-    description: 'Traditional corporate format with serif fonts, ideal for business environments. (File-based template component)',
-    thumbnail: '/placeholder.svg',
-    category: 'classic'
-    // Uses file-based template: src/components/cv/templates/Classic.tsx
-  },
-  {
-    id: 'creative',
-    name: 'Creative Portfolio',
-    description: 'Bold purple design with unique layouts for creative professionals',
-    thumbnail: '/placeholder.svg',
     category: 'creative'
-  },
-  {
-    id: 'minimal',
-    name: 'Minimal Clean',
-    description: 'Ultra-clean design with lots of white space and subtle typography',
-    thumbnail: '/placeholder.svg',
-    category: 'minimal'
-  },
-  {
-    id: 'executive',
-    name: 'Executive Suite',
-    description: 'Sophisticated dark theme with gold accents for senior executives',
-    thumbnail: '/placeholder.svg',
-    category: 'modern'
-  },
-  {
-    id: 'academic',
-    name: 'Academic Scholar',
-    description: 'Traditional academic format with structured sections for researchers',
-    thumbnail: '/placeholder.svg',
-    category: 'classic'
-  },
-  {
-    id: 'tech',
-    name: 'Tech Innovator',
-    description: 'Modern tech-focused design with green accents and clean code aesthetics',
-    thumbnail: '/placeholder.svg',
-    category: 'modern'
-  },
-  {
-    id: 'artistic',
-    name: 'Artistic Vision',
-    description: 'Vibrant and expressive design with colorful elements for artists',
-    thumbnail: '/placeholder.svg',
-    category: 'creative'
-  },
-  {
-    id: 'corporate',
-    name: 'Corporate Elite',
-    description: 'Professional navy blue design with structured layout for corporate roles',
-    thumbnail: '/placeholder.svg',
-    category: 'classic'
-  },
-  {
-    id: 'startup',
-    name: 'Startup Spirit',
-    description: 'Dynamic and energetic design with orange accents for entrepreneurs',
-    thumbnail: '/placeholder.svg',
-    category: 'modern'
-  },
-  {
-    id: 'freelancer',
-    name: 'Freelancer Pro',
-    description: 'Flexible design showcasing diverse skills and portfolio work',
-    thumbnail: '/placeholder.svg',
-    category: 'creative'
-  },
-  {
-    id: 'finance',
-    name: 'Finance Expert',
-    description: 'Conservative professional design with emphasis on achievements',
-    thumbnail: '/placeholder.svg',
-    category: 'classic'
-  },
-  {
-    id: 'healthcare',
-    name: 'Healthcare Professional',
-    description: 'Clean medical-themed design with trust-building elements',
-    thumbnail: '/placeholder.svg',
-    category: 'minimal'
-  },
-  {
-    id: 'sales',
-    name: 'Sales Champion',
-    description: 'Results-focused design highlighting achievements and metrics',
-    thumbnail: '/placeholder.svg',
-    category: 'modern'
-  },
-  {
-    id: 'designer',
-    name: 'Design Master',
-    description: 'Visually striking layout perfect for showcasing design skills',
-    thumbnail: '/placeholder.svg',
-    category: 'creative'
-  },
+  }
+  
+  // {
+  //   id: 'modern',
+  //   name: 'Modern Professional',
+  //   description: 'Clean and modern design with blue accents, perfect for tech professionals',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'modern'
+  // },
+  // {
+  //   id: 'classic',
+  //   name: 'Classic Business',
+  //   description: 'Traditional corporate format with serif fonts, ideal for business environments. (File-based template component)',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'classic'
+  //   // Uses file-based template: src/components/cv/templates/Classic.tsx
+  // },
+  // {
+  //   id: 'creative',
+  //   name: 'Creative Portfolio',
+  //   description: 'Bold purple design with unique layouts for creative professionals',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'creative'
+  // },
+  // {
+  //   id: 'minimal',
+  //   name: 'Minimal Clean',
+  //   description: 'Ultra-clean design with lots of white space and subtle typography',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'minimal'
+  // },
+  // {
+  //   id: 'executive',
+  //   name: 'Executive Suite',
+  //   description: 'Sophisticated dark theme with gold accents for senior executives',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'modern'
+  // },
+  // {
+  //   id: 'academic',
+  //   name: 'Academic Scholar',
+  //   description: 'Traditional academic format with structured sections for researchers',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'classic'
+  // },
+  // {
+  //   id: 'tech',
+  //   name: 'Tech Innovator',
+  //   description: 'Modern tech-focused design with green accents and clean code aesthetics',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'modern'
+  // },
+  // {
+  //   id: 'artistic',
+  //   name: 'Artistic Vision',
+  //   description: 'Vibrant and expressive design with colorful elements for artists',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'creative'
+  // },
+  // {
+  //   id: 'corporate',
+  //   name: 'Corporate Elite',
+  //   description: 'Professional navy blue design with structured layout for corporate roles',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'classic'
+  // },
+  // {
+  //   id: 'startup',
+  //   name: 'Startup Spirit',
+  //   description: 'Dynamic and energetic design with orange accents for entrepreneurs',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'modern'
+  // },
+  // {
+  //   id: 'freelancer',
+  //   name: 'Freelancer Pro',
+  //   description: 'Flexible design showcasing diverse skills and portfolio work',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'creative'
+  // },
+  // {
+  //   id: 'finance',
+  //   name: 'Finance Expert',
+  //   description: 'Conservative professional design with emphasis on achievements',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'classic'
+  // },
+  // {
+  //   id: 'healthcare',
+  //   name: 'Healthcare Professional',
+  //   description: 'Clean medical-themed design with trust-building elements',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'minimal'
+  // },
+  // {
+  //   id: 'sales',
+  //   name: 'Sales Champion',
+  //   description: 'Results-focused design highlighting achievements and metrics',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'modern'
+  // },
+  // {
+  //   id: 'designer',
+  //   name: 'Design Master',
+  //   description: 'Visually striking layout perfect for showcasing design skills',
+  //   thumbnail: '/placeholder.svg',
+  //   category: 'creative'
+  // },
 
 ];

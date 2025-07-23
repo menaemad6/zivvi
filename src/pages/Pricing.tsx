@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { LOGO_NAME, WEBSITE_URL } from '@/lib/constants';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -67,20 +68,54 @@ const pricingTiers = [
   },
 ];
 
+function getTimeLeft() {
+  const target = new Date('2025-08-01T00:00:00Z').getTime();
+  const now = Date.now();
+  let diff = Math.max(target - now, 0);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  diff -= days * 1000 * 60 * 60 * 24;
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  diff -= hours * 1000 * 60 * 60;
+  const minutes = Math.floor(diff / (1000 * 60));
+  return { days, hours, minutes };
+}
+
+function ModernCountdown() {
+  const [time, setTime] = useState(getTimeLeft());
+  useEffect(() => {
+    const interval = setInterval(() => setTime(getTimeLeft()), 1000 * 10);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <div className="flex flex-col items-center justify-center mb-10 fade-in-up">
+      <div className="flex gap-6 md:gap-10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl px-8 py-4 shadow-xl text-white font-extrabold text-2xl md:text-3xl tracking-tight">
+        <div className="flex flex-col items-center"><span>{time.days}</span><span className="text-xs font-medium mt-1">Days</span></div>
+        <span className="text-2xl md:text-3xl font-bold">:</span>
+        <div className="flex flex-col items-center"><span>{time.hours}</span><span className="text-xs font-medium mt-1">Hours</span></div>
+        <span className="text-2xl md:text-3xl font-bold">:</span>
+        <div className="flex flex-col items-center"><span>{time.minutes}</span><span className="text-xs font-medium mt-1">Minutes</span></div>
+      </div>
+      <div className="mt-6 text-lg md:text-xl font-semibold text-blue-900 bg-white/80 px-6 py-3 rounded-xl shadow border border-blue-100 max-w-2xl text-center">
+        <span className="bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-extrabold">{LOGO_NAME}</span> is <span className="font-bold">totally free</span> for all users until <span className="font-bold">August 1, 2025</span>, in celebration of our grand opening. Enjoy unlimited access to all premium features!
+      </div>
+    </div>
+  );
+}
+
 export default function Pricing() {
   return (
     <>
       <Helmet>
-        <title>Pricing | AI CV Builder</title>
-        <meta name="description" content="See our simple, transparent pricing plans. Start free and upgrade to unlock premium features for your CVs." />
-        <meta property="og:title" content="Pricing | AI CV Builder" />
-        <meta property="og:description" content="See our simple, transparent pricing plans. Start free and upgrade to unlock premium features for your CVs." />
+        <title>Pricing | {LOGO_NAME}</title>
+        <meta name="description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
+        <meta property="og:title" content={`Pricing | ${LOGO_NAME}`} />
+        <meta property="og:description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/pricing" />
+        <meta property="og:url" content={`${WEBSITE_URL}/pricing`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Pricing | AI CV Builder" />
-        <meta name="twitter:description" content="See our simple, transparent pricing plans. Start free and upgrade to unlock premium features for your CVs." />
+        <meta name="twitter:title" content={`Pricing | ${LOGO_NAME}`} />
+        <meta name="twitter:description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
@@ -100,6 +135,7 @@ export default function Pricing() {
         
         <main className="pt-24 pb-16 relative z-10">
           <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
+            
             {/* Header */}
             <div className="text-center mb-16 fade-in-up">
               <div className="flex items-center justify-center gap-4 mb-8">
@@ -114,6 +150,9 @@ export default function Pricing() {
                 Choose the perfect plan for your CV building needs. Start free and upgrade when you're ready.
               </p>
             </div>
+
+            <ModernCountdown />
+
 
             {/* Pricing Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">

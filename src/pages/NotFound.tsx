@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
+import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
 const NotFound = () => {
   const location = useLocation();
@@ -20,16 +21,16 @@ const NotFound = () => {
   return (
     <>
       <Helmet>
-        <title>404 Not Found | AI CV Builder</title>
-        <meta name="description" content="Sorry, the page you are looking for does not exist. Return to the AI CV Builder home page." />
-        <meta property="og:title" content="404 Not Found | AI CV Builder" />
-        <meta property="og:description" content="Sorry, the page you are looking for does not exist. Return to the AI CV Builder home page." />
+        <title>{LOGO_NAME} 404 Not Found</title>
+        <meta name="description" content={`Sorry, the page you are looking for does not exist. Return to the ${LOGO_NAME} home page.`} />
+        <meta property="og:title" content={`${LOGO_NAME} 404 Not Found`} />
+        <meta property="og:description" content={`Sorry, the page you are looking for does not exist. Return to the ${LOGO_NAME} home page.`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://your-website-url.com/404" />
+        <meta property="og:url" content={`${WEBSITE_URL}/404`} />
         <meta property="og:image" content="/templates/elegant-template.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="404 Not Found | AI CV Builder" />
-        <meta name="twitter:description" content="Sorry, the page you are looking for does not exist. Return to the AI CV Builder home page." />
+        <meta name="twitter:title" content={`${LOGO_NAME} 404 Not Found`} />
+        <meta name="twitter:description" content={`Sorry, the page you are looking for does not exist. Return to the ${LOGO_NAME} home page.`} />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
       </Helmet>
       <Navbar />

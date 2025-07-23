@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Star, Users, Download, ArrowRight, Zap, Layout, FileText, Play, Shield, Clock, Sparkles, ChevronRight, Check, Globe, Award, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { LOGO_NAME } from "@/lib/constants";
 
 const Index = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -75,27 +76,28 @@ const Index = () => {
 
   const testimonials = [
     {
-      name: "Sarah Chen",
-      role: "Software Engineer at Google",
-      content: "CVBuilder helped me land my dream job. The templates are modern and the AI suggestions were spot-on.",
-      avatar: "SC",
+      name: "Layla Hassan",
+      role: "Frontend Developer at STC",
+      content: "CVBuilder made my CV look so professional. The modern layouts and smart tips gave me a real edge.",
+      avatar: "LH",
       rating: 5
     },
     {
-      name: "Marcus Johnson",
-      role: "Product Manager at Meta",
-      content: "Best CV builder I've used. Clean, professional, and incredibly easy to customize.",
-      avatar: "MJ",
+      name: "Omar Khaled",
+      role: "Product Manager at Talabat",
+      content: "Super easy to use and very flexible. I created a standout CV in minutes that got me interviews fast.",
+      avatar: "OK",
       rating: 5
     },
     {
-      name: "Elena Rodriguez",
-      role: "Designer at Airbnb",
-      content: "The design templates are outstanding. Got multiple interview calls within a week!",
-      avatar: "ER",
+      name: "Nour Al-Masri",
+      role: "UI/UX Designer at Noon",
+      content: "The templates are visually stunning and perfect for creative roles. I got several callbacks thanks to it.",
+      avatar: "NM",
       rating: 5
     }
   ];
+  
 
   const floatingElements = [
     { id: 1, size: 'w-16 h-16', position: 'top-20 left-10', delay: '0s', icon: FileText },
@@ -108,22 +110,22 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>AI CV Builder - Create Professional Resumes in Minutes</title>
+        <title>{LOGO_NAME} - Create Professional Resumes in Minutes</title>
         <meta name="description" content="Build and optimize beautiful, professional CVs in minutes with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
         <meta name="keywords" content="CV builder, resume builder, AI resume, professional resume, online CV, resume templates, CV templates" />
-        <meta name="author" content="CV Builder" />
+        <meta name="author" content={LOGO_NAME} />
         <meta name="theme-color" content="#ffffff" />
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://your-website-url.com/" />
-        <meta property="og:title" content="AI CV Builder - Create Professional Resumes in Minutes" />
+        <meta property="og:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta property="og:description" content="Build and optimize beautiful, professional CVs with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
         <meta property="og:image" content="/templates/elegant-template.png" />
-        <meta property="og:site_name" content="AI CV Builder" />
+        <meta property="og:site_name" content={LOGO_NAME} />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content="https://your-website-url.com/" />
-        <meta name="twitter:title" content="AI CV Builder - Create Professional Resumes in Minutes" />
+        <meta name="twitter:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta name="twitter:description" content="Build and optimize beautiful, professional CVs with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
         <meta name="twitter:image" content="/templates/elegant-template.png" />
         <meta name="twitter:creator" content="@YourTwitterHandle" />
@@ -319,17 +321,12 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6">
                 <Link to="/signup">
-                  <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-10 py-6 text-xl h-16 hover-glow shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold">
+                  <Button size="lg" className="bg-white  hover:bg-gray-100 px-10 py-6 text-xl h-16 hover-glow shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold">
                     Start Building for Free
                     <ArrowRight className="w-6 h-6 ml-3" />
                   </Button>
                 </Link>
-                <Link to="/templates">
-                  <Button variant="outline" size="lg" className="border-2 border-white/30 text-white hover:bg-white/10 px-10 py-6 text-xl h-16 backdrop-blur-sm hover:border-white/50 transition-all duration-300">
-                    Explore Templates
-                    <ChevronRight className="w-6 h-6 ml-3" />
-                  </Button>
-                </Link>
+                
               </div>
             </div>
           </div>
