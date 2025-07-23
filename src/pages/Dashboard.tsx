@@ -199,11 +199,11 @@ const Dashboard = () => {
         <meta property="og:description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/dashboard`} />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="{LOGO_NAME} Dashboard | {WEBSITE_URL}" />
         <meta name="twitter:description" content="Manage your CVs, track analytics, and access professional tools on your {LOGO_NAME} dashboard." />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">

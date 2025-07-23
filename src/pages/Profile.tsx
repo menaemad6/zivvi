@@ -86,11 +86,11 @@ const Profile = () => {
         <meta property="og:description" content="Manage your profile, update your information, and track your CV stats on {WEBSITE_URL}." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://your-website-url.com/profile" />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="{LOGO_NAME} | Profile" />
         <meta name="twitter:description" content="Manage your profile, update your information, and track your CV stats on {WEBSITE_URL}." />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
       <div className="min-h-screen pt-16 bg-gradient-to-br from-gray-50 via-white to-blue-50">

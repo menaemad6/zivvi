@@ -14,7 +14,7 @@ export const cvTemplates: CVTemplate[] = [
     id: 'elegantTemp',
     name: 'Elegant Template',
     description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
-    thumbnail: '/templates/elegant-template.png',
+    thumbnail: '/zivvi-logo.png',
     category: 'modern'
     // Uses file-based template: src/components/cv/templates/PreBuiltTemplates
   },

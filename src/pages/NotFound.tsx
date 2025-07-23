@@ -27,11 +27,11 @@ const NotFound = () => {
         <meta property="og:description" content={`Sorry, the page you are looking for does not exist. Return to the ${LOGO_NAME} home page.`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/404`} />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${LOGO_NAME} 404 Not Found`} />
         <meta name="twitter:description" content={`Sorry, the page you are looking for does not exist. Return to the ${LOGO_NAME} home page.`} />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
       <div className="min-h-screen flex flex-col justify-between bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24">

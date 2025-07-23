@@ -120,14 +120,14 @@ const Index = () => {
         <meta property="og:url" content={WEBSITE_URL} />
         <meta property="og:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta property="og:description" content="Build and optimize beautiful, professional CVs with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta property="og:site_name" content={LOGO_NAME} />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content="https://your-website-url.com/" />
         <meta name="twitter:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta name="twitter:description" content="Build and optimize beautiful, professional CVs with our AI-powered resume builder. Choose from modern templates and get AI-driven suggestions." />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
         <meta name="twitter:creator" content="@YourTwitterHandle" />
         <meta name="twitter:site" content="@YourTwitterHandle" />
       </Helmet>

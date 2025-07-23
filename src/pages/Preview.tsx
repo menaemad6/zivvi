@@ -245,11 +245,11 @@ const Preview = () => {
         <meta property="og:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/preview`} />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${LOGO_NAME} CV Preview | ${WEBSITE_URL}`} />
         <meta name="twitter:description" content="Preview your professional CV before downloading or sharing. See your resume in a modern, optimized format." />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24">

@@ -112,11 +112,11 @@ export default function Pricing() {
         <meta property="og:description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/pricing`} />
-        <meta property="og:image" content="/templates/elegant-template.png" />
+        <meta property="og:image" content="/zivvi-logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`Pricing | ${LOGO_NAME}`} />
         <meta name="twitter:description" content={`See our simple, transparent pricing plans. ${LOGO_NAME} is free for all users until August 1, 2025!`} />
-        <meta name="twitter:image" content="/templates/elegant-template.png" />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
         {/* Enhanced Floating Background Elements */}
