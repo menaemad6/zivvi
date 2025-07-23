@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
@@ -10,7 +11,7 @@ const PrintCV = () => {
   const navigate = useNavigate();
   const [cvData, setCVData] = useState(null);
   const [template, setTemplate] = useState('');
-  const [sections, setSections] = useState([]);
+  const [sections, setSections] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { dismiss } = useToast();
 
@@ -25,7 +26,7 @@ const PrintCV = () => {
           const parsedData = JSON.parse(storedData);
           setCVData(parsedData.cvData);
           setTemplate(parsedData.template || 'modern');
-          setSections(parsedData.sections || []);
+          setSections(Array.isArray(parsedData.sections) ? parsedData.sections : []);
         } catch (error) {
           // ignore
         } finally {
@@ -37,7 +38,7 @@ const PrintCV = () => {
     }
   }, [id]);
 
-  const fetchCVData = async (cvId) => {
+  const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
     try {
       const { data: cvDataResponse, error } = await supabase
@@ -53,9 +54,9 @@ const PrintCV = () => {
       if (content && typeof content === 'object' && !Array.isArray(content)) {
         setCVData(content);
         setTemplate(cvDataResponse.template || 'modern');
-        const contentWithSections = content;
+        const contentWithSections = content as any;
         const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
-        setSections(contentSections);
+        setSections(Array.isArray(contentSections) ? contentSections : []);
       }
     } finally {
       setIsLoading(false);
@@ -101,4 +102,4 @@ const PrintCV = () => {
   );
 };
 
-export default PrintCV; 
+export default PrintCV;
