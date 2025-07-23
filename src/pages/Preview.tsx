@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
+import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 
 const Preview = () => {
   const { id } = useParams();
@@ -31,6 +32,15 @@ const Preview = () => {
   const [authorName, setAuthorName] = useState('');
   const [cvName, setCVName] = useState('');
   const lastTrackedCVId = useRef<string | null>(null);
+  const location = useLocation();
+  const [joyrideRun, setJoyrideRun] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('startPreviewDemo')) {
+      setJoyrideRun(true);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (id && id !== 'new') {
@@ -191,6 +201,22 @@ const Preview = () => {
     }
   };
 
+  const joyrideSteps = [
+    {
+      target: '.btn-download-cv',
+      content: 'Download or print your CV here!',
+      disableBeacon: true,
+    },
+  ];
+
+  const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
+    if (data.status === 'finished' || data.status === 'skipped') {
+      setJoyrideRun(false);
+      // Remove the flag from the URL
+      navigate(`/preview/${id}`, { replace: true });
+    }
+  };
+
   if (isLoading) {
     return (
       <>
@@ -294,7 +320,7 @@ const Preview = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate(`/print/${id}`)}
-                  className="border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
+                  className="btn-download-cv border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
                   title="Download/Print CV"
                 >
                   <Download className="h-3 w-3 sm:mr-1" />
@@ -355,6 +381,15 @@ const Preview = () => {
         </div>
       </div>
       <Footer />
+      <Joyride
+        steps={joyrideSteps}
+        run={joyrideRun}
+        continuous
+        showSkipButton
+        showProgress
+        callback={handleJoyrideCallback}
+        styles={{ options: { zIndex: 10000 } }}
+      />
     </>
   );
 };

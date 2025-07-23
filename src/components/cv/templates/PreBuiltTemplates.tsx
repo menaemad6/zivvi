@@ -21,13 +21,15 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
           {cvData.personalInfo?.location || "80 Gold Street, New York, NY 10038, United States"}, {cvData.personalInfo?.phone || "(917) 407-2179"}, {cvData.personalInfo?.email || "tim.stewart@gmail.com"}
         </div>
       </div>
+      {cvData.personalInfo?.summary && 
       <div className="mt-6">
         <div className="uppercase text-xs tracking-widest text-gray-700 font-semibold mb-1">Profile</div>
         <div className="border-t border-gray-300 mb-2"></div>
         <p className="text-sm text-gray-800 leading-relaxed">
-          {cvData.personalInfo?.summary || "Certified Accountant with five years of experience in account reconciliations, streamlining accounts, and financial planning. Highly motivated professional with a proven track record of delivering accurate reports and high quality service. Possess a comprehensive understanding of all aspects of accounting and financial planning. A dedicated leader with the ability to lead effective teams in attaining profit improvement."}
+          {cvData.personalInfo?.summary || null }
         </p>
       </div>
+      }
     </section>
   );
 

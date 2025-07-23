@@ -14,6 +14,8 @@ import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, Sparkles, Briefcase, Palette, Zap, Search, Filter, Star, Crown, Flame } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
+import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
+import { useLocation } from 'react-router-dom';
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -21,8 +23,43 @@ const Templates = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+  const location = useLocation();
+  const [joyrideRun, setJoyrideRun] = useState(false);
+  const [joyrideFinished, setJoyrideFinished] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('startDemo')) {
+      setJoyrideRun(true);
+      setJoyrideFinished(false);
+      setIsDemo(true);
+    }
+  }, [location]);
+
+  const joyrideSteps = [
+    {
+      target: '.template-card',
+      content: 'Choose a template to get started!',
+      disableBeacon: true,
+    },
+    {
+      target: '.template-card .use-template-btn',
+      content: 'Click here to use this template!',
+    },
+  ];
+
+  const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
+    if (data.status === 'finished' || data.status === 'skipped') {
+      setJoyrideRun(false);
+      setJoyrideFinished(true);
+      // Remove the flag from the URL
+      navigate('/templates', { replace: true });
+    }
+  };
 
   const createCVFromTemplate = async (templateId: string, templateName: string) => {
+    if (joyrideRun && !joyrideFinished) return; // Prevent navigation during demo
     if (!user) {
       navigate('/login');
       return;
@@ -60,7 +97,11 @@ const Templates = () => {
         description: `Your new ${templateName} CV has been created.`
       });
 
-      navigate(`/builder/${data.id}`);
+      if (isDemo) {
+        navigate(`/builder/${data.id}?startBuilderDemo=true`);
+      } else {
+        navigate(`/builder/${data.id}`);
+      }
     } catch (error: any) {
       toast({
         title: "Error creating CV",
@@ -276,7 +317,7 @@ const Templates = () => {
               {filteredTemplates.map((template) => (
                 <Card 
                   key={template.id} 
-                  className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-4 bg-white/80 backdrop-blur-lg border-0 shadow-lg overflow-hidden"
+                  className="template-card group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-4 bg-white/80 backdrop-blur-lg border-0 shadow-lg overflow-hidden"
                   onMouseEnter={() => setHoveredTemplate(template.id)}
                   onMouseLeave={() => setHoveredTemplate(null)}
                 >
@@ -311,7 +352,8 @@ const Templates = () => {
                   <CardContent className="pt-0">
                     <Button
                       onClick={() => createCVFromTemplate(template.id, template.name)}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl"
+                      className="use-template-btn w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl"
+                      disabled={joyrideRun && !joyrideFinished}
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
                       Use Template
@@ -340,6 +382,15 @@ const Templates = () => {
         </div>
       </div>
       <Footer />
+      <Joyride
+        steps={joyrideSteps}
+        run={joyrideRun}
+        continuous
+        showSkipButton
+        showProgress
+        callback={handleJoyrideCallback}
+        styles={{ options: { zIndex: 10000 } }}
+      />
     </>
   );
 };

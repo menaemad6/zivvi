@@ -66,6 +66,11 @@ export function Footer() {
       <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} {LOGO_NAME}. All rights reserved.</p>
       </div>
+      <div className="pt-4 text-center text-sm text-muted-foreground">
+        <p>Developed by <Link to="https://mina-emad.com">
+        <span className="font-extrabold text-2xl text-foreground tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 bg-clip-text text-transparent drop-shadow-lg">Mina Emad</span>
+        </Link></p>
+      </div>
     </footer>
   );
 }

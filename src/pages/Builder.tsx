@@ -29,6 +29,8 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
+import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
+import { useLocation } from 'react-router-dom';
 
 const Builder = () => {
   const { id } = useParams();
@@ -47,6 +49,43 @@ const Builder = () => {
       navigate('/dashboard');
     }
   }, [cvExists, navigate]);
+
+  const location = useLocation();
+  const [joyrideRun, setJoyrideRun] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('startBuilderDemo')) {
+      setJoyrideRun(true);
+    }
+  }, [location]);
+
+  const joyrideSteps = [
+    {
+      target: '.btn-smart-generator',
+      content: 'Start by using the Smart Generator to help build your CV!',
+      disableBeacon: true,
+    },
+    {
+      target: '.btn-generate-sections',
+      content: 'Click here to generate recommended sections for your CV.',
+    },
+    {
+      target: '.btn-apply-sections',
+      content: 'Apply the generated sections to your CV.',
+    },
+    {
+      target: '.btn-preview',
+      content: 'Preview your CV here.',
+    },
+  ];
+
+  const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
+    if (data.status === 'finished' || data.status === 'skipped') {
+      // Remove the flag from the URL
+      navigate(`/builder/${id}`, { replace: true });
+    }
+  };
 
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   // Start with empty sections for new CVs
@@ -958,7 +997,7 @@ const Builder = () => {
                       disabled={undoStack.length === 0}
                       size="sm"
                       title="Undo"
-                      className="border-0 hover:bg-white rounded-md h-6 w-6 p-0"
+                      className="btn-undo border-0 hover:bg-white rounded-md h-6 w-6 p-0"
                     >
                       <Undo className="h-2.5 w-2.5" />
                     </Button>
@@ -969,7 +1008,7 @@ const Builder = () => {
                       disabled={redoStack.length === 0}
                       size="sm"
                       title="Redo"
-                      className="border-0 hover:bg-white rounded-md h-6 w-6 p-0"
+                      className="btn-redo border-0 hover:bg-white rounded-md h-6 w-6 p-0"
                     >
                       <Redo className="h-2.5 w-2.5" />
                     </Button>
@@ -979,7 +1018,7 @@ const Builder = () => {
                   <Button 
                     variant="outline"
                     onClick={() => setSettingsModal(true)}
-                    className="border border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-md px-2 py-1 h-7 text-xs"
+                    className="btn-settings border border-gray-300 hover:border-purple-500 hover:bg-purple-50 rounded-md px-2 py-1 h-7 text-xs"
                     title="Settings"
                   >
                     <Settings className="h-3 w-3 sm:mr-1" />
@@ -990,7 +1029,7 @@ const Builder = () => {
                   <Button 
                     variant="outline"
                     onClick={handlePreview}
-                    className="border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-md px-2 py-1 h-7 text-xs"
+                    className="btn-preview border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-md px-2 py-1 h-7 text-xs"
                     title="Preview"
                   >
                     <Eye className="h-3 w-3 sm:mr-1" />
@@ -1001,7 +1040,7 @@ const Builder = () => {
                   <Button 
                     onClick={handleSave} 
                     disabled={isSaving} 
-                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs"
+                    className="btn-save bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs"
                   >
                     <Save className="h-3 w-3 sm:mr-1" />
                     <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save CV'}</span>
@@ -1033,7 +1072,7 @@ const Builder = () => {
                 {/* CV Builder Area */}
                 <div className="xl:col-span-1">
                   {/* Add Sections Section - Moved from sidebar */}
-                  <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
+                  <Card className="add-section bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
                     <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 py-3 sm:py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -1176,13 +1215,16 @@ const Builder = () => {
                     </CardHeader>
                     <CardContent className="p-3 sm:p-6">
                       <div className="bg-white rounded-2xl shadow-2xl min-h-[250px] sm:min-h-[400px] overflow-hidden border-2 border-gray-100">
-                        <div id="cv-content">
+                        <div id="cv-preview-outer">
+                          <div className="cv-preview-scaler">
+
                           {cvData && cvSections.length > 0 ? (
                             <CVTemplateRenderer
                               cvData={cvData}
                               templateId={currentTemplate}
                               sections={cvSections}
                             />
+                            
                           ) : (
                             <div className="text-center text-gray-400 py-8 sm:py-24">
                               <div className="w-12 h-12 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-4 sm:mb-8">
@@ -1192,6 +1234,8 @@ const Builder = () => {
                               <p className="text-gray-500 text-sm sm:text-lg">Add sections to see your CV come to life</p>
                             </div>
                           )}
+                          </div>
+
                         </div>
                       </div>
                     </CardContent>
@@ -1254,6 +1298,15 @@ const Builder = () => {
           />
         )}
       </div>
+      <Joyride
+        steps={joyrideSteps}
+        run={joyrideRun}
+        continuous
+        showSkipButton
+        showProgress
+        callback={handleJoyrideCallback}
+        styles={{ options: { zIndex: 10000 } }}
+      />
     </>
   );
 };

@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getGeminiResponse } from '@/utils/geminiApi';
+import { useNavigate } from 'react-router-dom';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -62,6 +63,7 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: On
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const debounceRef = React.useRef<NodeJS.Timeout | null>(null);
   const [lastClickedSkill, setLastClickedSkill] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isOpen) {
@@ -338,6 +340,8 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: On
     };
 
     onComplete(finalData);
+    // Redirect to templates with demo flag
+    navigate('/templates?startDemo=true');
   };
 
   const currentQuestion = questions[currentStep];

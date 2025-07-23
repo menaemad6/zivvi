@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -39,6 +39,12 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
   const [generatedSections, setGeneratedSections] = useState<GeneratedSection[]>([]);
   const [step, setStep] = useState<'analyzing' | 'generating' | 'reviewing'>('analyzing');
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setStep('analyzing');
+    }
+  }, [open]);
 
   const handleOnboardingComplete = async (data: any) => {
     try {
@@ -561,7 +567,7 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
               <Button 
                 onClick={generateSections} 
                 disabled={!profile?.profile_data || loading}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="btn-generate-sections bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Generate Sections
@@ -571,7 +577,7 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
             {step === 'reviewing' && (
               <Button 
                 onClick={applySections}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="btn-apply-sections bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 Apply Selected Sections
               </Button>

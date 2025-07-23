@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { cvTemplates } from '@/data/templates';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const PrintCV = () => {
   const { id } = useParams();
@@ -11,6 +12,7 @@ const PrintCV = () => {
   const [template, setTemplate] = useState('');
   const [sections, setSections] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { dismiss } = useToast();
 
   useEffect(() => {
     if (id && id !== 'new') {
@@ -63,6 +65,7 @@ const PrintCV = () => {
   useEffect(() => {
     if (!isLoading) {
       setTimeout(() => {
+        dismiss(); // Remove all toasts before printing
         window.print();
       }, 1000);
       const handleAfterPrint = () => {
@@ -73,7 +76,7 @@ const PrintCV = () => {
         window.removeEventListener('afterprint', handleAfterPrint);
       };
     }
-  }, [isLoading, id, navigate]);
+  }, [isLoading, id, navigate, dismiss]);
 
   if (isLoading) {
     return null;
