@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import type { CVData } from '@/types/cv';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,21 +20,42 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 
+const getResponsiveScale = () => {
+  // A4 width in mm: 210mm, in px: 210mm * 3.78 = ~794px (at 96dpi)
+  // But our template is 210mm wide, so we want to fit it in the viewport
+  const A4_WIDTH_MM = 210;
+  const MM_TO_PX = 3.78; // 1mm ≈ 3.78px at 96dpi
+  const A4_WIDTH_PX = A4_WIDTH_MM * MM_TO_PX;
+  const margin = 32; // px, some margin for shadow/air
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  // Fit to width, but never scale above 1
+  let scale = Math.min(1, (viewportWidth - margin) / A4_WIDTH_PX);
+  // On very short screens, fit to height
+  const A4_HEIGHT_PX = 297 * MM_TO_PX;
+  scale = Math.min(scale, (viewportHeight - margin) / A4_HEIGHT_PX);
+  // Minimum scale for mobile
+  scale = Math.max(scale, 0.45);
+  return scale;
+};
+
 const Preview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { trackCVView, trackCVDownload, trackCVShare } = useAnalytics();
-  const [cvData, setCVData] = useState(null);
-  const [template, setTemplate] = useState('');
-  const [sections, setSections] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isOwner, setIsOwner] = useState(false);
-  const [authorName, setAuthorName] = useState('');
-  const [cvName, setCVName] = useState('');
+  const [cvData, setCVData] = useState<Partial<CVData> | null>(null);
+  const [template, setTemplate] = useState<string>('');
+  const [sections, setSections] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [authorName, setAuthorName] = useState<string>('');
+  const [cvName, setCVName] = useState<string>('');
   const lastTrackedCVId = useRef<string | null>(null);
   const location = useLocation();
   const [joyrideRun, setJoyrideRun] = useState(false);
+  const [scale, setScale] = useState(getResponsiveScale());
+  const wrapperRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -68,6 +90,14 @@ const Preview = () => {
       }
     }
   }, [id, user]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScale(getResponsiveScale());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
@@ -105,8 +135,14 @@ const Preview = () => {
         setCVData(content);
         setTemplate(cvDataResponse.template || 'modern');
         // Safely extract sections from content
-        const contentWithSections = content as { [key: string]: any };
-        const contentSections = contentWithSections._sections || ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
+        const contentWithSections = content as { [key: string]: unknown };
+        let contentSections: string[] = ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
+        if (
+          '_sections' in contentWithSections &&
+          Array.isArray((contentWithSections as { _sections?: unknown })._sections)
+        ) {
+          contentSections = (contentWithSections as { _sections: unknown })._sections as string[];
+        }
         setSections(contentSections);
       } else {
         console.error('Invalid CV content format');
@@ -252,7 +288,7 @@ const Preview = () => {
         <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24 ">
         {/* Floating Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full floating blur-xl"></div>
@@ -350,9 +386,27 @@ const Preview = () => {
           </div>
         </div>
 
+
+
+
         {/* Enhanced CV Preview */}
-        <div className="cv-preview-outer pt-16">
-          <div className="cv-preview-scaler">
+        <div style={{ width: '100vw', height: '100vh', maxWidth: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'auto', overflowX: 'hidden', background: 'none', margin: 0, padding: 0 }}>
+          <div
+            ref={wrapperRef}
+            className="cv-wrapper"
+            style={{
+              transform: `scale(${scale})`,
+              transformOrigin: 'top center',
+              margin: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '100vh',
+              boxSizing: 'content-box',
+              overflow: 'visible',
+              maxWidth: '100vw',
+            }}
+          >
             {cvData && sections && sections.length > 0 ? (
               <CVTemplateRenderer
                 cvData={cvData}
@@ -379,7 +433,11 @@ const Preview = () => {
             )}
           </div>
         </div>
+
+
       </div>
+
+
       <Footer />
       <Joyride
         steps={joyrideSteps}

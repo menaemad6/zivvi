@@ -4,7 +4,7 @@ import { CVData } from '@/types/cv';
 import { templateComponentRegistry } from "./templates";
 
 interface CVTemplateRendererProps {
-  cvData: CVData;
+  cvData: Partial<CVData>;
   templateId: string;
   sections: string[];
 }
@@ -112,13 +112,13 @@ export const CVTemplateRenderer: React.FC<CVTemplateRendererProps> = ({
 
   const renderPersonalInfo = () => (
     <div className={styles.header}>
-      <h1 className={styles.headerName}>{cvData.personalInfo.fullName || 'Your Name'}</h1>
+      <h1 className={styles.headerName}>{cvData.personalInfo?.fullName || 'Your Name'}</h1>
       <div className={styles.headerContact}>
-        {cvData.personalInfo.email && <div>📧 {cvData.personalInfo.email}</div>}
-        {cvData.personalInfo.phone && <div>📱 {cvData.personalInfo.phone}</div>}
-        {cvData.personalInfo.location && <div>📍 {cvData.personalInfo.location}</div>}
+        {cvData.personalInfo?.email && <div>📧 {cvData.personalInfo.email}</div>}
+        {cvData.personalInfo?.phone && <div>📱 {cvData.personalInfo.phone}</div>}
+        {cvData.personalInfo?.location && <div>📍 {cvData.personalInfo.location}</div>}
       </div>
-      {cvData.personalInfo.summary && (
+      {cvData.personalInfo?.summary && (
         <div className="mt-6 text-base opacity-90 leading-relaxed max-w-4xl">
           {cvData.personalInfo.summary}
         </div>
