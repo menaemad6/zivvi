@@ -66,18 +66,18 @@ const Builder = () => {
       content: 'Start by using the Smart Generator to help build your CV!',
       disableBeacon: true,
     },
-    {
-      target: '.btn-generate-sections',
-      content: 'Click here to generate recommended sections for your CV.',
-    },
-    {
-      target: '.btn-apply-sections',
-      content: 'Apply the generated sections to your CV.',
-    },
-    {
-      target: '.btn-preview',
-      content: 'Preview your CV here.',
-    },
+    // {
+    //   target: '.btn-generate-sections',
+    //   content: 'Click here to generate recommended sections for your CV.',
+    // },
+    // {
+    //   target: '.btn-apply-sections',
+    //   content: 'Apply the generated sections to your CV.',
+    // },
+    // {
+    //   target: '.btn-preview',
+    //   content: 'Preview your CV here.',
+    // },
   ];
 
   const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
