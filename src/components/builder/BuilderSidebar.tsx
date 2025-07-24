@@ -134,7 +134,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   key={index}
                   onClick={tool.action}
                   className={`
-                    w-full rounded-xl bg-gradient-to-r ${tool.gradient} 
+                    w-full rounded-xl bg-gradient-to-r ${tool.gradient || tool.color} 
                     hover:shadow-lg hover:scale-[1.02] transition-all duration-200 
                     text-white group text-left
                     ${collapsed ? 'p-1 sm:p-2' : 'p-2 sm:p-3'}
@@ -180,19 +180,19 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   icon: Shuffle, 
                   label: 'Templates', 
                   action: onTemplateNavigation,
-                  gradient: 'from-blue-500 to-cyan-500'
+                  color: 'from-blue-500 to-cyan-500'
                 },
                 { 
                   icon: Copy, 
                   label: 'Duplicate', 
                   action: () => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." }),
-                  gradient: 'from-green-500 to-emerald-500'
+                  color: 'from-green-500 to-emerald-500'
                 },
                 { 
                   icon: Camera, 
                   label: 'Photos', 
                   action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
-                  gradient: 'from-purple-500 to-pink-500'
+                  color: 'from-purple-500 to-pink-500'
                 },
                 
               ].map((tool, index) => (
@@ -200,7 +200,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   key={index}
                   onClick={tool.action}
                   className={`
-                    w-full rounded-xl bg-gradient-to-r ${tool.gradient} 
+                    w-full rounded-xl bg-gradient-to-r ${tool.color} 
                     hover:shadow-lg hover:scale-[1.02] transition-all duration-200 
                     text-white group text-left
                     ${collapsed ? 'p-1 sm:p-2' : 'p-2 sm:p-3'}

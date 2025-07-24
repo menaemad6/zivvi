@@ -1,6 +1,5 @@
 import React from "react";
 import { CVData } from "@/types/cv";
-import { A4TemplateWrapper } from "./A4TemplateWrapper";
 
 interface PreBuiltTemplatesProps {
   cvData: Partial<CVData>;
@@ -15,46 +14,19 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   ]).forEach(s => { sectionMap[s] = true; });
 
   const renderProfile = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '10mm' }}>
       <div style={{ textAlign: 'center' }}>
-        <h1 style={{ 
-          fontSize: '16pt', 
-          fontFamily: 'serif', 
-          fontWeight: 700, 
-          letterSpacing: '0.5px', 
-          marginBottom: '2mm',
-          color: '#000'
-        }}>
-          {cvData.personalInfo?.fullName || "Your Name"}
-        </h1>
-        <div style={{ 
-          fontSize: '9pt', 
-          color: '#555',
-          lineHeight: '1.2'
-        }}>
+        <h1 style={{ fontSize: '18pt', fontFamily: 'serif', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '2mm' }}>{cvData.personalInfo?.fullName || "Your Name"}</h1>
+        <div style={{ fontSize: '10pt', color: '#555' }}>
           {cvData.personalInfo?.location || "80 Gold Street, New York, NY 10038, United States"}, {cvData.personalInfo?.phone || "(917) 407-2179"}, {cvData.personalInfo?.email || "tim.stewart@gmail.com"}
         </div>
       </div>
       {cvData.personalInfo?.summary && 
       <div style={{ marginTop: '6mm' }}>
-        <div style={{ 
-          textTransform: 'uppercase', 
-          fontSize: '7pt', 
-          letterSpacing: '1.5px', 
-          color: '#555', 
-          fontWeight: 600, 
-          marginBottom: '1mm' 
-        }}>
-          Profile
-        </div>
+        <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Profile</div>
         <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
-        <p style={{ 
-          fontSize: '9pt', 
-          color: '#333', 
-          lineHeight: '1.4',
-          margin: 0
-        }}>
-          {cvData.personalInfo?.summary}
+        <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
+          {cvData.personalInfo?.summary || null }
         </p>
       </div>
       }
@@ -62,123 +34,52 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderEmployment = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ 
-        textTransform: 'uppercase', 
-        fontSize: '7pt', 
-        letterSpacing: '1.5px', 
-        color: '#555', 
-        fontWeight: 600, 
-        marginBottom: '1mm' 
-      }}>
-        Employment History
-      </div>
+    <section style={{ marginBottom: '10mm' }}>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Employment History</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '5mm', overflow: 'hidden' }}>
-            <div style={{ 
-              float: 'left', 
-              width: '35mm', 
-              fontSize: '9pt', 
-              color: '#555', 
-              marginBottom: '1mm' 
-            }}>
-              {exp.startDate || ""} — {exp.endDate || ""}
-            </div>
-            <div style={{ marginLeft: '40mm' }}>
-              <div style={{ 
-                fontWeight: 600, 
-                color: '#222', 
-                fontSize: '10pt',
-                marginBottom: '1mm'
-              }}>
-                {exp.title || "Job Title"}, {exp.company || "Company"}
-              </div>
-              <div style={{ 
-                fontSize: '9pt', 
-                color: '#333', 
-                lineHeight: '1.4'
-              }}>
-                {exp.description || "Job description"}
-              </div>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+            <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{exp.startDate || ""} — {exp.endDate || ""}</div>
+            <div style={{ marginLeft: '45mm' }}>
+              <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{exp.title || "Job Title"}, {exp.company || "Company"}</div>
+              <ul style={{ paddingLeft: '5mm', fontSize: '10pt', color: '#333', marginTop: '1mm' }}>
+                {exp.description && <li>{exp.description}</li>}
+              </ul>
             </div>
             <div style={{ clear: 'both' }}></div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic', fontSize: '9pt' }}>No employment history added yet</div>}
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No employment history added yet</div>}
       </div>
     </section>
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ 
-        textTransform: 'uppercase', 
-        fontSize: '7pt', 
-        letterSpacing: '1.5px', 
-        color: '#555', 
-        fontWeight: 600, 
-        marginBottom: '1mm' 
-      }}>
-        Education
-      </div>
+    <section style={{ marginBottom: '10mm' }}>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Education</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '5mm', overflow: 'hidden' }}>
-            <div style={{ 
-              float: 'left', 
-              width: '35mm', 
-              fontSize: '9pt', 
-              color: '#555', 
-              marginBottom: '1mm' 
-            }}>
-              {edu.startDate || ""} — {edu.endDate || ""}
-            </div>
-            <div style={{ marginLeft: '40mm' }}>
-              <div style={{ 
-                fontWeight: 600, 
-                color: '#222', 
-                fontSize: '10pt' 
-              }}>
-                {edu.degree || "Degree"}, {edu.school || "Institution"}
-              </div>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+            <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{edu.startDate || ""} — {edu.endDate || ""}</div>
+            <div style={{ marginLeft: '45mm' }}>
+              <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{edu.degree || "Degree"}, {edu.school || "Institution"}</div>
             </div>
             <div style={{ clear: 'both' }}></div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic', fontSize: '9pt' }}>No education added yet</div>}
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
     </section>
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ 
-        textTransform: 'uppercase', 
-        fontSize: '7pt', 
-        letterSpacing: '1.5px', 
-        color: '#555', 
-        fontWeight: 600, 
-        marginBottom: '1mm' 
-      }}>
-        Skills
-      </div>
+    <section style={{ marginBottom: '10mm' }}>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Skills</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
-      <div style={{ 
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '2mm',
-        fontSize: '9pt', 
-        color: '#333' 
-      }}>
+      <div style={{ columnCount: 3, fontSize: '10pt', color: '#333' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <div key={idx} style={{ 
-            backgroundColor: '#f0f0f0',
-            padding: '1mm 2mm',
-            borderRadius: '2px',
-            fontSize: '8pt'
-          }}>
-            {typeof skill === "string" ? skill : "Skill"}
+          <div key={idx} style={{ borderBottom: '1px solid #eee', padding: '1mm 0' }}>
+            <span>{typeof skill === "string" ? skill : "Skill"}</span>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No skills added yet</div>}
       </div>
@@ -186,24 +87,14 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderReferences = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ 
-        textTransform: 'uppercase', 
-        fontSize: '7pt', 
-        letterSpacing: '1.5px', 
-        color: '#555', 
-        fontWeight: 600, 
-        marginBottom: '1mm' 
-      }}>
-        References
-      </div>
+    <section style={{ marginBottom: '10mm' }}>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>References</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
-      <div style={{ fontSize: '9pt', color: '#333' }}>
+      <div style={{ fontSize: '10pt', color: '#333' }}>
         {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
           <div key={idx} style={{ marginBottom: '2mm' }}>
             <span style={{ fontWeight: 600 }}>{ref.name || "Reference Name"}</span><br />
-            <span style={{ color: '#555' }}>{ref.email || "email@example.com"}</span> 
-            {ref.phone && ` - ${ref.phone}`}
+            <span style={{ color: '#555' }}>{ref.email || "email@example.com"}</span> {ref.phone && `- ${ref.phone}`}
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
       </div>
@@ -211,66 +102,38 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ 
-        textTransform: 'uppercase', 
-        fontSize: '7pt', 
-        letterSpacing: '1.5px', 
-        color: '#555', 
-        fontWeight: 600, 
-        marginBottom: '1mm' 
-      }}>
-        Projects
-      </div>
+    <section style={{ marginBottom: '10mm' }}>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Projects</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
-          <div key={idx} style={{ marginBottom: '5mm', overflow: 'hidden' }}>
-            <div style={{ 
-              float: 'left', 
-              width: '35mm', 
-              fontSize: '9pt', 
-              color: '#555', 
-              marginBottom: '1mm' 
-            }}>
-              {proj.startDate || ""} — {proj.endDate || ""}
-            </div>
-            <div style={{ marginLeft: '40mm' }}>
-              <div style={{ 
-                fontWeight: 600, 
-                color: '#222', 
-                fontSize: '10pt',
-                marginBottom: '1mm'
-              }}>
-                {proj.name || "Project Name"}
-              </div>
-              <p style={{ 
-                fontSize: '9pt', 
-                color: '#333', 
-                lineHeight: '1.4',
-                margin: 0
-              }}>
-                {proj.description || ""}
-              </p>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+            <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{proj.startDate || ""} — {proj.endDate || ""}</div>
+            <div style={{ marginLeft: '45mm' }}>
+              <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{proj.name || "Project Name"}</div>
+              <p style={{ fontSize: '10pt', color: '#333', marginTop: '1mm' }}>{proj.description || ""}</p>
             </div>
             <div style={{ clear: 'both' }}></div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic', fontSize: '9pt' }}>No projects added yet</div>}
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No projects added yet</div>}
       </div>
     </section>
   );
 
-  const templateContent = (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      padding: '15mm',
+  return (
+    <div className="cv-page" style={{
+      width: '210mm',
+      minHeight: '297mm',
+      padding: '20mm',
       backgroundColor: '#fff',
       boxSizing: 'border-box',
       fontFamily: 'Inter, sans-serif',
       color: '#222',
-      fontSize: '9pt',
-      lineHeight: '1.4'
+      margin: '0 auto', // ensure horizontal centering
+      boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
+      position: 'relative',
+      overflow: 'visible',
+      display: 'block',
     }}>
       {(sectionMap["profile"] || sectionMap["personalInfo"]) && renderProfile()}
       {sectionMap["experience"] && renderEmployment()}
@@ -279,12 +142,6 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       {sectionMap["skills"] && renderSkills()}
       {sectionMap["references"] && renderReferences()}
     </div>
-  );
-
-  return (
-    <A4TemplateWrapper templateId="classicTemp">
-      {templateContent}
-    </A4TemplateWrapper>
   );
 };
 
@@ -945,6 +802,7 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
       return <ElegantTemplate cvData={cvData} sections={sections} />;
     case "timelineTemp":
       return <TimelineTemplate cvData={cvData} sections={sections} />;
+    // Add more cases for other templates here
     case "compactTemp":
       return <CompactTemplate cvData={cvData} sections={sections} />;
     case "headerTemp":
@@ -954,4 +812,4 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
   }
 };
 
-export default PreBuiltTemplates;
+export default PreBuiltTemplates; 
