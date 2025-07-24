@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import type { CVData } from '@/types/cv';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -19,19 +20,19 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 import TemplateWrapper from '@/components/cv/templates/TemplateWrapper';
-import GeneratePdfFromHtml from '@/utils/pdfGeneration/GeneratePdfFromHtml.jsx';
+import { usePDFGeneration } from '@/hooks/usePDFGeneration';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import ResizeObserver from 'resize-observer-polyfill';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
-
 const Preview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { trackCVView, trackCVDownload, trackCVShare } = useAnalytics();
+  const { isGenerating, generateAndDownloadPDF } = usePDFGeneration();
   const [cvData, setCVData] = useState<Partial<CVData> | null>(null);
   const [template, setTemplate] = useState<string>('');
   const [sections, setSections] = useState<string[]>([]);
@@ -42,15 +43,9 @@ const Preview = () => {
   const lastTrackedCVId = useRef<string | null>(null);
   const location = useLocation();
   const [joyrideRun, setJoyrideRun] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
-  const pdfGenRef = useRef<(() => Promise<void>) | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pdfViewerLoading, setPdfViewerLoading] = useState(false);
 
   const wrapperRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
-  // Remove dynamic pdfPageWidth, always use 794 for PDF rendering
   const PDF_A4_WIDTH = 794;
   const PDF_A4_HEIGHT = 1123;
   const [containerWidth, setContainerWidth] = useState<number>(() => window.innerWidth);
@@ -84,12 +79,9 @@ const Preview = () => {
 
   useEffect(() => {
     if (id && id !== 'new') {
-      // Always fetch from Supabase if id is present and not 'new'
       fetchCVData(id);
-      // Clear localStorage preview data to avoid confusion
       localStorage.removeItem('previewCVData');
     } else {
-      // Fallback to localStorage for new/unsaved CVs
       const storedData = localStorage.getItem('previewCVData');
       if (storedData) {
         try {
@@ -112,7 +104,6 @@ const Preview = () => {
   const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
     try {
-      // Fetch CV data from Supabase
       const { data: cvDataResponse, error } = await supabase
         .from('cvs')
         .select(`
@@ -130,21 +121,17 @@ const Preview = () => {
         return;
       }
 
-      // Check if current user is the owner
       const currentUserId = user?.id;
       const cvOwnerId = cvDataResponse.user_id;
       setIsOwner(currentUserId === cvOwnerId);
       
-      // Set author name and CV name
       setAuthorName(cvDataResponse.profiles?.full_name || 'Unknown Author');
       setCVName(cvDataResponse.name || '');
 
-      // Parse CV content with proper type checking
       const content = cvDataResponse.content;
       if (content && typeof content === 'object' && !Array.isArray(content)) {
         setCVData(content);
         setTemplate(cvDataResponse.template || 'modern');
-        // Safely extract sections from content
         const contentWithSections = content as { [key: string]: unknown };
         let contentSections: string[] = ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
         if (
@@ -158,7 +145,6 @@ const Preview = () => {
         console.error('Invalid CV content format');
       }
 
-      // Track CV view only once per page load for this CV
       if (cvId && lastTrackedCVId.current !== cvId) {
         trackCVView(cvId, {
           template: cvDataResponse.template,
@@ -190,7 +176,6 @@ const Preview = () => {
           const fileName = cvName ? `${cvName}.pdf` : 'cv.pdf';
           pdf.save(fileName);
           
-          // Track download
           if (id && id !== 'new') {
             trackCVDownload(id, 'pdf', { 
               fileName, 
@@ -199,6 +184,28 @@ const Preview = () => {
             });
           }
         });
+    }
+  };
+
+  const handlePDFDownload = async () => {
+    if (!cvData || !template || !sections.length) {
+      toast({
+        title: "No CV Data",
+        description: "No CV data available to download.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const fileName = cvName ? `${cvName}.pdf` : 'cv.pdf';
+    await generateAndDownloadPDF(cvData, template, sections, fileName);
+    
+    if (id && id !== 'new') {
+      trackCVDownload(id, 'pdf', { 
+        fileName, 
+        template,
+        isOwner 
+      });
     }
   };
 
@@ -222,17 +229,14 @@ const Preview = () => {
           url: shareUrl,
         });
         
-        // Track share via native sharing
         trackCVShare(id, 'native', { shareUrl, cvName });
       } catch (error) {
-        // Fallback to clipboard
         await navigator.clipboard.writeText(shareUrl);
         toast({
           title: "Link Copied",
           description: "CV link has been copied to clipboard."
         });
         
-        // Track share via clipboard
         trackCVShare(id, 'clipboard', { shareUrl, cvName });
       }
     } else {
@@ -242,7 +246,6 @@ const Preview = () => {
         description: "CV link has been copied to clipboard."
       });
       
-      // Track share via clipboard
       trackCVShare(id, 'clipboard', { shareUrl, cvName });
     }
   };
@@ -258,7 +261,6 @@ const Preview = () => {
   const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
     if (data.status === 'finished' || data.status === 'skipped') {
       setJoyrideRun(false);
-      // Remove the flag from the URL
       navigate(`/preview/${id}`, { replace: true });
     }
   };
@@ -396,12 +398,29 @@ const Preview = () => {
           </div>
         </div>
 
-        <div className='py-14 w-full flex justify-center items-center'><Button>Download PDF</Button></div>
+        {/* Download PDF Button */}
+        <div className='py-14 w-full flex justify-center items-center'>
+          <Button 
+            onClick={handlePDFDownload}
+            disabled={isGenerating}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 rounded-xl"
+          >
+            {isGenerating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </>
+            )}
+          </Button>
+        </div>
 
         {/* CV Preview Container */}
-        <div className="cv-preview-outer pt-16">
-
-
+        <div className="cv-preview-outer">
           <div className="cv-preview-scaler" id="cv-content">
             <TemplateWrapper cvData={cvData} sections={sections} template={template} />
           </div>
