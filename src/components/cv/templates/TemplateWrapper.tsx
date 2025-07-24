@@ -11,7 +11,7 @@ const TemplateWrapper = ({ cvData, sections, template }: { cvData: any, sections
         width: '794px',
         height: '1123px',
         backgroundColor: '#ffffff',
-        overflow: 'hidden',
+        overflow: 'scroll',
         fontSize: '14px',
         lineHeight: '1.4',
         fontFamily: 'system-ui, -apple-system, sans-serif',
