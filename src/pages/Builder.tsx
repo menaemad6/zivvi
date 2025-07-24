@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
 import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star } from 'lucide-react';
-import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
+import BuilderSidebar from '@/components/builder/BuilderSidebar';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
