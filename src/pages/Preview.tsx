@@ -396,8 +396,12 @@ const Preview = () => {
           </div>
         </div>
 
+        <div className='py-14 w-full flex justify-center items-center'><Button>Download PDF</Button></div>
+
         {/* CV Preview Container */}
         <div className="cv-preview-outer pt-16">
+
+
           <div className="cv-preview-scaler" id="cv-content">
             <TemplateWrapper cvData={cvData} sections={sections} template={template} />
           </div>
