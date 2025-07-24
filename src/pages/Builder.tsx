@@ -66,6 +66,18 @@ const Builder = () => {
       content: 'Start by using the Smart Generator to help build your CV!',
       disableBeacon: true,
     },
+    // {
+    //   target: '.btn-generate-sections',
+    //   content: 'Click here to generate recommended sections for your CV.',
+    // },
+    // {
+    //   target: '.btn-apply-sections',
+    //   content: 'Apply the generated sections to your CV.',
+    // },
+    // {
+    //   target: '.btn-preview',
+    //   content: 'Preview your CV here.',
+    // },
   ];
 
   const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
@@ -1044,20 +1056,13 @@ const Builder = () => {
             {/* Left Sidebar */}
             <div className="transition-all duration-300 ease-in-out">
               <BuilderSidebar
-                cvData={cvData}
-                onSectionToggle={() => {}}
-                onTemplateChange={() => {}}
-                template={currentTemplate}
-                sections={[]}
-                onSave={handleSave}
-                isSaving={isSaving}
-                onAIGenerate={handleAIAssist}
                 collapsed={sidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                 onAIAssist={handleAIAssist}
                 onAIOptimizer={handleAIOptimizer}
                 onAIEnhancer={handleAIEnhancer}
                 onTemplateNavigation={() => navigate('/templates')}
+                onSave={handleSave}
               />
             </div>
 
