@@ -25,7 +25,7 @@ export const MultiPageCVRenderer: React.FC<MultiPageCVRendererProps> = ({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Create a temporary container to measure content
+    // Create a temporary container to measure content height
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
@@ -34,68 +34,95 @@ export const MultiPageCVRenderer: React.FC<MultiPageCVRendererProps> = ({
     tempContainer.style.visibility = 'hidden';
     document.body.appendChild(tempContainer);
 
-    // Render the CV content in the temporary container
+    // Create the CV content to measure
     const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = `
+      <div style="width: 794px; font-size: 14px; line-height: 1.4; font-family: system-ui, -apple-system, sans-serif;">
+        <div id="cv-content"></div>
+      </div>
+    `;
     tempContainer.appendChild(tempDiv);
 
-    // Use React to render the content
-    import('react-dom').then(({ createRoot }) => {
-      const root = createRoot(tempDiv);
-      root.render(
-        <CVTemplateRenderer
-          cvData={cvData}
-          templateId={templateId}
-          sections={sections}
-        />
-      );
+    // Simulate content height calculation
+    setTimeout(() => {
+      // Calculate estimated content height based on sections
+      let estimatedHeight = 0;
+      
+      // Header section (personalInfo)
+      if (sections.includes('personalInfo')) {
+        estimatedHeight += 200; // Estimated header height
+      }
+      
+      // Experience section
+      if (sections.includes('experience') && cvData.experience) {
+        estimatedHeight += cvData.experience.length * 120; // ~120px per experience item
+      }
+      
+      // Education section
+      if (sections.includes('education') && cvData.education) {
+        estimatedHeight += cvData.education.length * 100; // ~100px per education item
+      }
+      
+      // Skills section
+      if (sections.includes('skills') && cvData.skills) {
+        estimatedHeight += 150; // Skills section height
+      }
+      
+      // Projects section
+      if (sections.includes('projects') && cvData.projects) {
+        estimatedHeight += cvData.projects.length * 140; // ~140px per project
+      }
+      
+      // References section
+      if (sections.includes('references') && cvData.references) {
+        estimatedHeight += cvData.references.length * 100; // ~100px per reference
+      }
 
-      // Wait for rendering to complete
-      setTimeout(() => {
-        const contentHeight = tempDiv.scrollHeight;
-        const numberOfPages = Math.ceil(contentHeight / A4_HEIGHT);
-        
-        setTotalPages(numberOfPages);
-        onPagesChange?.(numberOfPages);
+      // Add some padding
+      estimatedHeight += 100;
 
-        // Generate pages
-        const pageElements = [];
-        for (let i = 0; i < numberOfPages; i++) {
-          pageElements.push(
+      const numberOfPages = Math.max(1, Math.ceil(estimatedHeight / A4_HEIGHT));
+      
+      setTotalPages(numberOfPages);
+      onPagesChange?.(numberOfPages);
+
+      // Generate page elements
+      const pageElements = [];
+      for (let i = 0; i < numberOfPages; i++) {
+        pageElements.push(
+          <div
+            key={i}
+            className="cv-page"
+            style={{
+              width: '794px',
+              height: '1123px',
+              backgroundColor: '#ffffff',
+              overflow: 'hidden',
+              position: 'relative',
+              marginBottom: i < numberOfPages - 1 ? '20px' : '0',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+            }}
+          >
             <div
-              key={i}
-              className="cv-page"
               style={{
-                width: '794px',
-                height: '1123px',
-                backgroundColor: '#ffffff',
-                overflow: 'hidden',
-                position: 'relative',
-                marginBottom: i < numberOfPages - 1 ? '20px' : '0',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                transform: `translateY(-${i * A4_HEIGHT}px)`,
+                width: '100%',
+                height: `${numberOfPages * A4_HEIGHT}px`
               }}
             >
-              <div
-                style={{
-                  transform: `translateY(-${i * A4_HEIGHT}px)`,
-                  width: '100%',
-                  height: `${numberOfPages * A4_HEIGHT}px`
-                }}
-              >
-                <CVTemplateRenderer
-                  cvData={cvData}
-                  templateId={templateId}
-                  sections={sections}
-                />
-              </div>
+              <CVTemplateRenderer
+                cvData={cvData}
+                templateId={templateId}
+                sections={sections}
+              />
             </div>
-          );
-        }
+          </div>
+        );
+      }
 
-        setPages(pageElements);
-        root.unmount();
-        document.body.removeChild(tempContainer);
-      }, 100);
-    });
+      setPages(pageElements);
+      document.body.removeChild(tempContainer);
+    }, 100);
   }, [cvData, templateId, sections, onPagesChange]);
 
   return (
