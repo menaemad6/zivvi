@@ -453,16 +453,15 @@ const Preview = () => {
           {!pdfLoading && pdfUrl && (
             <div
               ref={pdfContainerRef}
+              className="pdf-preview-container"
               style={{
                 width: '100%',
-                maxWidth: PDF_A4_WIDTH,
+                maxWidth: '800px',
                 margin: '0 auto',
                 background: '#fff',
                 borderRadius: 8,
-                boxShadow: '0 0 24px #0002',
-                minHeight: isMobile ? 400 : undefined,
-                maxHeight: isMobile ? '90vh' : undefined,
-                overflow: 'auto',
+                boxShadow: '0 0 24px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -470,12 +469,13 @@ const Preview = () => {
               }}
             >
               <div
+                className="pdf-scaled-container"
                 style={{
-                  width: PDF_A4_WIDTH,
-                  height: PDF_A4_HEIGHT,
-                  transform: `scale(${Math.min(containerWidth / PDF_A4_WIDTH, 1)})`,
+                  width: '100%',
+                  maxWidth: '794px',
+                  transform: `scale(${Math.min(containerWidth / 794, 1)})`,
                   transformOrigin: 'top center',
-                  transition: 'transform 0.2s',
+                  transition: 'transform 0.2s ease-out',
                 }}
               >
                 <Document
@@ -491,7 +491,7 @@ const Preview = () => {
                 >
                   <Page
                     pageNumber={1}
-                    width={PDF_A4_WIDTH}
+                    width={794}
                     loading={
                       <div className="flex flex-col items-center justify-center h-96">
                         <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
@@ -503,12 +503,12 @@ const Preview = () => {
               </div>
             </div>
           )}
-          {/* Hidden PDF generator */}
+          {/* Hidden PDF generator with fixed dimensions */}
           <GeneratePdfFromHtml
             ref={pdfGenRef}
             htmlContent={memoizedTemplateContent}
             pdfFileName="preview.pdf"
-            options={{ resolution: isMobile ? 1.5 : 2, randomCrop: false }}
+            options={{ resolution: 2, randomCrop: false }}
             onPdfReady={handlePdfReady}
           />
         </div>
