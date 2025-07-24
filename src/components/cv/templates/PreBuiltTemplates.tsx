@@ -327,10 +327,8 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
               <div className="font-bold text-gray-900 text-lg">{proj.name || "Project Name"}</div>
               <div className="text-sm text-gray-600">{proj.startDate || ""} - {proj.endDate || ""}</div>
             </div>
-            {proj.technologies && (
-              <div className="text-blue-700 font-semibold">{proj.technologies}</div>
-            )}
-            <p className="text-gray-800 text-sm mt-1">{proj.description || ""}</p>
+            {proj.technologies && <div className="font-semibold text-yellow-700 text-sm mb-1">{proj.technologies}</div>}
+            <div className="text-gray-800 text-sm mt-1">{proj.description || ""}</div>
           </div>
         )) : <div className="text-gray-500 italic">No projects added yet</div>}
       </div>
@@ -373,32 +371,37 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
     "header", "summary", "experience", "projects", "education", "achievements", "skills"
   ]).forEach(s => { sectionMap[s] = true; });
 
-  // Helper for contact icons
-  const ContactIcon = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
-    <span className="flex items-center gap-1 text-gray-700 text-sm">
-      {icon} {text}
-    </span>
-  );
-
   // Header
   const renderHeader = () => (
-    <div className="mb-6">
-      <h1 className="text-4xl font-bold tracking-wide text-gray-900 leading-tight">{cvData.personalInfo?.fullName || "STEVE GREEN"}</h1>
-      <div className="text-xl font-semibold text-yellow-600 mt-1 mb-2">{"Data Scientist | Machine Learning | AI Innovation"}</div>
-      <div className="flex flex-wrap gap-4 items-center text-gray-700 text-sm mb-2">
-        <ContactIcon icon={<span>📞</span>} text={cvData.personalInfo?.phone || "+44 20 7123 4567"} />
-        <ContactIcon icon={<span>✉️</span>} text={cvData.personalInfo?.email || "help@enhancv.com"} />
-        <ContactIcon icon={<span>🔗</span>} text={"linkedin.com/in/"} />
-        <ContactIcon icon={<span>📍</span>} text={cvData.personalInfo?.location || "Reading, UK"} />
+    <div style={{ marginBottom: '6mm' }}>
+      <h1 style={{ fontSize: '16pt', fontWeight: 700, letterSpacing: '0.5px', color: '#333', lineHeight: 1.2, marginBottom: '2mm' }}>
+        {cvData.personalInfo?.fullName || "STEVE GREEN"}
+      </h1>
+      <div style={{ fontSize: '12pt', fontWeight: 600, color: '#d97706', marginTop: '1mm', marginBottom: '2mm' }}>
+        {"Data Scientist | Machine Learning | AI Innovation"}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm', alignItems: 'center', fontSize: '9pt', color: '#555' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+          <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+          <span>✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+          <span>🔗</span> {"linkedin.com/in/"}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+          <span>📍</span> {cvData.personalInfo?.location || "Reading, UK"}
+        </span>
       </div>
     </div>
   );
 
   // Summary
   const renderSummary = () => (
-    <section className="mb-8">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-1">Summary</div>
-      <p className="text-gray-800 text-base leading-relaxed">
+    <section style={{ marginBottom: '8mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '1mm' }}>Summary</div>
+      <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
         {cvData.personalInfo?.summary || "Dedicated Data Scientist with a proven track record in predictive analytics, machine learning, and AI innovation. Skilled in developing advanced models to drive strategic decision-making and enhance operational efficiency. Experienced in optimizing algorithms for improved performance and leading collaborative teams to achieve remarkable results. Strong background in data governance and visualization. Enthusiastic about utilizing data-driven insights to contribute to impactful projects that align with business objectives and societal well-being."}
       </p>
     </section>
@@ -406,99 +409,137 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
 
   // Experience
   const renderExperience = () => (
-    <section className="mb-8">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-2">Experience</div>
-      <div className="space-y-6">
+    <section style={{ marginBottom: '8mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Experience</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={exp.id || idx} className="flex flex-col sm:flex-row sm:items-start sm:gap-6">
-            <div className="sm:w-1/4 text-sm text-gray-700 font-medium mb-1 sm:mb-0 whitespace-nowrap">{exp.startDate || "MM/YYYY"} - {exp.endDate || "MM/YYYY"}</div>
-            <div className="sm:w-3/4">
-              <div className="font-bold text-gray-900 text-base mb-0.5">{exp.title || "Data Scientist"}</div>
-              <div className="font-semibold text-yellow-700 text-sm mb-1">{exp.company || "Company"}</div>
-              <ul className="list-disc pl-5 text-gray-800 text-sm space-y-0.5">
+          <div key={exp.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm' }}>
+            <div style={{ width: '40mm', fontSize: '9pt', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+              {exp.startDate || "MM/YYYY"} - {exp.endDate || "MM/YYYY"}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '0.5mm' }}>
+                {exp.title || "Data Scientist"}
+              </div>
+              <div style={{ fontWeight: 600, color: '#d97706', fontSize: '9pt', marginBottom: '1mm' }}>
+                {exp.company || "Company"}
+              </div>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '5mm', fontSize: '9pt', color: '#333', lineHeight: 1.4 }}>
                 {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : <li>Job description</li>}
               </ul>
             </div>
           </div>
-        )) : <div className="text-gray-500 italic">No experience added yet</div>}
+        )) : <div style={{ color: '#777', fontStyle: 'italic', fontSize: '9pt' }}>No experience added yet</div>}
       </div>
     </section>
   );
 
-  // Projects (like Education, before Education)
+  // Projects
   const renderProjects = () => (
-    <section className="mb-8">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-2">Projects</div>
-      <div className="space-y-6">
+    <section style={{ marginBottom: '8mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Projects</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
-          <div key={proj.id || idx} className="flex flex-col sm:flex-row sm:items-start sm:gap-6">
-            <div className="sm:w-1/4 text-sm text-gray-700 font-medium mb-1 sm:mb-0 whitespace-nowrap">{proj.startDate || "MM/YYYY"} - {proj.endDate || "MM/YYYY"}</div>
-            <div className="sm:w-3/4">
-              <div className="font-bold text-gray-900 text-base mb-0.5">{proj.name || "Project Name"}</div>
-              {proj.technologies && <div className="font-semibold text-yellow-700 text-sm mb-1">{proj.technologies}</div>}
-              <div className="text-gray-800 text-sm mt-1">{proj.description || ""}</div>
+          <div key={proj.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm' }}>
+            <div style={{ width: '40mm', fontSize: '9pt', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+              {proj.startDate || "MM/YYYY"} - {proj.endDate || "MM/YYYY"}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '0.5mm' }}>
+                {proj.name || "Project Name"}
+              </div>
+              {proj.technologies && (
+                <div style={{ fontWeight: 600, color: '#d97706', fontSize: '9pt', marginBottom: '1mm' }}>
+                  {proj.technologies}
+                </div>
+              )}
+              <div style={{ fontSize: '9pt', color: '#333', marginTop: '1mm', lineHeight: 1.4 }}>
+                {proj.description || ""}
+              </div>
             </div>
           </div>
-        )) : <div className="text-gray-500 italic">No projects added yet</div>}
+        )) : <div style={{ color: '#777', fontStyle: 'italic', fontSize: '9pt' }}>No projects added yet</div>}
       </div>
     </section>
   );
 
   // Education
   const renderEducation = () => (
-    <section className="mb-8">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-2">Education</div>
-      <div className="space-y-6">
+    <section style={{ marginBottom: '8mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Education</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={edu.id || idx} className="flex flex-col sm:flex-row sm:items-start sm:gap-6">
-            <div className="sm:w-1/4 text-sm text-gray-700 font-medium mb-1 sm:mb-0 whitespace-nowrap">{edu.startDate || "MM/YYYY"} - {edu.endDate || "MM/YYYY"}</div>
-            <div className="sm:w-3/4">
-              <div className="font-bold text-gray-900 text-base mb-0.5">{edu.degree || "Degree"}</div>
-              <div className="font-semibold text-yellow-700 text-sm mb-1">{edu.school || "Institution"}</div>
+          <div key={edu.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm' }}>
+            <div style={{ width: '40mm', fontSize: '9pt', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+              {edu.startDate || "MM/YYYY"} - {edu.endDate || "MM/YYYY"}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '0.5mm' }}>
+                {edu.degree || "Degree"}
+              </div>
+              <div style={{ fontWeight: 600, color: '#d97706', fontSize: '9pt', marginBottom: '1mm' }}>
+                {edu.school || "Institution"}
+              </div>
             </div>
           </div>
-        )) : <div className="text-gray-500 italic">No education added yet</div>}
+        )) : <div style={{ color: '#777', fontStyle: 'italic', fontSize: '9pt' }}>No education added yet</div>}
       </div>
     </section>
   );
 
   // Achievements
   const renderAchievements = () => (
-    <section className="mb-8">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-2">Achievements</div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex items-start gap-2">
-          <span className="text-yellow-500 text-xl mt-0.5">✔️</span>
+    <section style={{ marginBottom: '8mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Achievements</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm' }}>
+          <span style={{ color: '#eab308', fontSize: '12pt', marginTop: '0.5mm' }}>✔️</span>
           <div>
-            <div className="font-bold text-gray-900 text-sm">Team Leadership</div>
-            <div className="text-gray-700 text-sm">Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
+            <div style={{ fontWeight: 700, color: '#333', fontSize: '9pt' }}>Team Leadership</div>
+            <div style={{ color: '#555', fontSize: '9pt', lineHeight: 1.4 }}>Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
           </div>
         </div>
-        <div className="flex items-start gap-2">
-          <span className="text-yellow-500 text-xl mt-0.5">🏳️</span>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm' }}>
+          <span style={{ color: '#eab308', fontSize: '12pt', marginTop: '0.5mm' }}>🏳️</span>
           <div>
-            <div className="font-bold text-gray-900 text-sm">Machine Downtime Reduction</div>
-            <div className="text-gray-700 text-sm">Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
+            <div style={{ fontWeight: 700, color: '#333', fontSize: '9pt' }}>Machine Downtime Reduction</div>
+            <div style={{ color: '#555', fontSize: '9pt', lineHeight: 1.4 }}>Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
           </div>
         </div>
       </div>
     </section>
   );
 
-  // Skills (yellow background, bold)
+  // Skills
   const renderSkills = () => (
-    <section className="mb-2">
-      <div className="uppercase text-lg font-bold text-gray-900 mb-2">Skills</div>
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
+    <section style={{ marginBottom: '2mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Skills</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm 4mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <span key={idx} className="bg-yellow-100 text-yellow-800 font-bold px-3 py-1 rounded text-base">{skill}</span>
-        )) : <span className="text-gray-400 italic">No skills added yet</span>}
+          <span key={idx} style={{ backgroundColor: '#fef3c7', color: '#92400e', fontWeight: 700, padding: '1mm 3mm', borderRadius: '1mm', fontSize: '10pt' }}>
+            {skill}
+          </span>
+        )) : <span style={{ color: '#777', fontStyle: 'italic', fontSize: '9pt' }}>No skills added yet</span>}
       </div>
     </section>
   );
 
   return (
-    <div id="cv-content" className="mx-auto bg-white w-[794px] min-h-[1123px] p-6 font-sans text-gray-900 text-base" style={{ boxShadow: "none", border: "none" }}>
+    <div id="cv-content" style={{
+      width: '210mm',
+      minHeight: '297mm',
+      margin: '0 auto',
+      backgroundColor: '#fff',
+      padding: '16mm',
+      fontFamily: 'Inter, sans-serif',
+      color: '#333',
+      boxSizing: 'border-box',
+      boxShadow: 'none',
+      border: 'none',
+      position: 'relative',
+      overflow: 'visible',
+      display: 'block'
+    }}>
       {renderHeader()}
       {cvData.personalInfo?.summary && renderSummary()}
       {sectionMap["experience"] && renderExperience()}
@@ -830,4 +871,4 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
   }
 };
 
-export default PreBuiltTemplates; 
+export default PreBuiltTemplates;

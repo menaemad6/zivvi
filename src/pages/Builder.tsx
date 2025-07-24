@@ -31,6 +31,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
+import TemplateWrapper from '@/components/cv/templates/TemplateWrapper';
 
 const Builder = () => {
   const { id } = useParams();
@@ -1068,9 +1069,9 @@ const Builder = () => {
 
             {/* Main Content Area */}
             <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
                 {/* CV Builder Area */}
-                <div className="xl:col-span-1">
+                <div className="xl:col-span-2">
                   {/* Add Sections Section - Moved from sidebar */}
                   <Card className="add-section bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
                     <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 py-3 sm:py-4">
@@ -1196,7 +1197,7 @@ const Builder = () => {
                 </div>
 
                 {/* Preview */}
-                <div className="xl:col-span-1">
+                <div className="xl:col-span-3">
                   <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden">
                     <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 py-3 sm:py-4">
                       <div className="flex items-center justify-between">
@@ -1214,30 +1215,11 @@ const Builder = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="p-3 sm:p-6">
-                      <div className="bg-white rounded-2xl shadow-2xl min-h-[250px] sm:min-h-[400px] overflow-hidden border-2 border-gray-100">
-                        <div id="cv-preview-outer">
-                          <div className="cv-preview-scaler">
-
-                          {cvData && cvSections.length > 0 ? (
-                            <CVTemplateRenderer
-                              cvData={cvData}
-                              templateId={currentTemplate}
-                              sections={cvSections}
-                            />
-                            
-                          ) : (
-                            <div className="text-center text-gray-400 py-8 sm:py-24">
-                              <div className="w-12 h-12 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center mx-auto mb-4 sm:mb-8">
-                                <FileText className="h-6 w-6 sm:h-12 sm:w-12 text-gray-500" />
-                              </div>
-                              <p className="text-lg sm:text-2xl font-semibold mb-2 sm:mb-4 text-gray-600">Your CV Preview</p>
-                              <p className="text-gray-500 text-sm sm:text-lg">Add sections to see your CV come to life</p>
-                            </div>
-                          )}
+                        <div className="cv-preview-outer">
+                          <div className="cv-preview-scaler" id="cv-content" >
+                            <TemplateWrapper cvData={cvData} sections={cvSections} template={currentTemplate} />
                           </div>
-
                         </div>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
