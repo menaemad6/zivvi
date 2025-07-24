@@ -135,15 +135,33 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       overflow: 'visible',
       display: 'block',
     }}>
+
+
       {(sectionMap["profile"] || sectionMap["personalInfo"]) && renderProfile()}
       {sectionMap["experience"] && renderEmployment()}
       {sectionMap["projects"] && renderProjects()}
       {sectionMap["education"] && renderEducation()}
       {sectionMap["skills"] && renderSkills()}
       {sectionMap["references"] && renderReferences()}
+
+      
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   // Section mapping for compatibility

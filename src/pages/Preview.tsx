@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import type { CVData } from '@/types/cv';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,25 +19,14 @@ import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
+import TemplateWrapper from '@/components/cv/templates/TemplateWrapper';
+import GeneratePdfFromHtml from '@/utils/pdfGeneration/GeneratePdfFromHtml.jsx';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import ResizeObserver from 'resize-observer-polyfill';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
-const getResponsiveScale = () => {
-  // A4 width in mm: 210mm, in px: 210mm * 3.78 = ~794px (at 96dpi)
-  // But our template is 210mm wide, so we want to fit it in the viewport
-  const A4_WIDTH_MM = 210;
-  const MM_TO_PX = 3.78; // 1mm ≈ 3.78px at 96dpi
-  const A4_WIDTH_PX = A4_WIDTH_MM * MM_TO_PX;
-  const margin = 32; // px, some margin for shadow/air
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  // Fit to width, but never scale above 1
-  let scale = Math.min(1, (viewportWidth - margin) / A4_WIDTH_PX);
-  // On very short screens, fit to height
-  const A4_HEIGHT_PX = 297 * MM_TO_PX;
-  scale = Math.min(scale, (viewportHeight - margin) / A4_HEIGHT_PX);
-  // Minimum scale for mobile
-  scale = Math.max(scale, 0.45);
-  return scale;
-};
 
 const Preview = () => {
   const { id } = useParams();
@@ -54,8 +43,38 @@ const Preview = () => {
   const lastTrackedCVId = useRef<string | null>(null);
   const location = useLocation();
   const [joyrideRun, setJoyrideRun] = useState(false);
-  const [scale, setScale] = useState(getResponsiveScale());
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const pdfGenRef = useRef<(() => Promise<void>) | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pdfViewerLoading, setPdfViewerLoading] = useState(false);
+
   const wrapperRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+  // Remove dynamic pdfPageWidth, always use 794 for PDF rendering
+  const PDF_A4_WIDTH = 794;
+  const PDF_A4_HEIGHT = 1123;
+  const [containerWidth, setContainerWidth] = useState<number>(() => window.innerWidth);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    function updateContainerWidth() {
+      if (pdfContainerRef.current) {
+        setContainerWidth(pdfContainerRef.current.offsetWidth);
+      }
+    }
+    updateContainerWidth();
+    let ro: ResizeObserver | null = null;
+    if (pdfContainerRef.current) {
+      ro = new ResizeObserver(() => updateContainerWidth());
+      ro.observe(pdfContainerRef.current);
+    }
+    window.addEventListener('resize', updateContainerWidth);
+    return () => {
+      window.removeEventListener('resize', updateContainerWidth);
+      if (ro && pdfContainerRef.current) ro.unobserve(pdfContainerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -92,12 +111,46 @@ const Preview = () => {
   }, [id, user]);
 
   useEffect(() => {
-    const handleResize = () => {
-      setScale(getResponsiveScale());
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const checkMobile = () => setIsMobile(window.innerWidth < 600);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Memoize the TemplateWrapper content for PDF generation
+  const memoizedTemplateContent = useMemo(() => (
+    <TemplateWrapper cvData={cvData} sections={sections} template={template} />
+  ), [cvData, sections, template]);
+
+  // Generate PDF and set URL for iframe
+  useEffect(() => {
+    if (cvData && sections && template) {
+      setPdfLoading(true);
+      setPdfUrl(null);
+      setTimeout(() => {
+        if (pdfGenRef.current) {
+          pdfGenRef.current(); // This will trigger onPdfReady
+        }
+      }, 300);
+    }
+    // Cleanup old URL
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+    // eslint-disable-next-line
+  }, [cvData, sections, template]);
+
+  const handlePdfReady = (blob: Blob) => {
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+    setPdfLoading(false);
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setPdfViewerLoading(false);
+  };
 
   const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
@@ -390,48 +443,74 @@ const Preview = () => {
 
 
         {/* Enhanced CV Preview */}
-        <div style={{ width: '100vw', height: '100vh', maxWidth: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'auto', overflowX: 'hidden', background: 'none', margin: 0, padding: 0 }}>
-          <div
-            ref={wrapperRef}
-            className="cv-wrapper"
-            style={{
-              transform: `scale(${scale})`,
-              transformOrigin: 'top center',
-              margin: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '100vh',
-              boxSizing: 'content-box',
-              overflow: 'visible',
-              maxWidth: '100vw',
-            }}
-          >
-            {cvData && sections && sections.length > 0 ? (
-              <CVTemplateRenderer
-                cvData={cvData}
-                templateId={template || 'modern'}
-                sections={sections}
-              />
-            ) : (
-              <div className="text-center py-24 px-8">
-                <div className="relative mb-8">
-                  <div className="floating">
-                    <FileText className="h-32 w-32 mx-auto text-gray-300" />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full animate-pulse"></div>
-                  </div>
-                </div>
-                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
-                  No CV Data Available
-                </h3>
-                <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
-                  This CV doesn't contain any content or the content couldn't be loaded properly.
-                </p>
+        <div className='w-full h-full flex justify-center items-center bg-none m-0 p-0 py-16'>
+          {pdfLoading && (
+            <div className="flex flex-col items-center justify-center h-96">
+              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+              <p className="text-lg text-gray-600">Generating PDF preview...</p>
+            </div>
+          )}
+          {!pdfLoading && pdfUrl && (
+            <div
+              ref={pdfContainerRef}
+              style={{
+                width: '100%',
+                maxWidth: PDF_A4_WIDTH,
+                margin: '0 auto',
+                background: '#fff',
+                borderRadius: 8,
+                boxShadow: '0 0 24px #0002',
+                minHeight: isMobile ? 400 : undefined,
+                maxHeight: isMobile ? '90vh' : undefined,
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <div
+                style={{
+                  width: PDF_A4_WIDTH,
+                  height: PDF_A4_HEIGHT,
+                  transform: `scale(${Math.min(containerWidth / PDF_A4_WIDTH, 1)})`,
+                  transformOrigin: 'top center',
+                  transition: 'transform 0.2s',
+                }}
+              >
+                <Document
+                  file={pdfUrl}
+                  loading={
+                    <div className="flex flex-col items-center justify-center h-96">
+                      <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                      <p className="text-lg text-gray-600">Loading PDF preview...</p>
+                    </div>
+                  }
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  onLoadError={() => setPdfViewerLoading(false)}
+                >
+                  <Page
+                    pageNumber={1}
+                    width={PDF_A4_WIDTH}
+                    loading={
+                      <div className="flex flex-col items-center justify-center h-96">
+                        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                        <p className="text-lg text-gray-600">Rendering page...</p>
+                      </div>
+                    }
+                  />
+                </Document>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+          {/* Hidden PDF generator */}
+          <GeneratePdfFromHtml
+            ref={pdfGenRef}
+            htmlContent={memoizedTemplateContent}
+            pdfFileName="preview.pdf"
+            options={{ resolution: isMobile ? 1.5 : 2, randomCrop: false }}
+            onPdfReady={handlePdfReady}
+          />
         </div>
 
 
