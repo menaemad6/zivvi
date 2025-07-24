@@ -39,11 +39,11 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' ,  paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{exp.startDate || ""} — {exp.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{exp.title || "Job Title"}, {exp.company || "Company"}</div>
-              <ul style={{ paddingLeft: '5mm', fontSize: '10pt', color: '#333', marginTop: '1mm' }}>
+              <ul style={{ paddingLeft: '5mm', fontSize: '10pt', color: '#333', marginTop: '1mm'   }}>
                 {exp.description && <li>{exp.description}</li>}
               </ul>
             </div>
@@ -60,7 +60,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden', paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{edu.startDate || ""} — {edu.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{edu.degree || "Degree"}, {edu.school || "Institution"}</div>
@@ -78,7 +78,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div style={{ columnCount: 3, fontSize: '10pt', color: '#333' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <div key={idx} style={{ borderBottom: '1px solid #eee', padding: '1mm 0' }}>
+          <div key={idx} style={{ borderBottom: '1px solid #eee', padding: '1mm 0' , paddingBottom: '1mm' }}>
             <span>{typeof skill === "string" ? skill : "Skill"}</span>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No skills added yet</div>}
@@ -92,7 +92,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div style={{ fontSize: '10pt', color: '#333' }}>
         {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
-          <div key={idx} style={{ marginBottom: '2mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' , paddingBottom: '1mm' }}>
             <span style={{ fontWeight: 600 }}>{ref.name || "Reference Name"}</span><br />
             <span style={{ color: '#555' }}>{ref.email || "email@example.com"}</span> {ref.phone && `- ${ref.phone}`}
           </div>
@@ -107,7 +107,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' }}>
+          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' , paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{proj.startDate || ""} — {proj.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{proj.name || "Project Name"}</div>
