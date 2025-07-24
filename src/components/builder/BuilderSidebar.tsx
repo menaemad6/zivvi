@@ -33,9 +33,30 @@ interface BuilderSidebarProps {
   onSave: () => void;
   isSaving: boolean;
   onAIGenerate: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+  onAIAssist?: () => void;
+  onAIOptimizer?: () => void;
+  onAIEnhancer?: () => void;
+  onTemplateNavigation?: () => void;
 }
 
-const BuilderSidebar = ({ cvData, onSectionToggle, onTemplateChange, template, sections, onSave, isSaving, onAIGenerate }: BuilderSidebarProps) => {
+const BuilderSidebar = ({ 
+  cvData, 
+  onSectionToggle, 
+  onTemplateChange, 
+  template, 
+  sections, 
+  onSave, 
+  isSaving, 
+  onAIGenerate,
+  collapsed = false,
+  onToggleCollapse,
+  onAIAssist,
+  onAIOptimizer,
+  onAIEnhancer,
+  onTemplateNavigation
+}: BuilderSidebarProps) => {
   const navigate = useNavigate();
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
@@ -43,14 +64,14 @@ const BuilderSidebar = ({ cvData, onSectionToggle, onTemplateChange, template, s
     {
       icon: FileText,
       label: 'Add Template',
-      action: () => setShowTemplateSelector(true),
+      action: () => onTemplateNavigation ? onTemplateNavigation() : setShowTemplateSelector(true),
       gradient: 'from-blue-500 to-purple-500',
       className: 'hover:from-blue-600 hover:to-purple-600'
     },
     {
       icon: Sparkles,
       label: 'AI Generate',
-      action: onAIGenerate,
+      action: onAIAssist || onAIGenerate,
       gradient: 'from-purple-500 to-pink-500',
       className: 'hover:from-purple-600 hover:to-pink-600'
     },
@@ -146,10 +167,51 @@ const BuilderSidebar = ({ cvData, onSectionToggle, onTemplateChange, template, s
     </Sheet>
   );
 
+  if (collapsed) {
+    return (
+      <div className="h-full w-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-r border-gray-200/50 shadow-xl flex flex-col items-center py-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleCollapse}
+          className="mb-4 p-2 hover:bg-white/50"
+        >
+          <FileText className="h-4 w-4" />
+        </Button>
+        <div className="space-y-2">
+          {quickActions.map((action, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              onClick={action.action}
+              className="p-2 hover:bg-white/50"
+              title={action.label}
+            >
+              <action.icon className="h-4 w-4" />
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-r border-gray-200/50 shadow-xl">
+    <div className="h-full w-80 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-r border-gray-200/50 shadow-xl">
       <div className="p-4 border-b border-gray-200/50">
-        <h2 className="text-lg font-semibold text-gray-800">CV Builder</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-semibold text-gray-800">CV Builder</h2>
+          {onToggleCollapse && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapse}
+              className="p-1 hover:bg-white/50"
+            >
+              <FileText className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
         <p className="text-sm text-gray-600">Customize your CV</p>
         <Button
           onClick={onSave}
