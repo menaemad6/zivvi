@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import type { CVData } from '@/types/cv';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -109,48 +108,6 @@ const Preview = () => {
       }
     }
   }, [id, user]);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 600);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Memoize the TemplateWrapper content for PDF generation
-  const memoizedTemplateContent = useMemo(() => (
-    <TemplateWrapper cvData={cvData} sections={sections} template={template} />
-  ), [cvData, sections, template]);
-
-  // Generate PDF and set URL for iframe
-  useEffect(() => {
-    if (cvData && sections && template) {
-      setPdfLoading(true);
-      setPdfUrl(null);
-      setTimeout(() => {
-        if (pdfGenRef.current) {
-          pdfGenRef.current(); // This will trigger onPdfReady
-        }
-      }, 300);
-    }
-    // Cleanup old URL
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    };
-    // eslint-disable-next-line
-  }, [cvData, sections, template]);
-
-  const handlePdfReady = (blob: Blob) => {
-    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    const url = URL.createObjectURL(blob);
-    setPdfUrl(url);
-    setPdfLoading(false);
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    setPdfViewerLoading(false);
-  };
 
   const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
@@ -341,7 +298,7 @@ const Preview = () => {
         <meta name="twitter:image" content="/zivvi-logo.png" />
       </Helmet>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24 ">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pt-24">
         {/* Floating Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full floating blur-xl"></div>
@@ -350,7 +307,7 @@ const Preview = () => {
           <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-r from-pink-400/20 to-orange-400/20 rounded-full floating blur-xl" style={{animationDelay: '1s'}}></div>
         </div>
 
-        {/* Responsive Fixed Header (Builder style) */}
+        {/* Fixed Header */}
         <div className="fixed top-16 left-0 right-0 bg-white/90 backdrop-blur-2xl border-b border-gray-200/50 shadow-xl z-30">
           <div className="container mx-auto py-2 px-4 sm:px-6">
             <div className="flex items-center justify-between">
@@ -364,7 +321,7 @@ const Preview = () => {
                   <ArrowLeft className="mr-1 h-3 w-3" />
                   <span className="hidden sm:inline">Back</span>
                 </Button>
-                {/* Title Section - Responsive */}
+                {/* Title Section */}
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md ring-1 ring-white/50 relative">
                     <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
@@ -404,7 +361,7 @@ const Preview = () => {
                   </div>
                 </div>
               </div>
-              {/* Right Section - Responsive */}
+              {/* Right Section */}
               <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="outline"
@@ -439,83 +396,13 @@ const Preview = () => {
           </div>
         </div>
 
-
-
-
-        {/* Enhanced CV Preview */}
-        <div className='w-full h-full flex justify-center items-center bg-none m-0 p-0 py-16'>
-          {pdfLoading && (
-            <div className="flex flex-col items-center justify-center h-96">
-              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-              <p className="text-lg text-gray-600">Generating PDF preview...</p>
-            </div>
-          )}
-          {!pdfLoading && pdfUrl && (
-            <div
-              ref={pdfContainerRef}
-              className="pdf-preview-container"
-              style={{
-                width: '100%',
-                maxWidth: '800px',
-                margin: '0 auto',
-                background: '#fff',
-                borderRadius: 8,
-                boxShadow: '0 0 24px rgba(0,0,0,0.1)',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                className="pdf-scaled-container"
-                style={{
-                  width: '100%',
-                  maxWidth: '794px',
-                  transform: `scale(${Math.min(containerWidth / 794, 1)})`,
-                  transformOrigin: 'top center',
-                  transition: 'transform 0.2s ease-out',
-                }}
-              >
-                <Document
-                  file={pdfUrl}
-                  loading={
-                    <div className="flex flex-col items-center justify-center h-96">
-                      <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-                      <p className="text-lg text-gray-600">Loading PDF preview...</p>
-                    </div>
-                  }
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  onLoadError={() => setPdfViewerLoading(false)}
-                >
-                  <Page
-                    pageNumber={1}
-                    width={794}
-                    loading={
-                      <div className="flex flex-col items-center justify-center h-96">
-                        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-                        <p className="text-lg text-gray-600">Rendering page...</p>
-                      </div>
-                    }
-                  />
-                </Document>
-              </div>
-            </div>
-          )}
-          {/* Hidden PDF generator with fixed dimensions */}
-          <GeneratePdfFromHtml
-            ref={pdfGenRef}
-            htmlContent={memoizedTemplateContent}
-            pdfFileName="preview.pdf"
-            options={{ resolution: 2, randomCrop: false }}
-            onPdfReady={handlePdfReady}
-          />
+        {/* CV Preview Container */}
+        <div className="cv-preview-outer pt-16">
+          <div className="cv-preview-scaler" id="cv-content">
+            <TemplateWrapper cvData={cvData} sections={sections} template={template} />
+          </div>
         </div>
-
-
       </div>
-
 
       <Footer />
       <Joyride
