@@ -5,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, Share2, FileText, Palette, Eye, Sparkles, Star, Heart, Edit } from 'lucide-react';
-import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
+import { MultiPageCVRenderer } from '@/components/cv/MultiPageCVRenderer';
+import { PDFGenerator } from '@/components/cv/PDFGenerator';
 import { cvTemplates } from '@/data/templates';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,14 +17,6 @@ import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
-import TemplateWrapper from '@/components/cv/templates/TemplateWrapper';
-import GeneratePdfFromHtml from '@/utils/pdfGeneration/GeneratePdfFromHtml.jsx';
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
-import ResizeObserver from 'resize-observer-polyfill';
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
-
 
 const Preview = () => {
   const { id } = useParams();
@@ -39,41 +30,10 @@ const Preview = () => {
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [authorName, setAuthorName] = useState<string>('');
   const [cvName, setCVName] = useState<string>('');
+  const [totalPages, setTotalPages] = useState<number>(1);
   const lastTrackedCVId = useRef<string | null>(null);
   const location = useLocation();
   const [joyrideRun, setJoyrideRun] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
-  const pdfGenRef = useRef<(() => Promise<void>) | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pdfViewerLoading, setPdfViewerLoading] = useState(false);
-
-  const wrapperRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
-  // Remove dynamic pdfPageWidth, always use 794 for PDF rendering
-  const PDF_A4_WIDTH = 794;
-  const PDF_A4_HEIGHT = 1123;
-  const [containerWidth, setContainerWidth] = useState<number>(() => window.innerWidth);
-  const pdfContainerRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    function updateContainerWidth() {
-      if (pdfContainerRef.current) {
-        setContainerWidth(pdfContainerRef.current.offsetWidth);
-      }
-    }
-    updateContainerWidth();
-    let ro: ResizeObserver | null = null;
-    if (pdfContainerRef.current) {
-      ro = new ResizeObserver(() => updateContainerWidth());
-      ro.observe(pdfContainerRef.current);
-    }
-    window.addEventListener('resize', updateContainerWidth);
-    return () => {
-      window.removeEventListener('resize', updateContainerWidth);
-      if (ro && pdfContainerRef.current) ro.unobserve(pdfContainerRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -84,12 +44,9 @@ const Preview = () => {
 
   useEffect(() => {
     if (id && id !== 'new') {
-      // Always fetch from Supabase if id is present and not 'new'
       fetchCVData(id);
-      // Clear localStorage preview data to avoid confusion
       localStorage.removeItem('previewCVData');
     } else {
-      // Fallback to localStorage for new/unsaved CVs
       const storedData = localStorage.getItem('previewCVData');
       if (storedData) {
         try {
@@ -112,7 +69,6 @@ const Preview = () => {
   const fetchCVData = async (cvId: string) => {
     setIsLoading(true);
     try {
-      // Fetch CV data from Supabase
       const { data: cvDataResponse, error } = await supabase
         .from('cvs')
         .select(`
@@ -130,21 +86,17 @@ const Preview = () => {
         return;
       }
 
-      // Check if current user is the owner
       const currentUserId = user?.id;
       const cvOwnerId = cvDataResponse.user_id;
       setIsOwner(currentUserId === cvOwnerId);
       
-      // Set author name and CV name
       setAuthorName(cvDataResponse.profiles?.full_name || 'Unknown Author');
       setCVName(cvDataResponse.name || '');
 
-      // Parse CV content with proper type checking
       const content = cvDataResponse.content;
       if (content && typeof content === 'object' && !Array.isArray(content)) {
         setCVData(content);
         setTemplate(cvDataResponse.template || 'modern');
-        // Safely extract sections from content
         const contentWithSections = content as { [key: string]: unknown };
         let contentSections: string[] = ['personalInfo', 'experience', 'education', 'skills', 'projects', 'references'];
         if (
@@ -158,7 +110,6 @@ const Preview = () => {
         console.error('Invalid CV content format');
       }
 
-      // Track CV view only once per page load for this CV
       if (cvId && lastTrackedCVId.current !== cvId) {
         trackCVView(cvId, {
           template: cvDataResponse.template,
@@ -175,32 +126,6 @@ const Preview = () => {
   };
 
   const currentTemplateInfo = cvTemplates.find(t => t.id === template);
-
-  const handleDownload = () => {
-    const input = document.getElementById('cv-content');
-    if (input) {
-      html2canvas(input, { scale: 2, useCORS: true })
-        .then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          const fileName = cvName ? `${cvName}.pdf` : 'cv.pdf';
-          pdf.save(fileName);
-          
-          // Track download
-          if (id && id !== 'new') {
-            trackCVDownload(id, 'pdf', { 
-              fileName, 
-              template,
-              isOwner 
-            });
-          }
-        });
-    }
-  };
 
   const handleShare = async () => {
     if (!id || id === 'new') {
@@ -222,17 +147,14 @@ const Preview = () => {
           url: shareUrl,
         });
         
-        // Track share via native sharing
         trackCVShare(id, 'native', { shareUrl, cvName });
       } catch (error) {
-        // Fallback to clipboard
         await navigator.clipboard.writeText(shareUrl);
         toast({
           title: "Link Copied",
           description: "CV link has been copied to clipboard."
         });
         
-        // Track share via clipboard
         trackCVShare(id, 'clipboard', { shareUrl, cvName });
       }
     } else {
@@ -242,8 +164,18 @@ const Preview = () => {
         description: "CV link has been copied to clipboard."
       });
       
-      // Track share via clipboard
       trackCVShare(id, 'clipboard', { shareUrl, cvName });
+    }
+  };
+
+  const handlePDFDownload = () => {
+    if (id && id !== 'new') {
+      trackCVDownload(id, 'pdf', { 
+        fileName: cvName ? `${cvName}.pdf` : 'cv.pdf', 
+        template,
+        isOwner,
+        pages: totalPages
+      });
     }
   };
 
@@ -258,7 +190,6 @@ const Preview = () => {
   const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
     if (data.status === 'finished' || data.status === 'skipped') {
       setJoyrideRun(false);
-      // Remove the flag from the URL
       navigate(`/preview/${id}`, { replace: true });
     }
   };
@@ -345,6 +276,11 @@ const Preview = () => {
                           </Badge>
                         </>
                       )}
+                      {totalPages > 1 && (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-2 py-0.5 text-xs">
+                          {totalPages} pages
+                        </Badge>
+                      )}
                       {!isOwner && authorName && (
                         <Badge variant="outline" className="bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border-amber-200 shadow-sm px-2 py-0.5 text-xs">
                           <Star className="w-3 h-3 mr-1" />
@@ -367,10 +303,10 @@ const Preview = () => {
                   variant="outline"
                   onClick={() => navigate(`/print/${id}`)}
                   className="btn-download-cv border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
-                  title="Download/Print CV"
+                  title="Print CV"
                 >
-                  <Download className="h-3 w-3 sm:mr-1" />
-                  <span className="hidden sm:inline">Download/Print CV</span>
+                  <FileText className="h-3 w-3 sm:mr-1" />
+                  <span className="hidden sm:inline">Print</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -396,10 +332,34 @@ const Preview = () => {
           </div>
         </div>
 
+        {/* Download PDF Button */}
+        <div className="fixed top-28 right-4 z-20">
+          {cvData && (
+            <PDFGenerator
+              cvData={cvData}
+              templateId={template}
+              sections={sections}
+              fileName={cvName ? `${cvName}.pdf` : 'cv.pdf'}
+              onDownload={handlePDFDownload}
+            />
+          )}
+        </div>
+
         {/* CV Preview Container */}
-        <div className="cv-preview-outer pt-16">
-          <div className="cv-preview-scaler" id="cv-content">
-            <TemplateWrapper cvData={cvData} sections={sections} template={template} />
+        <div className="flex flex-col items-center justify-center min-h-screen pt-16 pb-8">
+          <div className="w-full max-w-4xl px-4">
+            <div className="flex justify-center">
+              <div className="transform-gpu" style={{ transformOrigin: 'center top' }}>
+                {cvData && (
+                  <MultiPageCVRenderer
+                    cvData={cvData}
+                    templateId={template}
+                    sections={sections}
+                    onPagesChange={setTotalPages}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
