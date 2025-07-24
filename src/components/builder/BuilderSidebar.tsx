@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { LayoutDashboard, ListChecks, User2, GraduationCap, Briefcase, Code, MessageSquare, Settings, HelpCircle, Sparkles, Zap, Star, Template, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, ListChecks, User2, GraduationCap, Briefcase, Code, MessageSquare, Settings, HelpCircle, Sparkles, Zap, Star, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Tool {
@@ -165,7 +164,7 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
               className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition-colors text-sm text-gray-600"
               title={collapsed ? "Templates" : undefined}
             >
-              <Template className="w-4 h-4 text-gray-400" />
+              <FileText className="w-4 h-4 text-gray-400" />
               {!collapsed && "Templates"}
             </button>
           )}
