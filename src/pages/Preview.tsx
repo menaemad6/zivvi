@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import type { CVData } from '@/types/cv';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -31,7 +32,7 @@ const Preview = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { trackCVView, trackCVDownload, trackCVShare } = useAnalytics();
-  const { generateAndDownloadPDF, isGenerating } = usePDFGeneration();
+  const { isGenerating, generateAndDownloadPDF } = usePDFGeneration();
   const [cvData, setCVData] = useState<Partial<CVData> | null>(null);
   const [template, setTemplate] = useState<string>('');
   const [sections, setSections] = useState<string[]>([]);
