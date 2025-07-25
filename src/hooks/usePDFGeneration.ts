@@ -80,8 +80,14 @@ export const usePDFGeneration = () => {
     }
   }, []);
 
+  const generateAndDownloadPDF = useCallback(async (cvData: any, template: string, sections: string[], filename: string = 'cv.pdf') => {
+    // For now, just use the existing generatePDF method with the cv-content element
+    await generatePDF('cv-content', filename);
+  }, [generatePDF]);
+
   return {
     generatePDF,
+    generateAndDownloadPDF,
     isGenerating,
   };
 };
