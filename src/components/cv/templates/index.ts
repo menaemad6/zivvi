@@ -4,9 +4,9 @@ import PreBuiltTemplates from "./PreBuiltTemplates";
 
 export const templateComponentRegistry: Record<string, any> = {
   classicTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "classicTemp" }),
-  visionaryPro: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "visionaryPro" }),
-  elegantPro: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "elegantPro" }),
-  highPerformer: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "highPerformer" }),
+  visionaryProTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "visionaryProTemp" }),
+  elegantProTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "elegantProTemp" }),
+  highPerformerTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "highPerformerTemp" }),
   elegantTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "elegantTemp" }),
   timelineTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "timelineTemp" }),
   compactTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "compactTemp" }),

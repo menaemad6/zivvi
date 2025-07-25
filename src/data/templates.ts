@@ -10,24 +10,24 @@ export const cvTemplates: CVTemplate[] = [
     category: 'classic'
   },
   {
-    id: 'visionaryPro',
+    id: 'visionaryProTemp',
     name: 'Visionary Pro',
     description: 'Bold orange header design with structured sections and achievement highlights. Perfect for showcasing leadership and innovation.',
-    thumbnail: '/templates/classic-template.png',
+    thumbnail: '/templates/visionary-pro-template.png',
     category: 'creative'
   },
   {
-    id: 'elegantPro',
+    id: 'elegantProTemp',
     name: 'Elegant Pro',
     description: 'Two-column layout with red sidebar containing strengths and achievements. Ideal for experienced professionals.',
-    thumbnail: '/templates/elegant-template.png',
+    thumbnail: '/templates/elegant-pro-template.png',
     category: 'modern'
   },
   {
-    id: 'highPerformer',
+    id: 'highPerformerTemp',
     name: 'High Performer',
     description: 'Clean blue-accented design with emphasis on achievements and project highlights. Great for project managers and directors.',
-    thumbnail: '/templates/timeline-template.png',
+    thumbnail: '/templates/high-performer-template.png',
     category: 'modern'
   },
   {
