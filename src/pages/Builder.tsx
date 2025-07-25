@@ -930,10 +930,16 @@ const Builder = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/builder`} />
         <meta property="og:image" content="/zivvi-logo.png" />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${LOGO_NAME} CV Builder | AI CV Builder`} />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
+        {/* Twitter */}
+        <meta name="twitter:card" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
+        <meta property="twitter:url" content={WEBSITE_URL} />
+        <meta name="twitter:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta name="twitter:description" content="Use the AI-powered CV Builder to create, edit, and optimize your professional resume with modern templates." />
         <meta name="twitter:image" content="/zivvi-logo.png" />
+        <meta name="twitter:creator" content="@zivvi" />
+        <meta name="twitter:site" content="@zivvi" />
       </Helmet>
       <Navbar />
       <div className="flex min-h-screen bg-gradient-to-br from-violet-50 via-white to-cyan-50 pt-8 sm:pt-14 md:pt-12 ">

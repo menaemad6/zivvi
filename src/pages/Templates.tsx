@@ -159,10 +159,16 @@ const Templates = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${WEBSITE_URL}/templates`} />
         <meta property="og:image" content="/zivvi-logo.png" />
-        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`{LOGO_NAME} | CV Templates`} />
+        <meta name="twitter:image" content="/zivvi-logo.png" />
+        {/* Twitter */}
+        <meta name="twitter:card" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
+        <meta property="twitter:url" content={WEBSITE_URL} />
+        <meta name="twitter:title" content={`${LOGO_NAME} - Create Professional Resumes in Minutes`} />
         <meta name="twitter:description" content="Browse and choose from a wide range of modern, professional CV templates to kickstart your resume." />
         <meta name="twitter:image" content="/zivvi-logo.png" />
+        <meta name="twitter:creator" content="@zivvi" />
+        <meta name="twitter:site" content="@zivvi" />
       </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
