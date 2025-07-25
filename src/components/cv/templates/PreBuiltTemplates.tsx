@@ -151,65 +151,96 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     "header", "personalInfo", "experience", "projects", "education", "skills"
   ]).forEach(s => { sectionMap[s] = true; });
 
+
+  const renderSectionTitle = (title: string) => (
+    <div style={{
+      color: '#b91c1c',
+      padding: '0',
+      marginBottom: '4mm',
+      fontSize: '12pt',
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      borderBottom: '2px solid #b91c1c',
+      paddingBottom: '2mm'
+    }}>
+      {title}
+    </div>
+  )
+    
+  // Header (with name, contact, photo)
   const renderHeader = () => (
-    <div style={{ 
+    <div style={{
       backgroundColor: '#ea580c',
       color: '#fff',
-      padding: '15mm 15mm 10mm 15mm',
-      margin: '-20mm -20mm 15mm -20mm',
+      padding: '10mm',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
+      flexDirection: 'column',
+      marginBottom: '10mm',
+      alignItems: 'start',
+
     }}>
-      <div style={{ flex: 1 }}>
-        <h1 style={{ fontSize: '24pt', fontWeight: 700, marginBottom: '3mm' }}>
-          {cvData.personalInfo?.fullName || "Alicia Stephens"}
-        </h1>
-        {/* <div style={{ fontSize: '11pt', marginBottom: '2mm' }}>
-          I solve problems and help people overcome obstacles.
-        </div> */}
-        <div style={{ fontSize: '10pt', display: 'flex', gap: '8mm' }}>
-          <span>📞 {cvData.personalInfo?.phone || "+1-000-000"}</span>
-          <span>📧 {cvData.personalInfo?.email || "alicia@enhancv.com"}</span>
-          {/* <span>🔗 https://www.linkedin.com/isabelle</span> */}
-          <span>📍 {cvData.personalInfo?.location || "New York City, NY"}</span>
-        </div>
+      
+      <h1 style={{ fontSize: '22pt', fontWeight: 700, marginBottom: '2mm', textAlign: 'center' }}>
+        {cvData.personalInfo?.fullName || "Alicia Stephens"}
+      </h1>
+
+      <div style={{ fontSize: '9.5pt', display: 'flex', flexDirection: 'column' }}>
+        <span>📞 {cvData.personalInfo?.phone || "+1-000-000"}</span>
+        {/* <span>📧 {cvData.personalInfo?.email || "alicia@enhancv.com"}</span> */}
+        <span>📍 {cvData.personalInfo?.location || "New York City, NY"}</span>
       </div>
-      {/* <div style={{ width: '50mm', height: '50mm', backgroundColor: '#fff', borderRadius: '2mm', marginLeft: '10mm' }}>
-        <div style={{ 
-          width: '100%', 
-          height: '100%', 
-          backgroundColor: '#ddd', 
-          borderRadius: '2mm',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#666',
-          fontSize: '9pt'
-        }}>
-          Photo
-        </div>
-      </div> */}
     </div>
   );
 
-  const renderExperience = () => (
+    // Projects
+    const renderSummary = () => (
+      <section style={{ marginBottom: '3mm', padding : '2mm 0mm'}}>
+        {renderSectionTitle("SUMMARY")}
+        <div style={{
+          padding: '0mm 2mm',
+          marginBottom: '2mm',
+        }}>
+        {cvData.personalInfo?.summary || 'I solve problems and help people overcome obstacles.'}
+        </div>
+      </section>
+    );
+  // Skills (Tech Stack)
+  const renderSkills = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '1mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        paddingBottom: '3mm'
-      }}>
-        EXPERIENCE
+      {renderSectionTitle("SUMMARY")}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3mm' }}>
+        {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
+          <div key={idx} style={{
+            backgroundColor: '#f3f4f6',
+            color: '#374151',
+            padding: '2mm 6mm',
+            textAlign: 'center',
+            fontSize: '9pt',
+            borderRadius: '1mm',
+            fontWeight: 500,
+          }}>
+            {skill}
+          </div>
+        )) : (
+          <>
+            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm 6mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Zoho Sprints</div>
+            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm 6mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>UseVoice</div>
+            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm 6mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Intercom</div>
+            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm 6mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>VWO</div>
+            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm 6mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Taboola</div>
+          </>
+        )}
       </div>
+    </section>
+  );
+
+  // Experience
+  const renderExperience = () => (
+    <section style={{ marginBottom: '3mm' }}>
+      {renderSectionTitle("EXPERIENCE")}
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm', backgroundColor: '#fef3c7', padding: '4mm', borderRadius: '2mm' }}>
+          <div key={idx} style={{ marginBottom: '8mm', padding: '0.1mm 2mm', borderRadius: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#b91c1c', marginBottom: '1mm' }}>
               {exp.title || "Senior IT Product Manager"}
             </div>
@@ -220,10 +251,10 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               📅 {exp.startDate || "02/2010"} - {exp.endDate || "04/2012"} 📍 {cvData.personalInfo?.location || "San Francisco, CA"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm', fontStyle: 'italic' }}>
-              Rover Games is a multi-play mobile game app development firm that has successful titles such as Drink Something, Trivia Tonight and King's Fight.
+              {exp.description?.split('\n')[0] || 'Description...'}
             </div>
             <ul style={{ fontSize: '9pt', color: '#333', paddingLeft: '5mm', lineHeight: 1.5 }}>
-              {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : (
+              {exp.description ? exp.description.split('\n').slice(1).map((line, i) => <li key={i}>{line}</li>) : (
                 <>
                   <li>Accelerated outbound sales cycle by 330% by designing and implementing customer acquisition platform for training and managing technical sales personnel</li>
                   <li>Established and curated strategic partnerships with 6 out of 10 top state manufacturing companies which resulted in $20M additional annual revenue</li>
@@ -237,168 +268,45 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     </section>
   );
 
-  const renderKeyAchievements = () => (
+  // Projects
+  const renderProjects = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '2mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase'
-      }}>
-        KEY ACHIEVEMENTS
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4mm' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '3mm' }}>
-            <span style={{ color: '#ea580c', fontSize: '12pt' }}>🚀</span>
-            <div>
-              <div style={{ fontWeight: 700, color: '#b91c1c', fontSize: '10pt', marginBottom: '1mm' }}>Record Project Delivery</div>
-              <div style={{ fontSize: '9pt', color: '#666' }}>Facilitated the development of a full-featured SMB product in just 4 months.</div>
-            </div>
+      {renderSectionTitle("PROJECTS")}
+      <div>
+        {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
+          <div key={idx} style={{ marginBottom: '6mm', backgroundColor: '#fff', borderRadius: '2mm', padding: '0.1mm 2mm', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#b91c1c', marginBottom: '1mm' }}>{proj.name || "Project Name"}</div>
+            <div style={{ fontSize: '10pt', color: '#ea580c', fontWeight: 600, marginBottom: '1mm' }}>{proj.technologies || "Tech Stack"}</div>
+            <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>{proj.description || "Project description..."}</div>
+            {/* {proj.link && <a href={proj.link} style={{ color: '#ea580c', fontSize: '9pt' }}>{proj.link}</a>} */}
           </div>
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '3mm' }}>
-            <span style={{ color: '#ea580c', fontSize: '12pt' }}>👥</span>
-            <div>
-              <div style={{ fontWeight: 700, color: '#b91c1c', fontSize: '10pt', marginBottom: '1mm' }}>Mentoring</div>
-              <div style={{ fontSize: '9pt', color: '#666' }}>Implemented 1-on-1 meeting rhythm within my team, reaching high employee happiness and the longest retention rate.</div>
-            </div>
-          </div>
-        </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No projects added yet</div>}
       </div>
     </section>
   );
 
-  const renderCertifications = () => (
-    <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '2mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase'
-      }}>
-        CERTIFICATIONS
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3mm' }}>
-        <div>
-          <div style={{ fontWeight: 700, color: '#b91c1c', fontSize: '10pt' }}>Certified Scrum Product Owner & Professional</div>
-          <div style={{ fontSize: '9pt', color: '#666' }}>Scrum Alliance</div>
-        </div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#b91c1c', fontSize: '10pt' }}>Agile Certified Practitioner</div>
-          <div style={{ fontSize: '9pt', color: '#666' }}>Project Management Institute - PMI</div>
-        </div>
-      </div>
-    </section>
-  );
-
+  // Education
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '2mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase'
-      }}>
-        EDUCATION
-      </div>
+    <section style={{ marginBottom: '3mm' }}>
+      {renderSectionTitle("EDUCATION")}
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '4mm' }}>
-            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#b91c1c', marginBottom: '1mm' }}>
-              {edu.degree || "MSc Project and Process Management"}
-            </div>
-            <div style={{ fontSize: '10pt', color: '#666' }}>
-              {edu.school || "University of California, Berkeley"}
-            </div>
-            <div style={{ fontSize: '9pt', color: '#666' }}>
-              📅 {edu.startDate || "10/2008"} - {edu.endDate || "01/2010"}
-            </div>
+          <div key={idx} style={{ marginBottom: '4mm', backgroundColor: '#fff', borderRadius: '2mm', padding: '1mm 0mm', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#b91c1c', marginBottom: '1mm' }}>{edu.degree || "MSc Project and Process Management"}</div>
+            <div style={{ fontSize: '10pt', color: '#666' }}>{edu.school || "University of California, Berkeley"}</div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>📅 {edu.startDate || "10/2008"} - {edu.endDate || "01/2010"}</div>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
     </section>
   );
 
-  const renderTechStack = () => (
-    <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '2mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase'
-      }}>
-        SKILLS
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2mm' }}>
-        {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <div key={idx} style={{ 
-            backgroundColor: '#f3f4f6',
-            color: '#374151',
-            padding: '2mm',
-            textAlign: 'center',
-            fontSize: '9pt',
-            borderRadius: '1mm'
-          }}>
-            {skill}
-          </div>
-        )) : (
-          <>
-            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Zoho Sprints</div>
-            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>UserVoice</div>
-            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Amplitude</div>
-            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>Intercom</div>
-            <div style={{ backgroundColor: '#f3f4f6', color: '#374151', padding: '2mm', textAlign: 'center', fontSize: '9pt', borderRadius: '1mm' }}>VWO</div>
-          </>
-        )}
-      </div>
-    </section>
-  );
-
-  const renderPassions = () => (
-    <section style={{ marginBottom: '10mm' }}>
-      <div style={{ 
-        backgroundColor: '#fef3c7',
-        color: '#b91c1c',
-        padding: '2mm 4mm',
-        marginBottom: '4mm',
-        fontSize: '12pt',
-        fontWeight: 700,
-        textTransform: 'uppercase'
-      }}>
-        PASSIONS
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3mm' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span style={{ color: '#ea580c', fontSize: '12pt' }}>🏃</span>
-          <span style={{ fontSize: '10pt', color: '#333' }}>Running</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span style={{ color: '#ea580c', fontSize: '12pt' }}>🏂</span>
-          <span style={{ fontSize: '10pt', color: '#333' }}>Adrenaline Sports</span>
-        </div>
-      </div>
-    </section>
-  );
-
+  // Layout: Two columns
   return (
     <div className="cv-page" style={{
       width: '210mm',
       minHeight: '297mm',
-      padding: '20mm',
+      padding: '0',
       backgroundColor: '#fff',
       boxSizing: 'border-box',
       fontFamily: 'Inter, sans-serif',
@@ -407,16 +315,46 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
       position: 'relative',
       overflow: 'visible',
-      display: 'block',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
-      {(sectionMap["header"] || sectionMap["personalInfo"]) && renderHeader()}
-      {sectionMap["experience"] && renderExperience()}
-      {/* {sectionMap["projects"] && renderProjects()} */}
-      {/* {renderKeyAchievements()} */}
-      {/* {renderCertifications()} */}
-      {sectionMap["education"] && renderEducation()}
-      {sectionMap["skills"] && renderTechStack()}
-      {/* {renderPassions()} */}
+      <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+
+      
+      {/* Header (Top) */}
+      <div>
+        {sectionMap["personalInfo"] && renderHeader()}
+      </div>
+
+      <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      gap: '3mm'
+    }}>
+
+
+      {/* Main (left) */}
+      <div style={{ flex: 1, paddingLeft: '6mm', minHeight: '297mm', display: 'flex', flexDirection: 'column', gap: '0' }}>
+        {cvData.personalInfo?.summary && renderSummary()}
+        {sectionMap["experience"] && renderExperience()}
+        {sectionMap["projects"] && renderProjects()}
+      </div>
+      {/* Main (left) */}
+
+      {/* Sidebar (right) */}
+      <div style={{ width: '80mm', paddingRight: '6mm', display: 'flex', flexDirection: 'column', minHeight: '297mm' }}>
+        {sectionMap["education"] && renderEducation()}
+        {sectionMap["skills"] && renderSkills()}
+      </div>
+      {/* Sidebar (right) */}
+
+      </div>
+
+
+      </div>
     </div>
   );
 };
@@ -609,11 +547,9 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       {(sectionMap["header"] || sectionMap["personalInfo"]) && renderHeader()}
       {renderSummary()}
       {sectionMap["experience"] && renderExperience()}
-      {/* {renderKeyAchievements()} */}
-      {/* {renderProjects()} */}
       {sectionMap["education"] && renderEducation()}
-      {/* {renderCourses()} */}
       {sectionMap["skills"] && renderSkills()}
+      {sectionMap["courses"] && renderCourses()}
     </div>
   );
 };
@@ -840,11 +776,11 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       {(sectionMap["header"] || sectionMap["personalInfo"]) && renderHeader()}
       {renderSummary()}
       {sectionMap["experience"] && renderExperience()}
-      {/* {renderKeyAchievements()} */}
       {renderProjects()}
       {sectionMap["education"] && renderEducation()}
-      {/* {renderCourses()} */}
+      {sectionMap["achievements"] && renderKeyAchievements()}
       {sectionMap["skills"] && renderSkills()}
+      {sectionMap["courses"] && renderCourses()}
     </div>
   );
 };
@@ -986,11 +922,8 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       {renderHeader()}
       {cvData.personalInfo?.summary && renderSummary()}
       {sectionMap["experience"] && renderExperience()}
-      {/* Projects  */}
       {sectionMap["education"] && renderEducation()}
-      {/* Skills  */}
-      {/* {renderAchievements()} */}
-      
+      {sectionMap["achievements"] && renderAchievements()}
     </div>
   );
 };
@@ -1148,9 +1081,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       {renderHeader()}
       {cvData.personalInfo?.summary && renderSummary()}
       {sectionMap["experience"] && renderExperience()}
-      {/* Projects  */}
       {sectionMap["education"] && renderEducation()}
-      {/* {renderCertification()} */}
       {renderTechnicalSkills()}
     </div>
   );
