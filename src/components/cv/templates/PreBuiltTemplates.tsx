@@ -156,23 +156,24 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       <h1 style={{ fontSize: '24pt', fontWeight: 700, color: '#333', marginBottom: '3mm' }}>
         {cvData.personalInfo?.fullName || "Mason Turner"}
       </h1>
-      <div style={{ fontSize: '14pt', color: '#4A90E2', fontWeight: 600, marginBottom: '3mm' }}>
+      {/* <div style={{ fontSize: '14pt', color: '#4A90E2', fontWeight: 600, marginBottom: '3mm' }}>
         Experienced Sales Professional | B2B | Networking
-      </div>
+      </div> */}
       <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         📞 {cvData.personalInfo?.phone || "+1-(234)-555-1234"} &nbsp;&nbsp;
         📧 {cvData.personalInfo?.email || "help@enhancv.com"} &nbsp;&nbsp;
-        🔗 linkedin.com
-      </div>
-      <div style={{ fontSize: '10pt', color: '#666' }}>
         📍 {cvData.personalInfo?.location || "Denver, Colorado"}
+        {/* 🔗 linkedin.com */}
       </div>
+      {/* <div style={{ fontSize: '10pt', color: '#666' }}>
+        📍 {cvData.personalInfo?.location || "Denver, Colorado"}
+      </div> */}
     </section>
   );
 
   const renderSummary = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Summary
       </h2>
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
@@ -183,7 +184,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
 
   const renderExperience = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Experience
       </h2>
       <div>
@@ -214,7 +215,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
 
   const renderEducation = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Education
       </h2>
       <div>
@@ -237,7 +238,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
 
   const renderAchievements = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Key Achievements
       </h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
@@ -281,8 +282,11 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       {renderHeader()}
       {cvData.personalInfo?.summary && renderSummary()}
       {sectionMap["experience"] && renderExperience()}
+      {/* Projects  */}
       {sectionMap["education"] && renderEducation()}
-      {renderAchievements()}
+      {/* Skills  */}
+      {/* {renderAchievements()} */}
+      
     </div>
   );
 };
@@ -298,23 +302,21 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       <h1 style={{ fontSize: '24pt', fontWeight: 700, color: '#000', marginBottom: '3mm', textTransform: 'uppercase' }}>
         {cvData.personalInfo?.fullName || "Isabelle Todd"}
       </h1>
-      <div style={{ fontSize: '12pt', color: '#666', marginBottom: '4mm' }}>
+      {/* <div style={{ fontSize: '12pt', color: '#666', marginBottom: '4mm' }}>
         I solve problems and help people overcome obstacles.
-      </div>
+      </div> */}
       <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         📞 {cvData.personalInfo?.phone || "000-123-456"} &nbsp;&nbsp;
         📧 {cvData.personalInfo?.email || "todd@enhancv.com"} &nbsp;&nbsp;
-        🔗 linkedin.com/isabelle
-      </div>
-      <div style={{ fontSize: '10pt', color: '#666' }}>
         📍 {cvData.personalInfo?.location || "New York City, NY"}
+        {/* 🔗 linkedin.com/isabelle */}
       </div>
     </section>
   );
 
   const renderSummary = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Summary of Qualifications
       </h2>
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
@@ -325,7 +327,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
 
   const renderExperience = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Experience
       </h2>
       <div>
@@ -340,9 +342,9 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
               📅 {exp.startDate || "2019"} - {exp.endDate || "Present"} 📍 {cvData.personalInfo?.location || "New York City, NY"}
             </div>
-            <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm', fontStyle: 'italic' }}>
+            {/* <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm', fontStyle: 'italic' }}>
               Tesla is an electric vehicle manufacturer that is revolutionizing the automobile industry
-            </div>
+            </div> */}
             <ul style={{ fontSize: '10pt', color: '#333', paddingLeft: '5mm', lineHeight: 1.5 }}>
               {exp.description ? exp.description.split('\n').map((line, i) => <li key={i} style={{ marginBottom: '1mm' }}>{line}</li>) : 
                 <>
@@ -359,7 +361,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
 
   const renderEducation = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Education
       </h2>
       <div>
@@ -382,7 +384,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
 
   const renderCertification = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Certification
       </h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
@@ -400,10 +402,10 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
 
   const renderTechnicalSkills = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '1mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Technical Skills
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
           <div key={idx} style={{ fontSize: '10pt', color: '#333', textAlign: 'center', padding: '2mm', backgroundColor: '#f5f5f5', borderRadius: '2mm' }}>
             {skill}
@@ -442,8 +444,9 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       {renderHeader()}
       {cvData.personalInfo?.summary && renderSummary()}
       {sectionMap["experience"] && renderExperience()}
+      {/* Projects  */}
       {sectionMap["education"] && renderEducation()}
-      {renderCertification()}
+      {/* {renderCertification()} */}
       {renderTechnicalSkills()}
     </div>
   );
@@ -1086,9 +1089,9 @@ const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections,
   switch (templateId) {
     case "classicTemp":
       return <ClassicTemplate cvData={cvData} sections={sections} />;
-    case "singleColumn":
+    case "singleColumnTemp":
       return <SingleColumnTemplate cvData={cvData} sections={sections} />;
-    case "monochrome":
+    case "monochromeTemp":
       return <MonochromeTemplate cvData={cvData} sections={sections} />;
     case "elegantTemp":
       return <ElegantTemplate cvData={cvData} sections={sections} />;

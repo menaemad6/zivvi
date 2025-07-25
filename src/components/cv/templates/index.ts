@@ -8,4 +8,6 @@ export const templateComponentRegistry: Record<string, any> = {
   // Add more mappings as you add more templates
   compactTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "compactTemp" }),
   headerTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "headerTemp" }),
+  monochromeTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "monochromeTemp" }),
+  singleColumnTemp: (props: any) => React.createElement(PreBuiltTemplates, { ...props, templateId: "singleColumnTemp" }),
 }; 

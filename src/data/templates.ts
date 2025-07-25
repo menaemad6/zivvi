@@ -10,24 +10,10 @@ export const cvTemplates: CVTemplate[] = [
     category: 'classic'
   },
   {
-    id: 'singleColumn',
-    name: 'Single Column',
-    description: 'Clean single-column layout with blue accents and clear section divisions. Perfect for sales professionals and networking roles.',
-    thumbnail: '/templates/classic-template.png',
-    category: 'modern'
-  },
-  {
-    id: 'monochrome',
-    name: 'Monochrome',
-    description: 'Professional black and white design with strong typography. Ideal for project managers and technical professionals.',
-    thumbnail: '/templates/classic-template.png',
-    category: 'minimal'
-  },
-  {
     id: 'elegantTemp',
     name: 'Elegant Template',
     description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
-    thumbnail: '/zivvi-logo.png',
+    thumbnail: '/templates/elegant-template.png',
     category: 'modern'
   },
   {
@@ -50,5 +36,19 @@ export const cvTemplates: CVTemplate[] = [
     description: 'Features a bold, modern header section that highlights your name and title. Ideal for personal branding and standout resumes.',
     thumbnail: '/templates/header-template.png',
     category: 'creative'
-  }
+  },
+  {
+    id: 'singleColumnTemp',
+    name: 'Single Column',
+    description: 'Clean single-column layout with blue accents and clear section divisions. Perfect for sales professionals and networking roles.',
+    thumbnail: '/templates/single-column-template.png',
+    category: 'modern'
+  },
+  {
+    id: 'monochromeTemp',
+    name: 'Monochrome',
+    description: 'Professional black and white design with strong typography. Ideal for project managers and technical professionals.',
+    thumbnail: '/templates/monochrome-template.png',
+    category: 'minimal'
+  },
 ];
