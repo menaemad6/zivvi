@@ -17,6 +17,7 @@ interface OnboardingModalProps {
   onClose: () => void;
   onComplete: (data: Record<string, unknown>) => void;
   initialData?: Partial<QuestionData>;
+  continueDemo: boolean;
 }
 
 interface QuestionData {
@@ -28,6 +29,10 @@ interface QuestionData {
   education_level?: string;
   career_goals?: string;
   preferred_cv_style?: string;
+  // Add new optional fields for links
+  personal_website?: string;
+  linkedin?: string;
+  github?: string;
 }
 
 const INDUSTRIES = [
@@ -55,7 +60,7 @@ const COMMON_SKILLS = [
   'Data Analysis', 'Marketing', 'Sales', 'Design', 'Writing'
 ];
 
-export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: OnboardingModalProps) => {
+export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData , continueDemo }: OnboardingModalProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<QuestionData>(initialData || {});
   const [customSkills, setCustomSkills] = useState('');
@@ -310,7 +315,44 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: On
           rows={4}
         />
       )
-    }
+    },
+    // New step: Links
+    {
+      id: 'links',
+      title: 'Add your links (optional)',
+      description: 'Share your personal website, LinkedIn, or GitHub to make your CV stand out. You can skip any of these.',
+      component: (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="personal_website">Personal Website</Label>
+            <Input
+              id="personal_website"
+              placeholder="https://yourwebsite.com"
+              value={data.personal_website || ''}
+              onChange={(e) => setData(prev => ({ ...prev, personal_website: e.target.value }))}
+            />
+          </div>
+          <div>
+            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Input
+              id="linkedin"
+              placeholder="https://linkedin.com/in/yourprofile"
+              value={data.linkedin || ''}
+              onChange={(e) => setData(prev => ({ ...prev, linkedin: e.target.value }))}
+            />
+          </div>
+          <div>
+            <Label htmlFor="github">GitHub</Label>
+            <Input
+              id="github"
+              placeholder="https://github.com/yourusername"
+              value={data.github || ''}
+              onChange={(e) => setData(prev => ({ ...prev, github: e.target.value }))}
+            />
+          </div>
+        </div>
+      )
+    },
   ];
 
   const handleNext = () => {
@@ -341,7 +383,9 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData }: On
 
     onComplete(finalData);
     // Redirect to templates with demo flag
+    if (continueDemo) {
     navigate('/templates?startDemo=true');
+    }
   };
 
   const currentQuestion = questions[currentStep];

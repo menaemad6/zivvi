@@ -16,6 +16,7 @@ import { Helmet } from 'react-helmet-async';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
+import { useProfile } from '@/hooks/useProfile';
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ const Templates = () => {
   const [joyrideRun, setJoyrideRun] = useState(false);
   const [joyrideFinished, setJoyrideFinished] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
-
+  const { profile, isLoading: profileLoading } = useProfile();
+  
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('startDemo')) {
@@ -58,12 +60,16 @@ const Templates = () => {
     }
   };
 
+  
+
   const createCVFromTemplate = async (templateId: string, templateName: string) => {
     if (joyrideRun && !joyrideFinished) return; // Prevent navigation during demo
     if (!user) {
       navigate('/login');
       return;
     }
+
+
 
     try {
       const defaultCVData = {
@@ -72,11 +78,22 @@ const Templates = () => {
           email: user.email || '',
           phone: '',
           location: '',
-          summary: ''
+          title: '',
+          summary: '',
+          personal_website: profile?.profile_data?.personal_website || '',
+          github: profile?.profile_data?.github || '',
+          linkedin: profile?.profile_data?.linkedin || '',
+        },
+        designOptions: {
+          primaryColor: '',
+          secondaryColor: '',
+          font: '',
         },
         experience: [],
         education: [],
-        skills: []
+        skills: [],
+        projects: [],
+        references: []
       };
 
       const { data, error } = await supabase

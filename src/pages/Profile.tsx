@@ -214,6 +214,7 @@ const Profile = () => {
         onClose={() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
         initialData={profile?.profile_data}
+        continueDemo={shouldShowOnboarding}
       />
       
       <Footer />

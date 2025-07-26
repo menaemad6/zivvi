@@ -35,7 +35,7 @@ const App = () => (
               <Route path="/templates" element={<Templates />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/preview/:id" element={<Preview />} />
-            <Route path="/print/:id" element={<PrintCV />} />
+            {/* <Route path="/print/:id" element={<PrintCV />} /> */}
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />

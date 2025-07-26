@@ -372,12 +372,13 @@ const Preview = () => {
               <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/print/${id}`)}
+                  onClick={handlePDFDownload}
                   className="btn-download-cv border border-gray-300 hover:border-green-500 hover:bg-green-50 rounded-md px-2 py-1 h-7 text-xs"
-                  title="Download/Print CV"
+                  title="Download CV"
                 >
-                  <Download className="h-3 w-3 sm:mr-1" />
-                  <span className="hidden sm:inline">Download/Print CV</span>
+                  { !isGenerating && <Download className="h-3 w-3 sm:mr-1" />}
+                  <span className="hidden sm:inline">
+                    { isGenerating ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div> : "Download CV"} </span>
                 </Button>
                 <Button
                   variant="outline"
@@ -408,7 +409,7 @@ const Preview = () => {
           <Button 
             onClick={handlePDFDownload}
             disabled={isGenerating}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 rounded-xl"
+            className="btn-primary shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 rounded-xl"
           >
             {isGenerating ? (
               <>
@@ -426,11 +427,12 @@ const Preview = () => {
 
         {/* CV Preview Container */}
         <div className="cv-preview-outer">
-          
-          <div className="cv-preview-scaler" id="cv-content">
+          <div className="cv-preview-scaler !rounded-2xl" id="cv-content">
             <TemplateWrapper cvData={cvData} sections={sections} template={template} />
           </div>
         </div>
+
+
       </div>
 
       <Footer />

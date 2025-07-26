@@ -5,6 +5,11 @@ export interface CVTemplate {
   description: string;
   thumbnail: string;
   category: 'modern' | 'classic' | 'creative' | 'minimal';
+  options?: {
+    hasFont?: boolean;
+    hasPrimaryColor?: boolean;
+    hasSecondaryColor?: boolean;
+  }
 }
 
 export interface CustomSection {
@@ -17,12 +22,21 @@ export interface CustomSection {
 }
 
 export interface CVData {
+  designOptions: {
+    primaryColor: string;
+    secondaryColor: string;
+    font: string;
+  };
   personalInfo: {
     fullName: string;
     email: string;
     phone: string;
     location: string;
+    title: string;
     summary: string;
+    personal_website: string;
+    linkedin: string;
+    github: string;
   };
   experience: Array<{
     id: string;

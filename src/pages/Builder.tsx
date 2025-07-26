@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star, Type, Palette } from 'lucide-react';
 import BuilderSidebar from '@/components/builder/BuilderSidebar';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -21,6 +21,7 @@ import html2canvas from 'html2canvas';
 import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
+import { DesignOptionsModal } from '@/components/modals/DesignOptionsModal';
 import {
   Tooltip,
   TooltipContent,
@@ -111,6 +112,17 @@ const Builder = () => {
   const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
   const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
   const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const [designOptionsModal, setDesignOptionsModal] = useState<{
+    isOpen: boolean;
+    optionType: 'font' | 'color';
+    currentValue?: string;
+    specificOption?: 'font' | 'primaryColor' | 'secondaryColor';
+  }>({
+    isOpen: false,
+    optionType: 'font',
+    currentValue: '',
+    specificOption: 'font'
+  });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     // Check if we're on a mobile screen (width < 768px)
     if (typeof window !== 'undefined') {
@@ -391,6 +403,37 @@ const Builder = () => {
     setAIEnhancerOpen(true);
   };
 
+  const handleDesignOption = (optionType: 'font' | 'primaryColor' | 'secondaryColor') => {
+    const currentValue = cvData?.designOptions?.[optionType] || '';
+    
+    setDesignOptionsModal({
+      isOpen: true,
+      optionType: optionType === 'font' ? 'font' : 'color',
+      currentValue,
+      specificOption: optionType
+    });
+  };
+
+  const handleDesignOptionSave = (value: string) => {
+    if (!cvData || !designOptionsModal.specificOption) return;
+    
+    const updatedCVData = {
+      ...cvData,
+      designOptions: {
+        ...cvData.designOptions,
+        [designOptionsModal.specificOption]: value
+      }
+    };
+    
+    setCVData(updatedCVData);
+    saveCV(updatedCVData, deletedSections, cvSections);
+    
+    toast({
+      title: "Design Updated",
+      description: `${designOptionsModal.specificOption === 'font' ? 'Font' : 'Color'} has been updated successfully.`
+    });
+  };
+
   const handleAISectionsGenerated = (updatedCVData: CVData, newSectionIds: string[]) => {
     try {
       // Save current state to history
@@ -405,7 +448,16 @@ const Builder = () => {
           email: '',
           phone: '',
           location: '',
-          summary: ''
+          title: '',
+          summary: '',
+          personal_website: '',
+          linkedin: '',
+          github: ''
+        },
+        designOptions: updatedCVData.designOptions || {
+          primaryColor: 'blue',
+          secondaryColor: 'purple',
+          font: 'inter'
         },
         experience: Array.isArray(updatedCVData.experience) ? updatedCVData.experience : [],
         education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
@@ -662,7 +714,16 @@ const Builder = () => {
         email: '',
         phone: '',
         location: '',
-        summary: ''
+        title: '',
+        summary: '',
+        personal_website: '',
+        linkedin: '',
+        github: ''
+      },
+      designOptions: cvData.designOptions || {
+        primaryColor: 'blue',
+        secondaryColor: 'purple',
+        font: 'inter'
       },
       experience: Array.isArray(cvData.experience) ? cvData.experience : [],
       education: Array.isArray(cvData.education) ? cvData.education : [],
@@ -715,7 +776,16 @@ const Builder = () => {
         email: '',
         phone: '',
         location: '',
-        summary: ''
+        title: '',
+        summary: '',
+        personal_website: '',
+        linkedin: '',
+        github: ''
+      },
+      designOptions: updatedData.designOptions || {
+        primaryColor: 'blue',
+        secondaryColor: 'purple',
+        font: 'inter'
       },
       experience: Array.isArray(updatedData.experience) ? updatedData.experience : [],
       education: Array.isArray(updatedData.education) ? updatedData.education : [],
@@ -814,9 +884,27 @@ const Builder = () => {
             <p className="text-sm text-gray-600">
               <strong>Location:</strong> {cvData.personalInfo?.location || 'Not provided'}
             </p>
+            <p className="text-sm text-gray-600">
+              <strong>Title:</strong> {cvData.personalInfo?.title || 'Not provided'}
+            </p>
             {cvData.personalInfo?.summary && (
               <p className="text-sm text-gray-600">
                 <strong>Summary:</strong> {cvData.personalInfo.summary}
+              </p>
+            )}
+            {cvData.personalInfo?.linkedin && (
+              <p className="text-sm text-gray-600">
+                <strong>linkedIn:</strong> {cvData.personalInfo.linkedin}
+              </p>
+            )}
+            {cvData.personalInfo?.personal_website && (
+              <p className="text-sm text-gray-600">
+                <strong>Website:</strong> {cvData.personalInfo.personal_website}
+              </p>
+            )}
+            {cvData.personalInfo?.github && (
+              <p className="text-sm text-gray-600">
+                <strong>Github:</strong> {cvData.personalInfo.github}
               </p>
             )}
           </div>
@@ -1033,27 +1121,32 @@ const Builder = () => {
                     <span className="hidden sm:inline">Settings</span>
                   </Button>
 
-                  {/* Preview - Icon only on mobile */}
-                  <Button 
-                    variant="outline"
-                    onClick={handlePreview}
-                    className="btn-preview border border-gray-300 hover:border-blue-500 hover:bg-blue-50 rounded-md px-2 py-1 h-7 text-xs"
-                    title="Preview"
-                  >
-                    <Eye className="h-3 w-3 sm:mr-1" />
-                    <span className="hidden sm:inline">Preview</span>
-                  </Button>
-                  
                   {/* Save - Compact on mobile */}
                   <Button 
                     onClick={handleSave} 
                     disabled={isSaving} 
-                    className="btn-save bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs"
+                    className="hidden sm:flex btn-save bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 px-2 sm:px-3 py-1 h-7 text-xs"
                   >
                     <Save className="h-3 w-3 sm:mr-1" />
                     <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save CV'}</span>
                     <span className="sm:hidden">{isSaving ? '...' : 'Save'}</span>
                   </Button>
+
+                  
+                  {/* Preview - Icon only on mobile */}
+                  <Button 
+                    variant="outline"
+                    onClick={handlePreview}
+                    className="btn-preview bg-gradient-to-r from-orange-500 to-red-500 text-white hover:text-white shadow-lg hover:from-orange-600 hover:to-red-600 rounded-md px-2 py-1 h-7 text-xs"
+                    title="Preview"
+                  >
+                    <Eye className="h-3 w-3 sm:mr-1" />
+                    <span className="inline">Preview</span>
+                  </Button>
+                  
+
+
+
                 </div>
               </div>
             </div>
@@ -1129,6 +1222,106 @@ const Builder = () => {
                       )}
                     </CardContent>
                   </Card>
+
+                  {/* CV Design Options */}
+                  {currentTemplateInfo?.options && 
+                  <Card className="design-options bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-red-50 to-blue-50 py-3 sm:py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
+                            <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base sm:text-lg font-bold text-gray-900">CV Design Options</CardTitle>
+                            {/* <p className="text-xs sm:text-sm text-gray-600">Drag to CV structure</p> */}
+                          </div>
+                        </div>
+                        <Badge className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-0 px-2 sm:px-3 py-1 text-xs font-semibold">
+                          {Object.values(currentTemplateInfo.options || {}).filter(Boolean).length} options
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="space-y-3">
+                        {currentTemplateInfo.options?.hasFont && (
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                                <Type className="h-4 w-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">Font Style</p>
+                                <p className="text-xs text-gray-600">Customize your CV typography</p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDesignOption('font')}
+                              className="border-blue-200 hover:border-blue-400 hover:bg-blue-50 w-full sm:w-auto"
+                            >
+                              Choose Font
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {currentTemplateInfo.options?.hasPrimaryColor && (
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100 gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                                <Palette className="h-4 w-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">Primary Color</p>
+                                <p className="text-xs text-gray-600">Set your main accent color</p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDesignOption('primaryColor')}
+                              className="border-purple-200 hover:border-purple-400 hover:bg-purple-50 w-full sm:w-auto"
+                            >
+                              Choose Color
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {currentTemplateInfo.options?.hasSecondaryColor && (
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gradient-to-r from-green-50 to-teal-50 rounded-xl border border-green-100 gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
+                                <Palette className="h-4 w-4 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">Secondary Color</p>
+                                <p className="text-xs text-gray-600">Set your secondary accent color</p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDesignOption('secondaryColor')}
+                              className="border-green-200 hover:border-green-400 hover:bg-green-50 w-full sm:w-auto"
+                            >
+                              Choose Color
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {!currentTemplateInfo.options && (
+                          <div className="text-center py-6 text-gray-500">
+                            <Palette className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                            <p className="text-sm">No design options available for this template</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                }
+
+
 
                   {/* CV Structure Section */}
                   <Card className="bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden">
@@ -1286,6 +1479,20 @@ const Builder = () => {
             onRealTimeUpdate={handleRealTimeMetadataUpdate}
           />
         )}
+
+        {/* Design Options Modal */}
+        <DesignOptionsModal
+          isOpen={designOptionsModal.isOpen}
+          onClose={() => setDesignOptionsModal({ 
+            isOpen: false, 
+            optionType: 'font', 
+            currentValue: '', 
+            specificOption: 'font' 
+          })}
+          optionType={designOptionsModal.optionType}
+          currentValue={designOptionsModal.currentValue}
+          onSave={handleDesignOptionSave}
+        />
       </div>
       <Joyride
         steps={joyrideSteps}

@@ -83,7 +83,8 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
 
   const renderPersonalInfoSection = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="fullName">Full Name</Label>
           <Input
@@ -129,6 +130,17 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
+        <div className='col-span-2'>
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            value={localData.personalInfo?.title || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, title: e.target.value }
+            })}
+          />
+        </div>
       </div>
       
       <div>
@@ -155,6 +167,45 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
           placeholder="Write a brief professional summary..."
         />
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+          <Label htmlFor="linkedin">Linkedin Account</Label>
+          <Input
+            id="linkedin"
+            type="linkedin"
+            value={localData.personalInfo?.linkedin || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, linkedin: e.target.value }
+            })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="personal_website">Personal Website</Label>
+          <Input
+            id="personal_website"
+            value={localData.personalInfo?.personal_website || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, personal_website: e.target.value }
+            })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="github">Github Account</Label>
+          <Input
+            id="github"
+            value={localData.personalInfo?.github || ''}
+            onChange={(e) => setLocalData({
+              ...localData,
+              personalInfo: { ...localData.personalInfo!, github: e.target.value }
+            })}
+          />
+        </div>
+      </div>
+
+
     </div>
   );
 

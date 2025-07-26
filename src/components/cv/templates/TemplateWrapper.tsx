@@ -9,14 +9,17 @@ const TemplateWrapper = ({ cvData, sections, template }: { cvData: any, sections
       className="cv-wrapper"
       style={{
         width: '794px',
-        height: '1123px',
+        // height: '1123px',
+        height: "fit-content",
         backgroundColor: '#ffffff',
-        overflow: 'scroll',
+        // overflow: 'scroll',
+        overflow: 'hidden',
         fontSize: '14px',
         lineHeight: '1.4',
         fontFamily: 'system-ui, -apple-system, sans-serif',
         margin: '0 auto',
-        boxShadow: '0 0 20px rgba(0,0,0,0.1)'
+        boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+        border: '10px solid #e0e0e0',
       }}
     >
       {cvData && sections && sections.length > 0 ? (

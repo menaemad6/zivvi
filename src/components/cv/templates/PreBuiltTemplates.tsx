@@ -7,11 +7,62 @@ interface PreBuiltTemplatesProps {
   templateId: string;
 }
 
+// Design options utility functions
+const getFontFamily = (font?: string) => {
+  switch (font) {
+    case 'roboto': return 'Roboto, sans-serif';
+    case 'open-sans': return 'Open Sans, sans-serif';
+    case 'lato': return 'Lato, sans-serif';
+    case 'poppins': return 'Poppins, sans-serif';
+    case 'montserrat': return 'Montserrat, sans-serif';
+    case 'raleway': return 'Raleway, sans-serif';
+    case 'source-sans-pro': return 'Source Sans Pro, sans-serif';
+    default: return 'Inter, sans-serif';
+  }
+};
+
+const getColorStyles = (primaryColor?: string, secondaryColor?: string) => {
+  const colorMap = {
+    blue: { primary: '#3B82F6', secondary: '#1E40AF', bg: '#DBEAFE' },
+    purple: { primary: '#8B5CF6', secondary: '#6D28D9', bg: '#EDE9FE' },
+    green: { primary: '#10B981', secondary: '#059669', bg: '#D1FAE5' },
+    red: { primary: '#EF4444', secondary: '#DC2626', bg: '#FEE2E2' },
+    orange: { primary: '#F97316', secondary: '#EA580C', bg: '#FED7AA' },
+    pink: { primary: '#EC4899', secondary: '#DB2777', bg: '#FCE7F3' },
+    indigo: { primary: '#6366F1', secondary: '#4F46E5', bg: '#E0E7FF' },
+    teal: { primary: '#14B8A6', secondary: '#0D9488', bg: '#CCFBF1' },
+  };
+
+  const primary = colorMap[primaryColor as keyof typeof colorMap] || colorMap.blue;
+  const secondary = colorMap[secondaryColor as keyof typeof colorMap] || colorMap.purple;
+
+  return { primary, secondary };
+};
+
+const CV_PAGE_STYLE: React.CSSProperties = {
+  width: '210mm',
+  minHeight: '297mm',
+  padding: '20mm',
+  backgroundColor: '#fff',
+  boxSizing: 'border-box',
+  // fontFamily: 'Inter, sans-serif',
+  color: '#222',
+  margin: '0 auto',
+  boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
+  position: 'relative',
+  overflow: 'visible',
+  display: 'block',
+};
+
+
 const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
     "personalInfo", "experience", "education", "skills", "references"
   ]).forEach(s => { sectionMap[s] = true; });
+
+  const DesignFontFamily = getFontFamily(cvData.designOptions?.font);
+  const designColors = getColorStyles(cvData.designOptions?.primaryColor, cvData.designOptions?.secondaryColor);
 
   const renderProfile = () => (
     <section style={{ marginBottom: '10mm' }}>
@@ -122,18 +173,8 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   return (
     <div className="cv-page" style={{
-      width: '210mm',
-      minHeight: '297mm',
-      padding: '20mm',
-      backgroundColor: '#fff',
-      boxSizing: 'border-box',
-      fontFamily: 'Inter, sans-serif',
-      color: '#222',
-      margin: '0 auto',
-      boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
-      position: 'relative',
-      overflow: 'visible',
-      display: 'block',
+      ...CV_PAGE_STYLE,
+      fontFamily: DesignFontFamily
     }}>
       {(sectionMap["profile"] || sectionMap["personalInfo"]) && renderProfile()}
       {sectionMap["experience"] && renderEmployment()}
@@ -145,6 +186,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 };
 
+// Doesnt Use The Proper Style 
 const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
@@ -317,6 +359,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       overflow: 'visible',
       display: 'flex',
       flexDirection: 'column',
+
     }}>
       <div style={{
       display: 'flex',
@@ -1204,6 +1247,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 };
 
+// Doesnt Use The Proper Style
 const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
@@ -1584,6 +1628,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 };
 
+// Doesnt Use The Proper Style
 const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [

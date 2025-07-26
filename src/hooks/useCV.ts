@@ -11,7 +11,16 @@ const getStarterData = (): CVData => ({
     email: '',
     phone: '',
     location: '',
-    summary: ''
+    title: '',
+    summary: '',
+    personal_website: '',
+    linkedin: '',
+    github: ''
+  },
+  designOptions: {
+    primaryColor: 'blue',
+    secondaryColor: 'purple',
+    font: 'inter',
   },
   experience: [],
   education: [],
@@ -38,7 +47,16 @@ export const useCV = (cvId: string | undefined) => {
           email: '',
           phone: '',
           location: '',
-          summary: ''
+          title: '',
+          summary: '',
+          personal_website: '',
+          linkedin: '',
+          github: ''
+        },
+        designOptions: {
+          primaryColor: 'blue',
+          secondaryColor: 'purple',
+          font: 'inter',
         },
         experience: [],
         education: [],
@@ -99,6 +117,7 @@ export const useCV = (cvId: string | undefined) => {
         const starterData = getStarterData();
         const cvData: CVData = {
           personalInfo: parsedData.personalInfo || starterData.personalInfo,
+          designOptions: parsedData.designOptions || starterData.designOptions,
           experience: Array.isArray(parsedData.experience) ? parsedData.experience : [],
           education: Array.isArray(parsedData.education) ? parsedData.education : [],
           skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
@@ -111,7 +130,7 @@ export const useCV = (cvId: string | undefined) => {
         // Create default structure with starter data
         setCVData(getStarterData());
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading CV:', error);
       setCVExists(false);
       toast({
@@ -135,8 +154,19 @@ export const useCV = (cvId: string | undefined) => {
       const sectionsToSave = activeSections || [];
       
       // Prepare minimal content - only save what's needed
-      const contentToSave: any = {
-        personalInfo: data.personalInfo
+      const contentToSave: {
+        personalInfo: CVData['personalInfo'];
+        designOptions: CVData['designOptions'];
+        experience?: CVData['experience'];
+        education?: CVData['education'];
+        skills?: CVData['skills'];
+        projects?: CVData['projects'];
+        references?: CVData['references'];
+        _deletedSections?: string[];
+        _sections?: string[];
+      } = {
+        personalInfo: data.personalInfo,
+        designOptions: data.designOptions
       };
 
       // Only add sections if they're active and have content
@@ -175,11 +205,11 @@ export const useCV = (cvId: string | undefined) => {
         title: "CV Saved!",
         description: "Your changes have been saved successfully."
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving CV:', error);
       toast({
         title: "Error saving CV",
-        description: error.message,
+        description: error instanceof Error ? error.message : "An unknown error occurred",
         variant: "destructive"
       });
     } finally {
@@ -207,7 +237,7 @@ export const useCV = (cvId: string | undefined) => {
         description: "CV name and description updated successfully."
       });
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating CV metadata:', error);
       toast({
         title: "Error",

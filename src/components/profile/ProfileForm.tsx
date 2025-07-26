@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Calendar, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProfileFormProps {
   profile: any;
@@ -144,6 +145,24 @@ export const ProfileForm = ({ profile, onUpdate, onEditProfessionalInfo }: Profi
                 <Label className="text-sm font-medium text-gray-700">Career Goals</Label>
                 <p className="text-gray-900">{profileData.career_goals}</p>
               </div>
+            )}
+            {profileData.personal_website && (
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Personal Website</Label>
+                <p className="text-gray-900"><Link to={profileData.personal_website} target="_blank">{ profileData.personal_website.includes("https://") ? profileData.personal_website.split("/")[2] : profileData.personal_website}</Link></p>
+              </div> 
+            )}
+            {profileData.linkedin && (
+              <div>
+                <Label className="text-sm font-medium text-gray-700">LinkedIn Account</Label>
+                <p className="text-gray-900"><Link to={profileData.linkedin} target="_blank">{ profileData.linkedin.includes("https://") ? profileData.linkedin.split("/")[2] : profileData.linkedin}</Link></p>
+              </div> 
+            )}
+            {profileData.github && (
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Github Account</Label>
+                <p className="text-gray-900"><Link to={profileData.github} target="_blank">{ profileData.github.includes("https://") ? profileData.github.split("/")[2] : profileData.github}</Link></p>
+              </div> 
             )}
             <div className="flex justify-end gap-2 mt-4">
               <Button onClick={onEditProfessionalInfo}>
