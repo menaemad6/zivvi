@@ -1,4 +1,3 @@
-
 // Gemini API configuration
 const API_KEY = "AIzaSyCPq1M1m4GNyHBwnEILA874_Td9mxtRd8s";
 // const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
@@ -99,6 +98,23 @@ export function parseAIResponse(aiResponse: string, sectionType: string) {
 function extractStructuredData(text: string, sectionType: string) {
   try {
     switch (sectionType) {
+      case 'job_match': {
+        // Extract job matching data
+        const matchScoreMatch = text.match(/match\s*score:?\s*(\d+)/i);
+        const missingSkillsMatch = text.match(/missing\s*skills?:?\s*([^\n]+)/i);
+        
+        return {
+          matchScore: matchScoreMatch ? parseInt(matchScoreMatch[1]) : 70,
+          missingSkills: missingSkillsMatch ? 
+            missingSkillsMatch[1].split(',').map(skill => skill.trim()) : [],
+          recommendations: {
+            personalInfo: {
+              summary: "Enhanced summary based on job requirements"
+            }
+          }
+        };
+      }
+
       case 'about': {
         // Basic extraction for about section
         const nameMatch = text.match(/name:?\s*([^\n]+)/i);

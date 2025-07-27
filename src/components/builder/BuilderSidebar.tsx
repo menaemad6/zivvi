@@ -18,7 +18,8 @@ import {
   Camera,
   RefreshCw,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Crosshair
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -35,11 +36,12 @@ interface BuilderSidebarProps {
   onAIAssist: () => void;
   onAIOptimizer: () => void;
   onAIEnhancer: () => void;
+  onJobMatcher: () => void;
   onTemplateNavigation: () => void;
   onSave: () => void;
 }
 
- const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
+const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   availableSections,
   onDragStart,
   collapsed = false,
@@ -47,6 +49,7 @@ interface BuilderSidebarProps {
   onAIAssist,
   onAIOptimizer,
   onAIEnhancer,
+  onJobMatcher,
   onTemplateNavigation,
   onSave
 }) => {
@@ -117,12 +120,17 @@ interface BuilderSidebarProps {
                   gradient: 'from-pink-600 to-red-600'
                 },
                 { 
+                  icon: Crosshair, 
+                  label: 'Job Matcher', 
+                  action: onJobMatcher, 
+                  gradient: 'from-blue-600 to-cyan-600'
+                },
+                { 
                   icon: Lightbulb, 
                   label: 'Smart Tips', 
                   action: () => toast({ title: "Coming Soon!", description: "Smart tips feature is in development." }), 
                   gradient: 'from-yellow-600 to-orange-600'
                 },
-                
                 { 
                   icon: Languages, 
                   label: 'Multi-Language', 
@@ -226,4 +234,5 @@ interface BuilderSidebarProps {
     </div>
   );
 };
+
 export default BuilderSidebar;
