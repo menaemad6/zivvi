@@ -341,11 +341,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         projects: [...(cvData.projects || [])],
         references: [...(cvData.references || [])],
         designOptions: {
-          template: cvData.designOptions?.template || 'classic',
-          colorScheme: cvData.designOptions?.colorScheme || 'blue',
-          fontSize: cvData.designOptions?.fontSize || 'medium',
-          spacing: cvData.designOptions?.spacing || 'normal',
-          fontFamily: cvData.designOptions?.fontFamily || 'inter'
+          primaryColor: cvData.designOptions?.primaryColor || '',
+          secondaryColor: cvData.designOptions?.secondaryColor || '',
+          font: cvData.designOptions?.font || 'inter'
         }
       };
 
@@ -422,11 +420,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
         references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
         designOptions: {
-          template: updatedCVData.designOptions?.template || 'classic',
-          colorScheme: updatedCVData.designOptions?.colorScheme || 'blue',
-          fontSize: updatedCVData.designOptions?.fontSize || 'medium',
-          spacing: updatedCVData.designOptions?.spacing || 'normal',
-          fontFamily: updatedCVData.designOptions?.fontFamily || 'inter'
+          primaryColor: updatedCVData.designOptions?.primaryColor || '',
+          secondaryColor: updatedCVData.designOptions?.secondaryColor || '',
+          font: updatedCVData.designOptions?.font || 'inter'
         }
       };
 
