@@ -340,12 +340,12 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         skills: [...(cvData.skills || [])],
         projects: [...(cvData.projects || [])],
         references: [...(cvData.references || [])],
-        designOptions: cvData.designOptions || {
-          template: 'classic',
-          colorScheme: 'blue',
-          fontSize: 'medium',
-          spacing: 'normal',
-          fontFamily: 'inter'
+        designOptions: {
+          template: cvData.designOptions?.template || 'classic',
+          colorScheme: cvData.designOptions?.colorScheme || 'blue',
+          fontSize: cvData.designOptions?.fontSize || 'medium',
+          spacing: cvData.designOptions?.spacing || 'normal',
+          fontFamily: cvData.designOptions?.fontFamily || 'inter'
         }
       };
 
@@ -421,12 +421,12 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
         references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
-        designOptions: updatedCVData.designOptions || {
-          template: 'classic',
-          colorScheme: 'blue',
-          fontSize: 'medium',
-          spacing: 'normal',
-          fontFamily: 'inter'
+        designOptions: {
+          template: updatedCVData.designOptions?.template || 'classic',
+          colorScheme: updatedCVData.designOptions?.colorScheme || 'blue',
+          fontSize: updatedCVData.designOptions?.fontSize || 'medium',
+          spacing: updatedCVData.designOptions?.spacing || 'normal',
+          fontFamily: updatedCVData.designOptions?.fontFamily || 'inter'
         }
       };
 
