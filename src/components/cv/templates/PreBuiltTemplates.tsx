@@ -127,7 +127,10 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const renderProfile = () => (
     <section style={{ marginBottom: '6mm' }}>
       <div style={{ textAlign: 'center' }}>
-        <h1 style={{ fontSize: '18pt',  fontWeight: 700, letterSpacing: '0.5px', marginBottom: '2mm' }}>{cvData.personalInfo?.fullName || "Your Name"}</h1>
+        <h1 style={{ fontSize: '18pt',  fontWeight: 700, letterSpacing: '0.5px', marginBottom: '1mm' }}>{cvData.personalInfo?.fullName || "Your Name"}</h1>
+        {cvData.personalInfo?.title &&
+          <h1 style={{ fontSize: '12pt',  fontWeight: 500, letterSpacing: '0.5px', marginBottom: '1mm' }}>{cvData.personalInfo?.title}</h1>
+        }
         <div style={{ fontSize: '10pt', color: '#555', marginBottom:'2mm' }}>
           {cvData.personalInfo?.location || "80 Gold Street, New York, NY 10038, United States"}, {cvData.personalInfo?.phone || "(917) 407-2179"}, {cvData.personalInfo?.email || "tim.stewart@gmail.com"}
         </div>

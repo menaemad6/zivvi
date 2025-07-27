@@ -65,6 +65,11 @@ Provide a detailed analysis in JSON format:
   ]
 }
 
+For education suggestions specifically:
+- Use the degree name as the "title" field
+- Use the degree name again as the "originalText" field
+- Provide an enhanced degree name in the "enhancedText" field
+
 Focus on:
 1. Adding job-specific keywords naturally
 2. Highlighting relevant achievements with metrics
@@ -174,6 +179,36 @@ Provide 5-8 specific suggestions covering different CV sections.`;
           updatedCV.skills = mergedSkills;
         }
         break;
+      case 'education':
+        if (updatedCV.education) {
+          // Log for debugging
+          console.log('Education suggestion:', suggestion);
+          console.log('Current education data:', updatedCV.education);
+          
+          // More flexible matching - try to find any education entry that might match
+          const eduIndex = updatedCV.education.findIndex(edu => {
+            // Try to match by degree or school, with more flexible comparison
+            return (
+              edu.degree.toLowerCase().includes(suggestion.title.toLowerCase()) || 
+              suggestion.title.toLowerCase().includes(edu.degree.toLowerCase()) ||
+              edu.school.toLowerCase().includes(suggestion.originalText.toLowerCase()) ||
+              suggestion.originalText.toLowerCase().includes(edu.school.toLowerCase())
+            );
+          });
+          
+          console.log('Found education index:', eduIndex);
+          
+          if (eduIndex !== -1) {
+            // Update the degree field with the enhanced text
+            console.log('Updating education degree from:', updatedCV.education[eduIndex].degree, 'to:', suggestion.enhancedText);
+            updatedCV.education[eduIndex].degree = suggestion.enhancedText;
+          } else if (updatedCV.education.length > 0) {
+            // If no match found but education entries exist, update the first one
+            console.log('No exact match found, updating first education entry');
+            updatedCV.education[0].degree = suggestion.enhancedText;
+          }
+        }
+        break;
     }
     
     onUpdateCV(updatedCV);
@@ -184,7 +219,7 @@ Provide 5-8 specific suggestions covering different CV sections.`;
   };
 
   const applyAllSuggestions = () => {
-    let updatedCV = { ...cvData };
+    const updatedCV = { ...cvData };
     
     suggestions.forEach(suggestion => {
       switch (suggestion.type) {
@@ -219,6 +254,17 @@ Provide 5-8 specific suggestions covering different CV sections.`;
             const existingSkills = updatedCV.skills || [];
             const mergedSkills = [...new Set([...existingSkills, ...newSkills])];
             updatedCV.skills = mergedSkills;
+          }
+          break;
+        case 'education':
+          if (updatedCV.education) {
+            const eduIndex = updatedCV.education.findIndex(edu => 
+              edu.degree === suggestion.title || edu.school === suggestion.originalText
+            );
+            if (eduIndex !== -1) {
+              // Update the degree field with the enhanced text
+              updatedCV.education[eduIndex].degree = suggestion.enhancedText;
+            }
           }
           break;
       }
