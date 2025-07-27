@@ -17,6 +17,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { AnalyticsSection } from '@/components/analytics/AnalyticsSection';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import { useDuplicateCV } from '@/hooks/useDuplicateCv';
+import { cvTemplates } from '@/data/templates';
 
 interface CV {
   id: string;
@@ -357,7 +358,7 @@ const Dashboard = () => {
                                   )}
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                     <Badge className="capitalize bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0 px-2 py-1 text-xs sm:text-sm w-fit">
-                                      {cv.template}
+                                      {cvTemplates.find(template => template.id === cv.template)?.name}
                                     </Badge>
                                     <span className="flex items-center text-xs sm:text-sm text-gray-500">
                                       <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
