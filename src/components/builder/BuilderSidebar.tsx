@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -186,7 +185,7 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
               {[
                 { 
                   icon: Shuffle, 
-                  label: 'Templates', 
+                  label: 'Change Template', 
                   action: onTemplateNavigation,
                   color: 'from-blue-500 to-cyan-500'
                 },
