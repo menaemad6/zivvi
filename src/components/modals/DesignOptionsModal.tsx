@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Palette, Type, Check } from 'lucide-react';
+import { HexColorPicker } from 'react-colorful';
 
 interface DesignOptionsModalProps {
   isOpen: boolean;
@@ -44,15 +45,36 @@ export const DesignOptionsModal = ({
   onSave 
 }: DesignOptionsModalProps) => {
   const [selectedValue, setSelectedValue] = useState(currentValue || '');
+  const [customColor, setCustomColor] = useState(currentValue && !COLOR_OPTIONS.find(c => c.value === currentValue) ? currentValue : '#3B82F6');
+  const [useCustomColor, setUseCustomColor] = useState(currentValue && !COLOR_OPTIONS.find(c => c.value === currentValue) ? true : false);
 
   // Update selectedValue when currentValue prop changes
   useEffect(() => {
-    setSelectedValue(currentValue || '');
+    if (currentValue) {
+      setSelectedValue(currentValue);
+      // Check if currentValue is a hex color and not in COLOR_OPTIONS
+      const isCustomColor = currentValue.startsWith('#') && !COLOR_OPTIONS.find(c => c.value === currentValue);
+      setUseCustomColor(isCustomColor);
+      if (isCustomColor) {
+        setCustomColor(currentValue);
+      }
+    } else {
+      setSelectedValue('');
+    }
   }, [currentValue]);
 
   const handleSave = () => {
-    onSave(selectedValue);
+    if (optionType === 'color' && useCustomColor) {
+      onSave(customColor);
+    } else {
+      onSave(selectedValue);
+    }
     onClose();
+  };
+
+  const handleColorChange = (color: string) => {
+    setCustomColor(color);
+    setSelectedValue(color);
   };
 
   const renderFontOptions = () => (
@@ -91,38 +113,86 @@ export const DesignOptionsModal = ({
   );
 
   const renderColorOptions = () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-      {COLOR_OPTIONS.map((color) => (
-        <Card 
-          key={color.value}
-          className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-            selectedValue === color.value 
-              ? 'ring-2 ring-blue-500' 
-              : 'hover:bg-gray-50'
-          }`}
-          onClick={() => setSelectedValue(color.value)}
-        >
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex flex-col items-center space-y-2">
-              <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-200 flex items-center justify-center"
-                style={{ backgroundColor: color.bgColor }}
-              >
-                <div 
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-full"
-                  style={{ backgroundColor: color.color }}
+    <div className="space-y-6">
+      {/* Predefined color options */}
+      <div>
+        <h3 className="text-sm font-medium mb-3">Predefined Colors</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+          {COLOR_OPTIONS.map((color) => (
+            <Card 
+              key={color.value}
+              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                selectedValue === color.value && !useCustomColor
+                  ? 'ring-2 ring-blue-500' 
+                  : 'hover:bg-gray-50'
+              }`}
+              onClick={() => {
+                setSelectedValue(color.value);
+                setUseCustomColor(false);
+              }}
+            >
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <div 
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-200 flex items-center justify-center"
+                    style={{ backgroundColor: color.bgColor }}
+                  >
+                    <div 
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full"
+                      style={{ backgroundColor: color.color }}
+                    />
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 text-center">{color.label}</p>
+                  {selectedValue === color.value && !useCustomColor && (
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                      <Check className="h-2 w-2 sm:h-3 sm:w-3 text-white" />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+      
+      {/* Custom color picker */}
+      <div>
+        <h3 className="text-sm font-medium mb-3">Custom Color</h3>
+        <Card className={`transition-all duration-200 ${useCustomColor ? 'ring-2 ring-blue-500' : ''}`}>
+          <CardContent className="p-4">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="use-custom-color" className="font-medium">Use custom color</Label>
+                <input 
+                  type="checkbox" 
+                  id="use-custom-color"
+                  checked={useCustomColor}
+                  onChange={(e) => setUseCustomColor(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </div>
-              <p className="text-xs sm:text-sm font-medium text-gray-700 text-center">{color.label}</p>
-              {selectedValue === color.value && (
-                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                  <Check className="h-2 w-2 sm:h-3 sm:w-3 text-white" />
+              
+              {useCustomColor && (
+                <div className="space-y-4">
+                  <HexColorPicker color={customColor} onChange={handleColorChange} />
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-8 h-8 rounded-md border border-gray-300"
+                      style={{ backgroundColor: customColor }}
+                    />
+                    <input
+                      type="text"
+                      value={customColor}
+                      onChange={(e) => handleColorChange(e.target.value)}
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
-      ))}
+      </div>
     </div>
   );
 
@@ -158,7 +228,7 @@ export const DesignOptionsModal = ({
           </Button>
           <Button 
             onClick={handleSave}
-            disabled={!selectedValue}
+            disabled={!selectedValue && !useCustomColor}
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
           >
             Apply {optionType === 'font' ? 'Font' : 'Color'}
@@ -167,4 +237,4 @@ export const DesignOptionsModal = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

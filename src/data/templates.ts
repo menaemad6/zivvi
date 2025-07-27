@@ -10,7 +10,6 @@ export const cvTemplates: CVTemplate[] = [
     category: 'classic',
     options: {
       hasFont: true,
-      hasPrimaryColor: true,
     }
   },
   {
@@ -22,7 +21,6 @@ export const cvTemplates: CVTemplate[] = [
     options: {
       hasFont: true,
       hasPrimaryColor: true,
-      hasSecondaryColor: true,
     }
   },
   {
@@ -89,7 +87,6 @@ export const cvTemplates: CVTemplate[] = [
     options: {
       hasFont: true,
       hasPrimaryColor: true,
-      hasSecondaryColor: true,
     }
   },
   {

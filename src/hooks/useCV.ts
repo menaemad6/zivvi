@@ -18,8 +18,8 @@ const getStarterData = (): CVData => ({
     github: ''
   },
   designOptions: {
-    primaryColor: 'blue',
-    secondaryColor: 'purple',
+    primaryColor: '',
+    secondaryColor: '',
     font: 'inter',
   },
   experience: [],
@@ -54,8 +54,8 @@ export const useCV = (cvId: string | undefined) => {
           github: ''
         },
         designOptions: {
-          primaryColor: 'blue',
-          secondaryColor: 'purple',
+          primaryColor: '',
+          secondaryColor: '',
           font: 'inter',
         },
         experience: [],

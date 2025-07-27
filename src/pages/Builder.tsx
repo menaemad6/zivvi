@@ -455,8 +455,8 @@ const Builder = () => {
           github: ''
         },
         designOptions: updatedCVData.designOptions || {
-          primaryColor: 'blue',
-          secondaryColor: 'purple',
+          primaryColor: '',
+          secondaryColor: '',
           font: 'inter'
         },
         experience: Array.isArray(updatedCVData.experience) ? updatedCVData.experience : [],

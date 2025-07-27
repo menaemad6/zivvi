@@ -87,7 +87,7 @@ const Templates = () => {
         designOptions: {
           primaryColor: '',
           secondaryColor: '',
-          font: '',
+          font: 'inter',
         },
         experience: [],
         education: [],
