@@ -34,6 +34,7 @@ import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 import Joyride, { CallBackProps as JoyrideCallBackProps } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 import TemplateWrapper from '@/components/cv/templates/TemplateWrapper';
+import JobMatcherModal from '@/components/builder/JobMatcherModal';
 
 const Builder = () => {
   const { id } = useParams();
@@ -112,6 +113,7 @@ const Builder = () => {
   const [aiAssistantOpen, setAIAssistantOpen] = useState(false);
   const [aiOptimizerOpen, setAIOptimizerOpen] = useState(false);
   const [aiEnhancerOpen, setAIEnhancerOpen] = useState(false);
+  const [jobMatcherOpen, setJobMatcherOpen] = useState(false);
   const [designOptionsModal, setDesignOptionsModal] = useState<{
     isOpen: boolean;
     optionType: 'font' | 'color';
@@ -401,6 +403,10 @@ const Builder = () => {
 
   const handleAIEnhancer = () => {
     setAIEnhancerOpen(true);
+  };
+
+  const handleJobMatcher = () => {
+    setJobMatcherOpen(true);
   };
 
   const handleDesignOption = (optionType: 'font' | 'primaryColor' | 'secondaryColor') => {
@@ -1162,6 +1168,7 @@ const Builder = () => {
                 onAIAssist={handleAIAssist}
                 onAIOptimizer={handleAIOptimizer}
                 onAIEnhancer={handleAIEnhancer}
+                onJobMatcher={handleJobMatcher}
                 onTemplateNavigation={() => navigate('/templates')}
                 onSave={handleSave}
               />
@@ -1454,6 +1461,16 @@ const Builder = () => {
             setOpen={setAIAssistantOpen}
             onSectionsGenerated={handleAISectionsGenerated}
             cvData={cvData}
+          />
+        )}
+
+        {/* Job Matcher */}
+        {cvData && (
+          <JobMatcherModal
+            isOpen={jobMatcherOpen}
+            onClose={() => setJobMatcherOpen(false)}
+            cvData={cvData}
+            onUpdateCV={handleModalSave}
           />
         )}
 

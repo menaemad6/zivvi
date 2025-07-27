@@ -17,7 +17,7 @@ interface OnboardingModalProps {
   onClose: () => void;
   onComplete: (data: Record<string, unknown>) => void;
   initialData?: Partial<QuestionData>;
-  continueDemo: boolean;
+  continueDemo?: boolean;
 }
 
 interface QuestionData {
