@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +29,10 @@ const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
     setSelectedTemplate(template.id);
   };
 
+  useEffect(() => {
+    handleTemplateSelect(cvTemplates.find(t => t.id === currentTemplate));
+  }, [currentTemplate]);
+
   const handleApplyTemplate = async () => {
     if (selectedTemplate === currentTemplate) {
       toast({
@@ -37,6 +41,7 @@ const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
       });
       return;
     }
+
 
     setIsChanging(true);
     try {
@@ -72,7 +77,7 @@ const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] p-0">
+      <DialogContent className="max-w-4xl max-h-[80vh] p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
@@ -89,7 +94,7 @@ const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-6 pt-4">
+        <ScrollArea className="flex-1 p-6 pt-4 max-h-[calc(80vh-200px)]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {cvTemplates.map((template) => (
               <div
@@ -160,7 +165,7 @@ const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
         </ScrollArea>
 
         {/* Footer */}
-        <div className="p-6 pt-0 border-t">
+        <div className="p-6 pt-3 border-t">
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600">
               {selectedTemplate !== currentTemplate ? (

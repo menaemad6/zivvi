@@ -38,6 +38,7 @@ interface BuilderSidebarProps {
   onJobMatcher: () => void;
   onTemplateNavigation: () => void;
   onSave: () => void;
+  onDuplicate?: () => void; // Add this new prop
 }
 
 const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
@@ -50,7 +51,8 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   onAIEnhancer,
   onJobMatcher,
   onTemplateNavigation,
-  onSave
+  onSave,
+  onDuplicate
 }) => {
   return (
     <div className={`h-full bg-white/90 backdrop-blur-2xl border-r border-gray-200/50 shadow-xl transition-all duration-300 ease-in-out
@@ -192,7 +194,7 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                 { 
                   icon: Copy, 
                   label: 'Duplicate', 
-                  action: () => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." }),
+                  action: onDuplicate || (() => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." })),
                   color: 'from-green-500 to-emerald-500'
                 },
                 { 

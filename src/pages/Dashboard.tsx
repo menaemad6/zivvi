@@ -16,6 +16,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { AnalyticsSection } from '@/components/analytics/AnalyticsSection';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
+import { useDuplicateCV } from '@/hooks/useDuplicateCv';
 
 interface CV {
   id: string;
@@ -117,40 +118,42 @@ const Dashboard = () => {
     }
   };
 
-  const duplicateCV = async (cv: CV) => {
-    try {
-      const { data: originalCV } = await supabase
-        .from('cvs')
-        .select('content')
-        .eq('id', cv.id)
-        .single();
+  // const duplicateCV = async (cv: CV) => {
+  //   try {
+  //     const { data: originalCV } = await supabase
+  //       .from('cvs')
+  //       .select('content')
+  //       .eq('id', cv.id)
+  //       .single();
 
-      const { data, error } = await supabase
-        .from('cvs')
-        .insert({
-          user_id: user!.id,
-          title: `${cv.title} (Copy)`,
-          template: cv.template,
-          content: originalCV?.content || {}
-        })
-        .select()
-        .single();
+  //     const { data, error } = await supabase
+  //       .from('cvs')
+  //       .insert({
+  //         user_id: user!.id,
+  //         title: `${cv.title} (Copy)`,
+  //         template: cv.template,
+  //         content: originalCV?.content || {}
+  //       })
+  //       .select()
+  //       .single();
 
-      if (error) throw error;
+  //     if (error) throw error;
 
-      fetchCVsAndAnalytics();
-      toast({
-        title: "CV Duplicated!",
-        description: "A copy of your CV has been created."
-      });
-    } catch (error) {
-      toast({
-        title: "Error duplicating CV",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
-    }
-  };
+  //     fetchCVsAndAnalytics();
+  //     toast({
+  //       title: "CV Duplicated!",
+  //       description: "A copy of your CV has been created."
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error duplicating CV",
+  //       description: (error as Error).message,
+  //       variant: "destructive"
+  //     });
+  //   }
+  // };
+
+  const {duplicateCv} = useDuplicateCV();
 
   const deleteCV = async (cvId: string) => {
     try {
@@ -387,7 +390,7 @@ const Dashboard = () => {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="bg-white border-0 shadow-xl rounded-xl">
-                                    <DropdownMenuItem onClick={() => duplicateCV(cv)} className="hover:bg-gray-50 rounded-lg">
+                                    <DropdownMenuItem onClick={() => duplicateCv(cv)} className="hover:bg-gray-50 rounded-lg">
                                       <Copy className="mr-2 h-4 w-4" />
                                       Duplicate
                                     </DropdownMenuItem>
