@@ -1485,7 +1485,7 @@ const handleExport = () => {
                         )}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-3 sm:p-6">
+                    <CardContent className="p-0">
                         <div className="cv-preview-outer">
                           <div className="cv-preview-scaler" id="cv-content" >
                             <TemplateWrapper cvData={cvData} sections={cvSections} template={currentTemplate} />
