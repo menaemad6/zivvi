@@ -36,7 +36,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     onClose();
   };
 
-  const generateExperienceDescription = (experience: any) => {
+  const generateExperienceDescription = (experience: {title:string , company:string , startDate:string, endDate:string}) => {
     const prompt = `Generate a professional job description for this work experience:
     
     Position: ${experience.title || 'Not specified'}
@@ -49,7 +49,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     return prompt;
   };
 
-  const generateProjectDescription = (project: any) => {
+  const generateProjectDescription = (project: {name:string, technologies:string, startDate:string, endDate:string}) => {
     const prompt = `Generate a professional project description:
     
     Project Name: ${project.name || 'Not specified'}
@@ -85,7 +85,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     <div className="space-y-4">
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div className='col-span-2 sm:col-span-1'>
           <Label htmlFor="fullName">Full Name</Label>
           <Input
             id="fullName"
@@ -96,7 +96,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div>
+        <div className='col-span-2 sm:col-span-1'>
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
@@ -108,7 +108,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div>
+        <div className='col-span-2 sm:col-span-1'>
           <Label htmlFor="phone">Phone</Label>
           <Input
             id="phone"
@@ -119,7 +119,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div>
+        <div className='col-span-2 sm:col-span-1'>
           <Label htmlFor="location">Location</Label>
           <Input
             id="location"

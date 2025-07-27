@@ -65,11 +65,28 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const designColors = getColorStyles(cvData.designOptions?.primaryColor, cvData.designOptions?.secondaryColor);
 
   const renderProfile = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textAlign: 'center' }}>
         <h1 style={{ fontSize: '18pt',  fontWeight: 700, letterSpacing: '0.5px', marginBottom: '2mm' }}>{cvData.personalInfo?.fullName || "Your Name"}</h1>
-        <div style={{ fontSize: '10pt', color: '#555' }}>
+        <div style={{ fontSize: '10pt', color: '#555', marginBottom:'2mm' }}>
           {cvData.personalInfo?.location || "80 Gold Street, New York, NY 10038, United States"}, {cvData.personalInfo?.phone || "(917) 407-2179"}, {cvData.personalInfo?.email || "tim.stewart@gmail.com"}
+        </div>
+        <div style={{ fontSize: '10pt', color: '#555' }}>
+          {cvData.personalInfo?.linkedin && 
+      <span>
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      </span>
+      }
+      {cvData.personalInfo?.personal_website &&
+      <span>
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      </span>
+      }
+      {cvData.personalInfo?.github &&
+      <span>
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      </span>
+      }
         </div>
       </div>
       {cvData.personalInfo?.summary && 
@@ -85,12 +102,12 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderEmployment = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Employment History</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' ,  paddingBottom: '1mm' }}>
+          <div key={idx} style={{ marginBottom: '4mm', overflow: 'hidden' ,  paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap', }}>{exp.startDate || ""} — {exp.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{exp.title || "Job Title"}, {exp.company || "Company"}</div>
@@ -106,12 +123,12 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Education</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden', paddingBottom: '1mm' }}>
+          <div key={idx} style={{ marginBottom: '4mm', overflow: 'hidden', paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{edu.startDate || ""} — {edu.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{edu.degree || "Degree"}, {edu.school || "Institution"}</div>
@@ -124,7 +141,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Skills</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div style={{ columnCount: 3, fontSize: '10pt', color: '#333' }}>
@@ -138,7 +155,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderReferences = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>References</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div style={{ fontSize: '10pt', color: '#333', }}>
@@ -153,12 +170,12 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#555', fontWeight: 600, marginBottom: '1mm' }}>Projects</div>
       <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm', overflow: 'hidden' , paddingBottom: '1mm' }}>
+          <div key={idx} style={{ marginBottom: '4mm', overflow: 'hidden' , paddingBottom: '1mm' }}>
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap' }}>{proj.startDate || ""} — {proj.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{proj.name || "Project Name"}</div>
@@ -219,7 +236,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     </div>
   )
     
-  // Header (with name, contact, photo)
+  // Header (with name, contact)
   const renderHeader = () => (
     <div style={{
       backgroundColor: '#ea580c',
@@ -261,8 +278,8 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     </div>
   );
 
-    // Projects
-    const renderSummary = () => (
+
+  const renderSummary = () => (
       <section style={{ marginBottom: '3mm', padding : '2mm 0mm'}}>
         {renderSectionTitle("SUMMARY")}
         <div style={{
@@ -276,7 +293,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     );
   // Skills (Tech Stack)
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       {renderSectionTitle("SUMMARY")}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
@@ -340,7 +357,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
 
   // Projects
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '3mm' }}>
       {renderSectionTitle("PROJECTS")}
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
@@ -491,7 +508,7 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       {renderSectionTitle("Summary")}
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
         {cvData.personalInfo?.summary || "Result-orientated project team leader with 5 years of experience covering project and product management including developing, implementing and supporting complex infrastructures for fast growing startups. A fast and eager learner, I am detail orientated and adapt to changing project requirements quickly to meet business goals. Comfortable with ambiguity and thrive in fast-paced environment."}
@@ -500,11 +517,11 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       {renderSectionTitle("EXPERIENCE")}
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1mm' }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
@@ -537,11 +554,11 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       {renderSectionTitle("PROJECTS")}
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((prj, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1mm' }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
@@ -578,11 +595,11 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm', paddingTop: '20mm' }}>
+    <section style={{ marginBottom: '5mm', paddingTop: '20mm' }}>
       {renderSectionTitle("EDUCATION" , true)}
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '11pt', color: 'white', marginBottom: '1mm' }}>
@@ -604,7 +621,7 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm', overflow: 'hidden' }}>
+    <section style={{ marginBottom: '4mm', overflow: 'hidden' }}>
       {renderSectionTitle("SKILLS" , true)}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
@@ -825,7 +842,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
   const renderKeyAchievements = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#fff', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #fff', paddingBottom: '2mm' }}>
         KEY ACHIEVEMENTS
       </h2>
@@ -859,7 +876,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       </h2>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '4mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
               {edu.degree || "Master's Degree in Public Health"}
             </div>
@@ -876,7 +893,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         SKILLS
       </h2>
@@ -990,7 +1007,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Summary
       </h2>
@@ -1001,13 +1018,13 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Experience
       </h2>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#333', marginBottom: '1mm' }}>
               {exp.title || "Senior Account Executive"}
             </div>
@@ -1032,13 +1049,13 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Projects
       </h2>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((prj, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#333', marginBottom: '1mm' }}>
               {prj.name || "Senior Account Executive"}
             </div>
@@ -1070,13 +1087,13 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Education
       </h2>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#333', marginBottom: '1mm' }}>
               {edu.degree || "Master of Business Administration"}
             </div>
@@ -1093,7 +1110,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderAchievements = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
         Key Achievements
       </h2>
@@ -1121,7 +1138,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Skills
       </h2>
@@ -1212,9 +1229,9 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
-        Summary of Qualifications
+        Summary
       </h2>
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
         {cvData.personalInfo?.summary || "Result-orientated project team leader with 5 years of experience covering project and product management including developing, implementing and supporting complex infrastructures for fast growing startups. A fast and eager learner, I am detail orientated and adapt to changing project requirements quickly to meet business goals. Comfortable with ambiguity and thrive in fast-paced environment."}
@@ -1223,13 +1240,13 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Experience
       </h2>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '3mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
               {exp.title || "Unit Director"}
             </div>
@@ -1257,13 +1274,13 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Projects
       </h2>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((prj, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '3mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
               {prj.name || "Unit Director"}
             </div>
@@ -1292,13 +1309,13 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Education
       </h2>
       <div>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm' }}>
+          <div key={idx} style={{ marginBottom: '3mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
               {edu.degree || "MSc Project and Process Management"}
             </div>
@@ -1333,7 +1350,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Skills
       </h2>
@@ -1506,7 +1523,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '4mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderSectionTitle("Education", true)}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
@@ -1523,7 +1540,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '4mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderSectionTitle("Skills", true)}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? (
@@ -1619,7 +1636,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '1mm' }}>Summary</div>
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
         {cvData.personalInfo?.summary || "Dedicated Data Scientist with a proven track record in predictive analytics, machine learning, and AI innovation. Skilled in developing advanced models to drive strategic decision-making and enhance operational efficiency. Experienced in optimizing algorithms for improved performance and leading collaborative teams to achieve remarkable results. Strong background in data governance and visualization. Enthusiastic about utilizing data-driven insights to contribute to impactful projects that align with business objectives and societal well-being."}
@@ -1628,7 +1645,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Experience</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
@@ -1654,7 +1671,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Projects</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
@@ -1682,7 +1699,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Education</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
@@ -1705,7 +1722,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderAchievements = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Achievements</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm' }}>
@@ -1727,7 +1744,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '2mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Skills</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
@@ -1821,7 +1838,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '6mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderTitle("SUMMARY")}
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
         {cvData.personalInfo?.summary || "Enthusiastic Data Scientist with a proven track record in leading innovative AI and machine learning projects. Experienced in developing predictive analytics models, improving data processing efficiency, and enhancing customer insights. Skilled in team leadership and collaborating across functions to drive strategic decision-making. MSc in Data Science from a prestigious university. Passionate about predictive analytics, AI for social good, and data-driven storytelling, aligning with the mission of leveraging data for impactful solutions."}
@@ -1830,7 +1847,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '6mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderTitle("EXPERIENCE")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
@@ -1850,7 +1867,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '6mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderTitle("PROJECTS")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
@@ -1874,7 +1891,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '6mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderTitle("EDUCATION")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
@@ -1914,7 +1931,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '6mm' }}>
+    <section style={{ marginBottom: '5mm' }}>
       {renderTitle("SKILLS")}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
@@ -2055,7 +2072,7 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
   );
 
   const renderSummary = () => (
-    <section style={{ marginTop: '6mm', marginBottom: '8mm' }}>
+    <section style={{ marginTop: '4mm', marginBottom: '8mm' }}>
       <div style={{ fontSize: '12pt', fontWeight: 600, color: '#16a34a', marginBottom: '2mm' }}>Summary</div>
       {/* <div style={{ borderTop: '1px solid #bbf7d0', marginBottom: '2mm' }}></div> */}
       <p style={{ fontSize: '10pt', color: '#555', lineHeight: 1.6 }}>
@@ -2066,9 +2083,9 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '12pt', fontWeight: 600, color: '#16a34a', marginBottom: '2mm' }}>Career Experience</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
           <div key={idx}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
@@ -2077,9 +2094,9 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
               </div>
               <div style={{ color: '#666', fontSize: '9pt' }}>{exp.startDate || "Start"} — {exp.endDate || "End"}</div>
             </div>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '6mm', fontSize: '10pt', color: '#555', lineHeight: 1.5, marginTop: '1mm' }}>
-              {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : <li>Job description</li>}
-            </ul>
+            <div style={{ listStyleType: 'disc', paddingLeft: '6mm', fontSize: '10pt', color: '#555', lineHeight: 1.5, marginTop: '1mm' }}>
+              {exp.description ? exp.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Job description</p>}
+            </div>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No experience added yet</div>}
       </div>
@@ -2087,7 +2104,7 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '8mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '12pt', fontWeight: 600, color: '#16a34a', marginBottom: '2mm' }}>Projects</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
@@ -2099,12 +2116,12 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
                  </div>
               
                 {proj.technologies && (
-                <div style={{ fontWeight: 600, color: '#16a34a', fontSize: '9pt', marginBottom: '1mm' }}>
+                <div style={{ fontWeight: 600, color: '#16a34a', fontSize: '9pt', marginBottom: '1mm' ,fontStyle:'italic' , paddingLeft:'4mm' }}>
                   {proj.technologies}
                 </div>
               )}
             </div>
-            <p style={{ fontSize: '10pt', color: '#555', lineHeight: 1.5, marginTop: '1mm' }}>{proj.description || ""}</p>
+            <p style={{ fontSize: '10pt', color: '#555', lineHeight: 1.5, paddingLeft:'4mm' }}>{proj.description || ""}</p>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No projects added yet</div>}
       </div>
