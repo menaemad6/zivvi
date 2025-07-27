@@ -422,6 +422,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   );
 };
 
+// Finished
 const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
@@ -703,6 +704,7 @@ const ElegantProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 };
 
+// Finished
 const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
@@ -714,29 +716,51 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
 
   const renderHeader = () => (
     <div style={{ marginBottom: '10mm' }}>
-      <h1 style={{ fontSize: '20pt', fontWeight: 700, color: '#0891b2', marginBottom: '2mm' }}>
+      <h1 style={{ fontSize: '20pt', fontWeight: 700, color: '#000', marginBottom: '2mm' }}>
         {cvData.personalInfo?.fullName || "ISAAC HALL"}
       </h1>
-      {/* <div style={{ fontSize: '12pt', color: '#0891b2', marginBottom: '3mm' }}>
-        Project Director | Global Health | Strategic Planning
-      </div> */}
+      {cvData.personalInfo.title && 
+      <h1 style={{ fontSize: '20pt', fontWeight: 700, color: '#0891b2', marginBottom: '2mm' }}>
+        {cvData.personalInfo?.title || ""}
+      </h1>
+      }
+
       <div style={{ fontSize: '10pt', color: '#666', display: 'flex', flexWrap: 'wrap', gap: '6mm' }}>
         <span>📞 {cvData.personalInfo?.phone || "+1-(234)-555-1234"}</span>
         <span>📧 {cvData.personalInfo?.email || "help@enhancv.com"}</span>
-        {/* <span>🔗 linkedin.com</span> */}
         <span>📍 {cvData.personalInfo?.location || "Seattle, Washington"}</span>
       </div>
+
+      <div style={{ fontSize: '10pt', color: '#666', display: 'flex', flexWrap: 'wrap', gap: '6mm' }}>
+      {cvData.personalInfo?.linkedin && 
+      <span>
+      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      </span>
+      }
+      {cvData.personalInfo?.personal_website &&
+      <span>
+      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      </span>
+      }
+      {cvData.personalInfo?.github &&
+      <span>
+      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      </span>
+      }
+      </div>
+
+
     </div>
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         EXPERIENCE
       </h2>
       <div>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '8mm' }}>
+          <div key={idx} style={{ marginBottom: '3mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
               {exp.title || "Project Director"}
             </div>
@@ -762,7 +786,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         SUMMARY
       </h2>
@@ -773,37 +797,45 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
   const renderProjects = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
+        PROJECTS
+      </h2>
       <div>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
-          <div key={idx} style={{ marginBottom: '6mm' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2mm' }}>
-              <div style={{ fontWeight: 700, fontSize: '10pt', color: '#000', paddingRight: '5mm' }}>
-                {proj.name || "Project name"}
-              </div>
-              <div style={{ fontSize: '10pt', color: '#0891b2', fontWeight: 600 }}>
-                {proj.description || "Description"}
-              </div>
+          <div key={idx} style={{ marginBottom: '3mm' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
+              {proj.name || "Project Name"}
             </div>
+            <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
+              {proj.startDate && proj.endDate && (
+                <span>📅 {proj.startDate} - {proj.endDate}</span>
+              )}
+            </div>
+            <div style={{ fontSize: '10pt', color: '#0891b2', fontWeight: 600, marginBottom: '1mm' , paddingLeft: '4mm', fontStyle: 'italic' }}>
+              {proj.technologies || "Technologies Used"}
+            </div>
+            <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5, paddingLeft: '4mm' }}>
+              {proj.description || "Project description"}
+            </p>
           </div>
-        )) : null}
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No projects added yet</div>}
       </div>
-
     </section>
   );
 
   const renderKeyAchievements = () => (
     <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#fff', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #fff', paddingBottom: '2mm' }}>
         KEY ACHIEVEMENTS
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6mm' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6mm' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
             <span style={{ color: '#0891b2', fontSize: '12pt' }}>✓</span>
             <div>
-              <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Led Policy Development Initiatives</div>
-              <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Spearheaded health governance reforms in six countries, influencing policies and improving healthcare outcomes.</div>
+              <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt', marginBottom: '1mm' }}>Led Policy Development Initiatives</div>
+              <div style={{ fontSize: '9pt', color: '#f0fdf4', lineHeight: 1.4 }}>Spearheaded health governance reforms in six countries, influencing policies and improving healthcare outcomes.</div>
             </div>
           </div>
         </div>
@@ -811,26 +843,8 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
             <span style={{ color: '#0891b2', fontSize: '12pt' }}>⭐</span>
             <div>
-              <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Optimized Project Execution</div>
-              <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Directed a project valued at $50M, increasing scope and effectively maintaining high compliance with USG policies.</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
-            <span style={{ color: '#0891b2', fontSize: '12pt' }}>🎯</span>
-            <div>
-              <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Enhanced Donor Relations</div>
-              <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Secured an additional $5M in grant funding by establishing and nurturing key donor relationships.</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
-            <span style={{ color: '#0891b2', fontSize: '12pt' }}>⚡</span>
-            <div>
-              <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Streamlined Reporting Mechanisms</div>
-              <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Revised reporting practices, significantly cutting down reporting times and bolstering organizational decision-making.</div>
+              <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt', marginBottom: '1mm' }}>Optimized Project Execution</div>
+              <div style={{ fontSize: '9pt', color: '#f0fdf4', lineHeight: 1.4 }}>Directed a project valued at $50M, increasing scope and effectively maintaining high compliance with USG policies.</div>
             </div>
           </div>
         </div>
@@ -839,7 +853,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
   const renderEducation = () => (
-    <section style={{ marginBottom: '10mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         EDUCATION
       </h2>
@@ -852,11 +866,11 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
             <div style={{ fontSize: '10pt', color: '#0891b2', fontWeight: 600, marginBottom: '1mm' }}>
               {edu.school || "Johns Hopkins University"}
             </div>
-            <div style={{ fontSize: '9pt', color: '#666' }}>
+            <div style={{ fontSize: '9pt', color: '#333' }}>
               📅 {edu.startDate || "01/2003"} - {edu.endDate || "01/2005"}
             </div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
+        )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
     </section>
   );
@@ -866,11 +880,11 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         SKILLS
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
           <div key={idx} style={{ 
-            backgroundColor: '#f0fdf4',
-            color: '#166534',
+            backgroundColor: '#ededed',
+            color: '#0891b2',
             padding: '2mm',
             textAlign: 'center',
             fontSize: '10pt',
@@ -885,55 +899,46 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
             <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '2mm', textAlign: 'center', fontSize: '10pt', borderRadius: '2mm', fontWeight: 600 }}>Program Development</div>
             <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '2mm', textAlign: 'center', fontSize: '10pt', borderRadius: '2mm', fontWeight: 600 }}>Project Planning</div>
             <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '2mm', textAlign: 'center', fontSize: '10pt', borderRadius: '2mm', fontWeight: 600 }}>Stakeholder Engagement</div>
-            <div style={{ backgroundColor: '#f0fdf4', color: '#166534', padding: '2mm', textAlign: 'center', fontSize: '10pt', borderRadius: '2mm', fontWeight: 600 }}>Financial Oversight</div>
           </>
         )}
       </div>
     </section>
   );
 
-  const renderCourses = () => (
-    <section style={{ marginBottom: '10mm' }}>
-      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm' }}>
-        COURSES
-      </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6mm' }}>
-        <div>
-          <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Advanced Project Management Certification</div>
-          <div style={{ fontSize: '9pt', color: '#666' }}>Focused on complex project management strategies, provided by the Project Management Institute.</div>
-        </div>
-        <div>
-          <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt', marginBottom: '1mm' }}>Global Health Leadership and Management Certificate</div>
-          <div style={{ fontSize: '9pt', color: '#666' }}>Covering leadership in international health contexts, provided by the University of Washington.</div>
-        </div>
-      </div>
-    </section>
-  );
-
+  // Updated return statement with two-sided layout
   return (
     <div className="cv-page" style={{
-      width: '210mm',
-      minHeight: '297mm',
-      padding: '20mm',
-      backgroundColor: '#fff',
-      boxSizing: 'border-box',
-      color: '#222',
-      margin: '0 auto',
-      boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
-      position: 'relative',
-      overflow: 'visible',
-      display: 'block',
-
+      ...CV_PAGE_STYLE,
+      padding: '6mm',
+      display: 'flex',
+      flexDirection: 'column',
       fontFamily: DesignFontFamily,
     }}>
-      {(sectionMap["header"] || sectionMap["personalInfo"]) && renderHeader()}
-      {renderSummary()}
-      {sectionMap["experience"] && renderExperience()}
-      {renderProjects()}
-      {sectionMap["education"] && renderEducation()}
-      {sectionMap["achievements"] && renderKeyAchievements()}
-      {sectionMap["skills"] && renderSkills()}
-      {sectionMap["courses"] && renderCourses()}
+
+        {/* Header  */}
+        {(sectionMap["header"] || sectionMap["personalInfo"]) && renderHeader()}
+
+
+        <div style={{display: 'flex' ,flexDirection: 'row'}}>
+
+            {/* Main (left) */}
+            <div style={{ flex: 1,  minHeight: '297mm', display: 'flex', flexDirection: 'column', gap: '0', paddingRight: '7mm' }}>
+              {cvData.personalInfo?.summary && renderSummary()}
+              {sectionMap["experience"] && renderExperience()}
+              {sectionMap["projects"] && renderProjects()}
+            </div>
+      
+            {/* Sidebar (right) */}
+            <div style={{ width: '70mm', display: 'flex', flexDirection: 'column', minHeight: '295mm' }}>
+              {sectionMap["education"] && renderEducation()}
+              {sectionMap["skills"] && renderSkills()}
+              {sectionMap["achievements"] && renderKeyAchievements()}
+            </div>
+
+        </div>
+
+
+
     </div>
   );
 };
@@ -1372,20 +1377,45 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
   );
 };
 
+// Finished
 const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
-    "personalInfo", "summary", "experience", "education", "achievements", "skills", "courses", "passions"
+    "personalInfo", "experience", "education", "skills"
   ]).forEach(s => { sectionMap[s] = true; });
 
   const DesignFontFamily = getFontFamily(cvData.designOptions?.font);
   const designColors = getColorStyles(cvData.designOptions?.primaryColor, cvData.designOptions?.secondaryColor);
 
+  const renderSectionTitle = (title: string, rightSidebar?: boolean) => {
+    const textColor = rightSidebar ? 'white' : '#666';
+    return (
+      <>
+      <div style={{
+        textTransform: 'uppercase',
+        fontSize: '8pt',
+        letterSpacing: '1.5px',
+        color: textColor,
+        fontWeight: 600,
+        marginBottom: '1mm',
+        paddingBottom:'2mm'
+      }}>
+        {title}
+      </div>
+      <div style={{ borderTop: '2px solid #ededed', marginBottom: '2mm' }}></div>
+        </>
+    );
+  }
+
   const renderHeader = () => (
-    <div style={{ padding: '20mm 0 10mm 0', backgroundColor: '#fff' }}>
-      <h1 style={{ fontSize: '18pt', fontWeight: 700, letterSpacing: '1px', color: '#222', lineHeight: 1.2, marginBottom: '2mm', textTransform: 'uppercase' }}>
+    <div style={{ padding: '10mm 0mm', backgroundColor: '#fff' }}>
+      <h1 style={{ fontSize: '18pt', fontWeight: 700, letterSpacing: '0.5px', color: '#333', lineHeight: 1.2, marginBottom: '2mm' }}>
         {cvData.personalInfo?.fullName || "SAMUEL CAMPBELL"}
       </h1>
+      {cvData.personalInfo?.title && 
+      <h2 style={{ fontSize: '14pt', fontWeight: 600, letterSpacing: '0.5px', color: '#48acff', lineHeight: 1.2, marginBottom: '2mm' }}>
+        {cvData.personalInfo?.title}
+      </h2>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
           <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
@@ -1397,13 +1427,31 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
           <span>📍</span> {cvData.personalInfo?.location || "Manchester"}
         </span>
       </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0mm', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
+        {cvData.personalInfo?.linkedin && 
+      <span>
+      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      </span>
+      }
+      {cvData.personalInfo?.personal_website &&
+      <span>
+      &nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      </span>
+      }
+      {cvData.personalInfo?.github &&
+      <span>
+      🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      </span>
+      }
+      </div>
+
     </div>
   );
 
   const renderSummary = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#1e3a8a', fontWeight: 600, marginBottom: '1mm' }}>Summary</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
+    <section style={{ marginBottom: '5mm' }}>
+      {renderSectionTitle("Summary")}
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
         {cvData.personalInfo?.summary ||
           "With over a decade of IT project management experience, adept in Agile and Waterfall methodologies, I possess a robust track record of delivering sophisticated IT projects. My proactive approach has consistently driven projects to success against challenging timeframes, highlighting my strength in orchestrating application software and hardware upgrades to meet strategic business objectives."}
@@ -1412,57 +1460,80 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   );
 
   const renderExperience = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#1e3a8a', fontWeight: 600, marginBottom: '1mm' }}>Experience</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
+    <section style={{ marginBottom: '5mm' }}>
+      {renderSectionTitle("Experience")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={idx} style={{ marginBottom: '4mm' }}>
+          <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
               <div style={{ fontWeight: 700, color: '#222', fontSize: '11pt' }}>{exp.title || "Senior IT Project Manager"}</div>
               <div style={{ fontSize: '9pt', color: '#666' }}>{exp.startDate || "06/2018"} - {exp.endDate || "Present"}</div>
             </div>
-            <div style={{ color: '#1e3a8a', fontWeight: 600, fontSize: '10pt', marginBottom: '1mm' }}>{exp.company || "TechWave Solutions"}</div>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '5mm', fontSize: '10pt', color: '#333', lineHeight: 1.5, marginTop: '2mm' }}>
-              {exp.description && <li>{exp.description}</li>}
-            </ul>
+            <div style={{ color: '#48acff', fontWeight: 600, fontSize: '10pt', marginBottom: '1mm' }}>{exp.company || "TechWave Solutions"}</div>
+            <div style={{  paddingLeft: '4mm', fontSize: '10pt', color: '#333', lineHeight: 1.5, marginTop: '2mm' }}>
+              {exp.description && <p>{exp.description}</p>}
+            </div>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No experience added yet</div>}
       </div>
     </section>
   );
 
+    const renderProjects = () => (
+    <section style={{ marginBottom: '5mm' }}>
+      {renderSectionTitle("Projects")}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
+        {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
+          <div key={idx} style={{ marginBottom: '2mm' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+              <div style={{ fontWeight: 700, color: '#222', fontSize: '11pt' }}>{proj.name || "Senior IT Project Manager"}</div>
+              <div style={{ fontSize: '9pt', color: '#666' }}>{proj.startDate || "06/2018"} - {proj.endDate || "Present"}</div>
+            </div>
+            <div style={{ color: '#48acff', fontWeight: 600, fontSize: '9pt', marginBottom: '1mm' , fontStyle:'italic' , paddingLeft:'4mm'}}>
+              {proj.technologies && (
+                <div>
+                  {proj.technologies}
+                </div>
+              )}
+              </div>
+            <div style={{ listStyleType: 'disc', paddingLeft: '4mm', fontSize: '10pt', color: '#333', lineHeight: 1.5, marginTop: '2mm' }}>
+              {proj.description && <p>{proj.description}</p>}
+            </div>
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No Projects added yet</div>}
+      </div>
+    </section>
+  );
+
   const renderEducation = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#1e3a8a', fontWeight: 600, marginBottom: '1mm' }}>Education</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
+    <section style={{ marginBottom: '4mm' }}>
+      {renderSectionTitle("Education", true)}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
           <div key={idx}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
-              <div style={{ fontWeight: 700, color: '#222', fontSize: '11pt' }}>{edu.degree || "MSc Information Technology Management"}</div>
-              <div style={{ fontSize: '9pt', color: '#666' }}>{edu.startDate || "01/2010"} - {edu.endDate || "01/2011"}</div>
+              <div style={{ fontWeight: 700, color: '#fff', fontSize: '11pt' }}>{edu.degree || "MSc Information Technology Management"}</div>
+              <div style={{ fontSize: '9pt', color: '#dbeafe' }}>{edu.startDate || "01/2010"} - {edu.endDate || "01/2011"}</div>
             </div>
-            <div style={{ color: '#1e3a8a', fontWeight: 600, fontSize: '10pt' }}>{edu.school || "University of Manchester"}</div>
+            <div style={{ color: '#fff', fontWeight: 600, fontSize: '10pt' }}>{edu.school || "University of Manchester"}</div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
+        )) : <div style={{ color: '#dbeafe', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
     </section>
   );
 
   const renderSkills = () => (
-    <section style={{ marginBottom: '8mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#1e3a8a', fontWeight: 600, marginBottom: '1mm' }}>Skills</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2mm' }}>
+    <section style={{ marginBottom: '4mm' }}>
+      {renderSectionTitle("Skills", true)}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? (
           cvData.skills.map((skill, idx) => (
-            <span key={idx} style={{ backgroundColor: '#1e3a8a', color: '#fff', padding: '2mm 4mm', borderRadius: '10pt', fontSize: '9pt' }}>
+            <span key={idx} style={{ backgroundColor: '#fff', color: '#1e3a8a', padding: '2mm 4mm', borderRadius: '10pt', fontSize: '9pt', textAlign: 'center', fontWeight: 600 }}>
               {skill}
             </span>
           ))
         ) : (
-          <span style={{ color: '#aaa', fontStyle: 'italic' }}>No skills added yet</span>
+          <span style={{ color: '#dbeafe', fontStyle: 'italic' }}>No skills added yet</span>
         )}
       </div>
     </section>
@@ -1470,15 +1541,28 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   return (
     <div className="cv-page" style={{
-
       ...CV_PAGE_STYLE,
       fontFamily: DesignFontFamily,
+      padding: '0mm',
+      display: 'flex',
+      flexDirection: 'row',
     }}>
-      {renderHeader()}
-      {cvData.personalInfo?.summary && renderSummary()}
-      {sectionMap["experience"] && renderExperience()}
-      {sectionMap["education"] && renderEducation()}
-      {sectionMap["skills"] && renderSkills()}
+      {/* Main (left) */}
+      <div style={{ flex: 1, padding: '0mm 6mm', minHeight: '297mm', display: 'flex', flexDirection: 'column', gap: '0' }}>
+        {renderHeader()}
+        {cvData.personalInfo?.summary && renderSummary()}
+        {sectionMap["experience"] && renderExperience()}
+        {sectionMap["projects"] && renderProjects()}
+      </div>
+      {/* Main (left) */}
+
+      {/* Sidebar (right) */}
+      <div style={{ width: '70mm', padding: '0mm 4mm', display: 'flex', flexDirection: 'column', minHeight: '297mm', backgroundColor: '#22405c' }}>
+        <div style={{ marginTop: '52mm' }}></div>
+        {sectionMap["education"] && renderEducation()}
+        {sectionMap["skills"] && renderSkills()}
+      </div>
+      {/* Sidebar (right) */}
     </div>
   );
 };
@@ -1679,6 +1763,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   );
 };
 
+// Finished
 const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sections?: string[] }) => {
   const sectionMap: Record<string, boolean> = {};
   (sections || [
@@ -1688,14 +1773,19 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const DesignFontFamily = getFontFamily(cvData.designOptions?.font);
   const designColors = getColorStyles(cvData.designOptions?.primaryColor, cvData.designOptions?.secondaryColor);
 
+  const renderTitle = (title : string) => (
+    <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#666', fontWeight: 600, marginBottom: '1mm' }}>{title}</div>
+  )
   const renderHeader = () => (
-    <div style={{ padding: '20mm 0 6mm 0', backgroundColor: '#fff' }}>
+    <div style={{ padding: '0mm 0 6mm 0', backgroundColor: '#fff' }}>
       <h1 style={{ fontSize: '20pt', fontWeight: 700, color: '#222', marginBottom: '2mm' }}>
         {cvData.personalInfo?.fullName || "Mia Ward"}
       </h1>
+      {cvData.personalInfo?.title && 
       <div style={{ fontSize: '14pt', fontWeight: 600, color: '#2563eb', marginBottom: '3mm' }}>
-        Data Scientist | Machine Learning | AI Innovation
+        {cvData.personalInfo?.title}
       </div>
+      }
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
           <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
@@ -1704,19 +1794,35 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
           <span>✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>🔗</span> linkedin.com
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
           <span>📍</span> {cvData.personalInfo?.location || "Reading, UK"}
         </span>
       </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
+        {cvData.personalInfo?.linkedin && 
+      <span>
+      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      </span>
+      }
+      {cvData.personalInfo?.personal_website &&
+      <span>
+      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      </span>
+      }
+      {cvData.personalInfo?.github &&
+      <span>
+      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      </span>
+      }
+      </div>
+
+
     </div>
   );
 
   const renderSummary = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#666', fontWeight: 600, marginBottom: '1mm' }}>Summary</div>
-      <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
+      {renderTitle("SUMMARY")}
       <p style={{ fontSize: '10pt', color: '#333', lineHeight: 1.6 }}>
         {cvData.personalInfo?.summary || "Enthusiastic Data Scientist with a proven track record in leading innovative AI and machine learning projects. Experienced in developing predictive analytics models, improving data processing efficiency, and enhancing customer insights. Skilled in team leadership and collaborating across functions to drive strategic decision-making. MSc in Data Science from a prestigious university. Passionate about predictive analytics, AI for social good, and data-driven storytelling, aligning with the mission of leveraging data for impactful solutions."}
       </p>
@@ -1725,19 +1831,18 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   const renderExperience = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#666', fontWeight: 600, marginBottom: '1mm' }}>Experience</div>
-      <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
+      {renderTitle("EXPERIENCE")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
           <div key={idx} style={{ marginBottom: '2mm' }}>
             <div style={{ fontWeight: 700, fontSize: '11pt', color: '#222', lineHeight: 1.3 }}>{exp.title || "Job Title"}</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4mm', marginBottom: '1mm' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', gap: '4mm', marginBottom: '1mm' }}>
               <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '10pt' }}>{exp.company || "Company"}</div>
               <span style={{ color: '#666', fontSize: '9pt' }}>{exp.startDate || "MM/YYYY"} - {exp.endDate || "MM/YYYY"}</span>
             </div>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '5mm', fontSize: '10pt', color: '#333', lineHeight: 1.5, marginTop: '1mm' }}>
-              {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : <li>Job description</li>}
-            </ul>
+            <div style={{ paddingLeft: '4mm', fontSize: '10pt', color: '#333', lineHeight: 1.5, marginTop: '1mm' }}>
+              {exp.description ? exp.description.split('\n').map((line, i) => <div key={i}>{line}</div>) : <li>Job description</li>}
+            </div>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No experience added yet</div>}
       </div>
@@ -1746,8 +1851,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   const renderProjects = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#666', fontWeight: 600, marginBottom: '1mm' }}>Projects</div>
-      <div style={{ borderTop: '1px solid #ccc', marginBottom: '2mm' }}></div>
+      {renderTitle("PROJECTS")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
         {cvData.projects && cvData.projects.length > 0 ? cvData.projects.map((proj, idx) => (
           <div key={idx} style={{ marginBottom: '2mm' }}>
@@ -1755,7 +1859,14 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
               <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>{proj.name || "Project Name"}</div>
               <div style={{ fontSize: '9pt', color: '#666' }}>{proj.startDate || ""} - {proj.endDate || ""}</div>
             </div>
-            <p style={{ fontSize: '10pt', color: '#333', marginTop: '1mm' }}>{proj.description || ""}</p>
+              <p style={{ fontSize: '9pt',  paddingLeft:'4mm', color:'#2563eb' }}>
+                {proj.technologies && (
+                <div style={{ fontWeight: 600, fontStyle:'italic'}}>
+                  {proj.technologies}
+                </div>
+              )}
+              </p>
+            <p style={{ fontSize: '10pt', color: '#333', marginTop: '1mm' ,paddingLeft:'4mm' }}>{proj.description || ""}</p>
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No projects added yet</div>}
       </div>
@@ -1764,40 +1875,39 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   const renderEducation = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#2563eb', fontWeight: 600, marginBottom: '1mm' }}>Education</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
+      {renderTitle("EDUCATION")}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4mm' }}>
         {cvData.education && cvData.education.length > 0 ? cvData.education.map((edu, idx) => (
           <div key={idx}>
-            <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>{edu.degree || "MSc in Data Science"}</div>
+            <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt' }}>{edu.degree || "MSc in Data Science"}</div>
             <div style={{ color: '#2563eb', fontWeight: 600, fontSize: '10pt' }}>{edu.school || "University College London"}</div>
             <div style={{ fontSize: '9pt', color: '#666' }}>{edu.startDate || "01/2014"} - {edu.endDate || "01/2015"}</div>
           </div>
-        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
+        )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
     </section>
   );
 
   const renderAchievements = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#2563eb', fontWeight: 600, marginBottom: '1mm' }}>Achievements</div>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#fff', fontWeight: 600, marginBottom: '1mm' }}>Achievements</div>
       <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
       <ul style={{ display: 'flex', flexDirection: 'column', gap: '2mm' }}>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Team Leadership</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Team Leadership</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Machine Downtime Reduction</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Machine Downtime Reduction</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Sales Campaign Enhancement</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Applied cluster analysis in customer segmentation, increasing conversion rates by 17% in targeted marketing campaigns.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Sales Campaign Enhancement</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Applied cluster analysis in customer segmentation, increasing conversion rates by 17% in targeted marketing campaigns.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Forecasting Model Development</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Created an AI-driven forecast model that increased predictive accuracy by 20%, significantly impacting strategic planning.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Forecasting Model Development</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Created an AI-driven forecast model that increased predictive accuracy by 20%, significantly impacting strategic planning.</div>
         </li>
       </ul>
     </section>
@@ -1805,30 +1915,29 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   const renderSkills = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#2563eb', fontWeight: 600, marginBottom: '1mm' }}>Skills</div>
-      <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2mm' }}>
+      {renderTitle("SKILLS")}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <span key={idx} style={{ backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: 700, padding: '2mm 3mm', borderRadius: '2mm', fontSize: '9pt' }}>
+          <span key={idx} style={{ backgroundColor: '#ededed', color: '#2563eb', fontWeight: 700, padding: '2mm 3mm', borderRadius: '2mm', fontSize: '9pt', textAlign: 'center' }}>
             {skill}
           </span>
-        )) : <span style={{ color: '#aaa', fontStyle: 'italic' }}>No skills added yet</span>}
+        )) : <span style={{ color: '#dbeafe', fontStyle: 'italic' }}>No skills added yet</span>}
       </div>
     </section>
   );
 
   const renderCourses = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#2563eb', fontWeight: 600, marginBottom: '1mm' }}>Courses</div>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#fff', fontWeight: 600, marginBottom: '1mm' }}>Courses</div>
       <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
       <ul style={{ display: 'flex', flexDirection: 'column', gap: '2mm' }}>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Applied Data Science with Python</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Acquired advanced Python programming skills for data science through this course offered by the University of Michigan.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Applied Data Science with Python</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Acquired advanced Python programming skills for data science through this course offered by the University of Michigan.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Machine Learning Specialization</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Completed a series of courses focused on machine learning techniques, provided by Stanford University online.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Machine Learning Specialization</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Completed a series of courses focused on machine learning techniques, provided by Stanford University online.</div>
         </li>
       </ul>
     </section>
@@ -1836,20 +1945,20 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   const renderPassions = () => (
     <section style={{ marginBottom: '6mm' }}>
-      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#2563eb', fontWeight: 600, marginBottom: '1mm' }}>Passions</div>
+      <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#fff', fontWeight: 600, marginBottom: '1mm' }}>Passions</div>
       <div style={{ borderTop: '1px solid #93c5fd', marginBottom: '2mm' }}></div>
       <ul style={{ display: 'flex', flexDirection: 'column', gap: '2mm' }}>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Predictive Analytics</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Passionate about uncovering trends and making accurate predictions that drive business success through data analysis.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Predictive Analytics</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Passionate about uncovering trends and making accurate predictions that drive business success through data analysis.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>AI for Social Good</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Interested in applying AI for solving complex societal challenges and contributing to community-centric projects.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>AI for Social Good</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Interested in applying AI for solving complex societal challenges and contributing to community-centric projects.</div>
         </li>
         <li>
-          <div style={{ fontWeight: 700, color: '#222', fontSize: '10pt' }}>Data-Driven Storytelling</div>
-          <div style={{ color: '#555', fontSize: '9pt' }}>Enjoy exploring the narrative potential of data and translating complex insights into compelling stories for diverse audiences.</div>
+          <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt' }}>Data-Driven Storytelling</div>
+          <div style={{ color: '#dbeafe', fontSize: '9pt' }}>Enjoy exploring the narrative potential of data and translating complex insights into compelling stories for diverse audiences.</div>
         </li>
       </ul>
     </section>
@@ -1857,29 +1966,36 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
 
   return (
     <div className="cv-page" style={{
-      width: '210mm',
-      minHeight: '297mm',
-      padding: '20mm',
-      backgroundColor: '#fff',
-      boxSizing: 'border-box',
-      color: '#222',
-      margin: '0 auto',
-      boxShadow: '0 0 0.5mm rgba(0,0,0,0.05)',
-      position: 'relative',
-      overflow: 'visible',
-      display: 'block',
-
+      ...CV_PAGE_STYLE,
       fontFamily: DesignFontFamily,
+      padding: '6mm',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
-      {renderHeader()}
-      {cvData.personalInfo?.summary && renderSummary()}
-      {sectionMap["experience"] && renderExperience()}
-      {sectionMap["projects"] && renderProjects()}
-      {sectionMap["education"] && renderEducation()}
-      {sectionMap["achievements"] && renderAchievements()}
-      {sectionMap["skills"] && renderSkills()}
-      {sectionMap["courses"] && renderCourses()}
-      {sectionMap["passions"] && renderPassions()}
+
+      {/* Header ( Center ) */}
+        {renderHeader()}
+
+        <div style={{display: 'flex' , flexDirection:'row'}}>
+          {/* Main (left) */}
+          <div style={{ flex: 1, paddingRight: '6mm', minHeight: '297mm', display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {cvData.personalInfo?.summary && renderSummary()}
+            {sectionMap["experience"] && renderExperience()}
+            {sectionMap["projects"] && renderProjects()}
+          </div>
+          {/* Main (left) */}
+
+          {/* Sidebar (right) */}
+          <div style={{ width: '70mm', display: 'flex', flexDirection: 'column', minHeight: '297mm' }}>
+            {sectionMap["education"] && renderEducation()}
+            {sectionMap["skills"] && renderSkills()}
+            {/* {sectionMap["achievements"] && renderAchievements()} */}
+            {/* {sectionMap["courses"] && renderCourses()} */}
+            {/* {sectionMap["passions"] && renderPassions()} */}
+          </div>
+          {/* Sidebar (right) */}
+        </div>
+
     </div>
   );
 };
@@ -2047,6 +2163,8 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
     </div>
   );
 };
+
+
 
 const PreBuiltTemplates: React.FC<PreBuiltTemplatesProps> = ({ cvData, sections, templateId }) => {
   switch (templateId) {
