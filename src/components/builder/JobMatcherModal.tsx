@@ -1,21 +1,30 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Loader2, Target, CheckCircle2, AlertCircle } from 'lucide-react';
-import { CVData } from '@/types/cv';
-import { getGeminiResponse, parseAIResponse } from '@/utils/geminiApi';
-import { toast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Loader2, Target, CheckCircle, TrendingUp, Users, Lightbulb, Award, Sparkles, RefreshCw } from 'lucide-react';
+import { CVData } from '@/types/cv';
+import { getGeminiResponse } from '@/utils/geminiApi';
+import { toast } from '@/hooks/use-toast';
 
 interface JobMatcherModalProps {
   isOpen: boolean;
   onClose: () => void;
   cvData: CVData;
   onUpdateCV: (data: CVData) => void;
+}
+
+interface JobMatchSuggestion {
+  type: 'experience' | 'skills' | 'summary' | 'projects' | 'education';
+  title: string;
+  originalText: string;
+  enhancedText: string;
+  improvement: string;
+  matchRelevance: string;
 }
 
 const JobMatcherModal: React.FC<JobMatcherModalProps> = ({ 
@@ -26,8 +35,68 @@ const JobMatcherModal: React.FC<JobMatcherModalProps> = ({
 }) => {
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [isApplying, setIsApplying] = useState(false);
+  const [matchScore, setMatchScore] = useState<number | null>(null);
+  const [missingSkills, setMissingSkills] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<JobMatchSuggestion[]>([]);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+
+  const generateJobMatchPrompt = (jobDescription: string, cvData: CVData) => {
+    return `Analyze this job description and provide specific enhancement suggestions to optimize the CV content to better match the job requirements.
+
+Job Description:
+${jobDescription}
+
+Current CV Data:
+${JSON.stringify(cvData, null, 2)}
+
+Provide a detailed analysis in JSON format:
+{
+  "matchScore": 85,
+  "missingSkills": ["skill1", "skill2"],
+  "suggestions": [
+    {
+      "type": "experience|skills|summary|projects|education",
+      "title": "Job title or section name",
+      "originalText": "Current text from CV",
+      "enhancedText": "Optimized version with job-specific keywords and achievements",
+      "improvement": "Explanation of what was improved",
+      "matchRelevance": "How this change improves job match"
+    }
+  ]
+}
+
+Focus on:
+1. Adding job-specific keywords naturally
+2. Highlighting relevant achievements with metrics
+3. Emphasizing transferable skills
+4. Using industry terminology from the job description
+5. Quantifying results where possible
+
+Provide 5-8 specific suggestions covering different CV sections.`;
+  };
+
+  const parseJobMatchResponse = (response: string) => {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response');
+      }
+      
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        matchScore: parsed.matchScore || 70,
+        missingSkills: parsed.missingSkills || [],
+        suggestions: parsed.suggestions || []
+      };
+    } catch (error) {
+      console.error('Error parsing job match response:', error);
+      return {
+        matchScore: 70,
+        missingSkills: [],
+        suggestions: []
+      };
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim()) {
@@ -40,60 +109,21 @@ const JobMatcherModal: React.FC<JobMatcherModalProps> = ({
     }
     
     setIsAnalyzing(true);
+    setAnalysisComplete(false);
+    
     try {
-      const prompt = `
-        Analyze this job description and provide recommendations to optimize the CV content to better match the job requirements.
-        
-        Job Description:
-        ${jobDescription}
-        
-        Current CV Data:
-        - Personal Info: ${JSON.stringify(cvData.personalInfo)}
-        - Experience: ${JSON.stringify(cvData.experience)}
-        - Skills: ${JSON.stringify(cvData.skills)}
-        - Projects: ${JSON.stringify(cvData.projects)}
-        - Education: ${JSON.stringify(cvData.education)}
-        
-        Please provide:
-        1. A match score (0-100)
-        2. Key missing skills/keywords
-        3. Specific recommendations for each CV section
-        4. Enhanced versions of existing content (don't create new entries, only enhance existing ones)
-        
-        Return the response in JSON format with the following structure:
-        {
-          "matchScore": 85,
-          "missingSkills": ["skill1", "skill2"],
-          "recommendations": {
-            "personalInfo": {
-              "title": "enhanced title",
-              "summary": "enhanced summary"
-            },
-            "experience": [
-              {
-                "id": "existing_id",
-                "enhancedDescription": "enhanced description"
-              }
-            ],
-            "skills": ["enhanced", "skill", "list"],
-            "projects": [
-              {
-                "id": "existing_id",
-                "enhancedDescription": "enhanced description"
-              }
-            ]
-          }
-        }
-      `;
-      
+      const prompt = generateJobMatchPrompt(jobDescription, cvData);
       const response = await getGeminiResponse(prompt);
-      const parsedResult = parseAIResponse(response, 'job_match');
+      const result = parseJobMatchResponse(response);
       
-      setAnalysisResult(parsedResult);
+      setMatchScore(result.matchScore);
+      setMissingSkills(result.missingSkills);
+      setSuggestions(result.suggestions);
+      setAnalysisComplete(true);
       
       toast({
-        title: "Analysis Complete",
-        description: "Job matching analysis has been completed. Review the recommendations below.",
+        title: "Job Match Analysis Complete",
+        description: `Generated ${result.suggestions.length} optimization suggestions.`
       });
     } catch (error) {
       console.error('Error analyzing job match:', error);
@@ -107,72 +137,145 @@ const JobMatcherModal: React.FC<JobMatcherModalProps> = ({
     }
   };
 
-  const handleApplyRecommendations = async () => {
-    if (!analysisResult) return;
+  const applySuggestion = (suggestion: JobMatchSuggestion) => {
+    const updatedCV = { ...cvData };
     
-    setIsApplying(true);
-    try {
-      const updatedCV: CVData = { ...cvData };
-      
-      // Apply personal info enhancements
-      if (analysisResult.recommendations?.personalInfo) {
-        if (analysisResult.recommendations.personalInfo.title) {
-          updatedCV.personalInfo.title = analysisResult.recommendations.personalInfo.title;
+    switch (suggestion.type) {
+      case 'summary':
+        if (updatedCV.personalInfo) {
+          updatedCV.personalInfo.summary = suggestion.enhancedText;
         }
-        if (analysisResult.recommendations.personalInfo.summary) {
-          updatedCV.personalInfo.summary = analysisResult.recommendations.personalInfo.summary;
+        break;
+      case 'experience':
+        if (updatedCV.experience) {
+          const expIndex = updatedCV.experience.findIndex(exp => 
+            exp.title === suggestion.title || exp.description === suggestion.originalText
+          );
+          if (expIndex !== -1) {
+            updatedCV.experience[expIndex].description = suggestion.enhancedText;
+          }
         }
-      }
-      
-      // Apply experience enhancements
-      if (analysisResult.recommendations?.experience) {
-        updatedCV.experience = updatedCV.experience.map(exp => {
-          const enhancement = analysisResult.recommendations.experience.find(
-            (e: any) => e.id === exp.id
+        break;
+      case 'projects':
+        if (updatedCV.projects) {
+          const projIndex = updatedCV.projects.findIndex(proj => 
+            proj.name === suggestion.title || proj.description === suggestion.originalText
           );
-          if (enhancement?.enhancedDescription) {
-            return { ...exp, description: enhancement.enhancedDescription };
+          if (projIndex !== -1) {
+            updatedCV.projects[projIndex].description = suggestion.enhancedText;
           }
-          return exp;
-        });
-      }
-      
-      // Apply skills enhancements
-      if (analysisResult.recommendations?.skills) {
-        updatedCV.skills = analysisResult.recommendations.skills;
-      }
-      
-      // Apply projects enhancements
-      if (analysisResult.recommendations?.projects) {
-        updatedCV.projects = updatedCV.projects.map(proj => {
-          const enhancement = analysisResult.recommendations.projects.find(
-            (p: any) => p.id === proj.id
-          );
-          if (enhancement?.enhancedDescription) {
-            return { ...proj, description: enhancement.enhancedDescription };
-          }
-          return proj;
-        });
-      }
-      
-      onUpdateCV(updatedCV);
-      
-      toast({
-        title: "CV Updated",
-        description: "Your CV has been optimized to better match the job requirements.",
-      });
-      
-      onClose();
-    } catch (error) {
-      console.error('Error applying recommendations:', error);
-      toast({
-        title: "Update Failed",
-        description: "Failed to apply recommendations. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsApplying(false);
+        }
+        break;
+      case 'skills':
+        if (updatedCV.skills) {
+          const newSkills = suggestion.enhancedText.split(',').map(skill => skill.trim());
+          const existingSkills = updatedCV.skills || [];
+          const mergedSkills = [...new Set([...existingSkills, ...newSkills])];
+          updatedCV.skills = mergedSkills;
+        }
+        break;
     }
+    
+    onUpdateCV(updatedCV);
+    toast({
+      title: "Suggestion Applied!",
+      description: "Your CV has been updated to better match the job requirements."
+    });
+  };
+
+  const applyAllSuggestions = () => {
+    let updatedCV = { ...cvData };
+    
+    suggestions.forEach(suggestion => {
+      switch (suggestion.type) {
+        case 'summary':
+          if (updatedCV.personalInfo) {
+            updatedCV.personalInfo.summary = suggestion.enhancedText;
+          }
+          break;
+        case 'experience':
+          if (updatedCV.experience) {
+            const expIndex = updatedCV.experience.findIndex(exp => 
+              exp.title === suggestion.title || exp.description === suggestion.originalText
+            );
+            if (expIndex !== -1) {
+              updatedCV.experience[expIndex].description = suggestion.enhancedText;
+            }
+          }
+          break;
+        case 'projects':
+          if (updatedCV.projects) {
+            const projIndex = updatedCV.projects.findIndex(proj => 
+              proj.name === suggestion.title || proj.description === suggestion.originalText
+            );
+            if (projIndex !== -1) {
+              updatedCV.projects[projIndex].description = suggestion.enhancedText;
+            }
+          }
+          break;
+        case 'skills':
+          if (updatedCV.skills) {
+            const newSkills = suggestion.enhancedText.split(',').map(skill => skill.trim());
+            const existingSkills = updatedCV.skills || [];
+            const mergedSkills = [...new Set([...existingSkills, ...newSkills])];
+            updatedCV.skills = mergedSkills;
+          }
+          break;
+      }
+    });
+    
+    onUpdateCV(updatedCV);
+    toast({
+      title: "All Suggestions Applied!",
+      description: "Your CV has been optimized to better match the job requirements."
+    });
+  };
+
+  const getSuggestionIcon = (type: string) => {
+    switch (type) {
+      case 'experience':
+        return <TrendingUp className="h-4 w-4" />;
+      case 'skills':
+        return <Award className="h-4 w-4" />;
+      case 'summary':
+        return <Users className="h-4 w-4" />;
+      case 'projects':
+        return <Lightbulb className="h-4 w-4" />;
+      case 'education':
+        return <CheckCircle className="h-4 w-4" />;
+      default:
+        return <Sparkles className="h-4 w-4" />;
+    }
+  };
+
+  const getSuggestionColors = (type: string) => {
+    switch (type) {
+      case 'experience':
+        return 'border-blue-200 bg-blue-50';
+      case 'skills':
+        return 'border-green-200 bg-green-50';
+      case 'summary':
+        return 'border-purple-200 bg-purple-50';
+      case 'projects':
+        return 'border-orange-200 bg-orange-50';
+      case 'education':
+        return 'border-indigo-200 bg-indigo-50';
+      default:
+        return 'border-gray-200 bg-gray-50';
+    }
+  };
+
+  const getMatchScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600 bg-green-100';
+    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
+
+  const resetAnalysis = () => {
+    setAnalysisComplete(false);
+    setSuggestions([]);
+    setMatchScore(null);
+    setMissingSkills([]);
   };
 
   return (
@@ -180,94 +283,184 @@ const JobMatcherModal: React.FC<JobMatcherModalProps> = ({
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 flex items-center justify-center">
+              <Target className="h-4 w-4 text-white" />
+            </div>
             Job Matcher
           </DialogTitle>
+          <DialogDescription>
+            Optimize your CV content to better match specific job requirements
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
-          <div>
-            <Label htmlFor="job-description">Job Description</Label>
-            <Textarea
-              id="job-description"
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Paste the job description here..."
-              className="min-h-[150px]"
-            />
-          </div>
-          
-          {!analysisResult ? (
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button onClick={handleAnalyze} disabled={!jobDescription.trim() || isAnalyzing}>
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  'Analyze Match'
-                )}
-              </Button>
+        {!analysisComplete && (
+          <div className="space-y-6">
+            <div>
+              <Label htmlFor="job-description">Job Description</Label>
+              <Textarea
+                id="job-description"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                placeholder="Paste the job description here..."
+                className="min-h-[200px] mt-2"
+              />
             </div>
-          ) : (
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    Match Analysis
-                  </CardTitle>
-                  <CardDescription>
-                    CV compatibility with job requirements
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Match Score:</span>
-                      <Badge variant={analysisResult.matchScore >= 80 ? "default" : analysisResult.matchScore >= 60 ? "secondary" : "destructive"}>
-                        {analysisResult.matchScore}%
-                      </Badge>
+            
+            {isAnalyzing && (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 flex items-center justify-center mx-auto mb-6">
+                  <Loader2 className="h-8 w-8 text-white animate-spin" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Analyzing Job Match</h3>
+                <p className="text-gray-600">AI is comparing your CV with the job requirements...</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {analysisComplete && (
+          <div className="space-y-6">
+            {/* Match Score Card */}
+            <Card className="border-l-4 border-l-emerald-500">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-emerald-600" />
+                  Job Match Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className={`text-4xl font-bold rounded-full w-20 h-20 flex items-center justify-center ${getMatchScoreColor(matchScore || 0)}`}>
+                        {matchScore}%
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Match Score</p>
                     </div>
-                    
-                    {analysisResult.missingSkills && analysisResult.missingSkills.length > 0 && (
-                      <div>
-                        <span className="text-sm font-medium">Missing Skills:</span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {analysisResult.missingSkills.map((skill: string, index: number) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {skill}
-                            </Badge>
-                          ))}
+                    <div className="flex-1">
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-300"
+                          style={{ width: `${matchScore}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {matchScore && matchScore >= 80 ? 'Excellent match!' : 
+                         matchScore && matchScore >= 60 ? 'Good match with room for improvement' : 
+                         'Needs optimization for better match'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {missingSkills.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Key Skills to Highlight:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {missingSkills.map((skill, index) => (
+                          <Badge key={index} variant="outline" className="text-xs border-emerald-200 text-emerald-700">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Suggestions */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Optimization Suggestions</h3>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={resetAnalysis}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Re-analyze
+                  </Button>
+                  <Button 
+                    onClick={applyAllSuggestions}
+                    size="sm"
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                  >
+                    Apply All
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <Card key={index} className={`border-l-4 ${getSuggestionColors(suggestion.type)}`}>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getSuggestionIcon(suggestion.type)}
+                          <CardTitle className="text-sm font-medium">{suggestion.title}</CardTitle>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {suggestion.type}
+                          </Badge>
+                          <Button 
+                            size="sm"
+                            onClick={() => applySuggestion(suggestion)}
+                            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                          >
+                            Apply
+                          </Button>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button onClick={handleApplyRecommendations} disabled={isApplying}>
-                  {isApplying ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Applying...
-                    </>
-                  ) : (
-                    'Apply Recommendations'
-                  )}
-                </Button>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-3">
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-1">Original:</p>
+                        <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                          {suggestion.originalText}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-1">Optimized:</p>
+                        <p className="text-sm text-gray-800 bg-emerald-50 p-2 rounded border-l-2 border-emerald-400">
+                          {suggestion.enhancedText}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-1">Improvement:</p>
+                        <p className="text-xs text-gray-600">{suggestion.improvement}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-1">Job Relevance:</p>
+                        <p className="text-xs text-emerald-600">{suggestion.matchRelevance}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+          
+          {!analysisComplete && (
+            <Button 
+              onClick={handleAnalyze} 
+              disabled={!jobDescription.trim() || isAnalyzing}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                'Analyze Job Match'
+              )}
+            </Button>
           )}
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

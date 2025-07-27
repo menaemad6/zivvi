@@ -1,3 +1,4 @@
+
 // AI SMART ASSISTANT
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -338,7 +339,14 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         education: [...(cvData.education || [])],
         skills: [...(cvData.skills || [])],
         projects: [...(cvData.projects || [])],
-        references: [...(cvData.references || [])]
+        references: [...(cvData.references || [])],
+        designOptions: cvData.designOptions || {
+          template: 'classic',
+          colorScheme: 'blue',
+          fontSize: 'medium',
+          spacing: 'normal',
+          fontFamily: 'inter'
+        }
       };
 
       const newSectionIds: string[] = [];
@@ -412,7 +420,14 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
         skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
-        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : []
+        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
+        designOptions: updatedCVData.designOptions || {
+          template: 'classic',
+          colorScheme: 'blue',
+          fontSize: 'medium',
+          spacing: 'normal',
+          fontFamily: 'inter'
+        }
       };
 
       onSectionsGenerated(finalCVData, newSectionIds);
