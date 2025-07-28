@@ -339,6 +339,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         education: [...(cvData.education || [])],
         skills: [...(cvData.skills || [])],
         projects: [...(cvData.projects || [])],
+        courses: [...(cvData.courses || [])],
+        certificates: [...(cvData.certificates || [])],
+        languages: [...(cvData.languages || [])],
         references: [...(cvData.references || [])],
         designOptions: {
           primaryColor: cvData.designOptions?.primaryColor || '',
@@ -418,6 +421,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
         skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
+        courses: Array.isArray(updatedCVData.courses) ? updatedCVData.courses : [],
+        certificates: Array.isArray(updatedCVData.certificates) ? updatedCVData.certificates : [],
+        languages: Array.isArray(updatedCVData.languages) ? updatedCVData.languages : [],
         references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
         designOptions: {
           primaryColor: updatedCVData.designOptions?.primaryColor || '',
