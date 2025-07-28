@@ -83,7 +83,7 @@ export default function Builder() {
   useEffect(() => {
     // Auto-save functionality
     if (autoSaveEnabled && cvData) {
-      handleAutoSave(cvData);
+      handleAutoSave();
     }
     // Cleanup timeout on unmount
     return () => {
@@ -213,7 +213,7 @@ export default function Builder() {
     
     // Auto-save the updated CV
     if (autoSaveEnabled) {
-      handleAutoSave(updatedCVData);
+      handleAutoSave();
     }
     
     trackEvent('ai_sections_generated', {
@@ -222,22 +222,24 @@ export default function Builder() {
     });
   };
 
-  const handleAutoSave = (dataToSave: CVData = cvData) => {
-    if (!dataToSave || !autoSaveEnabled) return;
+  const handleAutoSave = () => {
+    if (!cvData || !autoSaveEnabled) return;
     
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
-    autoSaveTimeoutRef.current = setTimeout(() => {
-      saveCV(dataToSave, deletedSections, activeSections);
-      setLastSaved(new Date());
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      const success = await saveCV(cvData);
+      if (success) {
+        setLastSaved(new Date());
+      }
     }, 2000);
   };
 
   const handleManualSave = async () => {
     if (cvData) {
-      const success = await saveCV(cvData, deletedSections, activeSections);
+      const success = await saveCV(cvData);
       if (success) {
         setLastSaved(new Date());
         toast({
@@ -472,7 +474,7 @@ export default function Builder() {
   const handleJobMatcherOptimize = (optimizedData: CVData) => {
     setCVData(optimizedData);
     if (autoSaveEnabled) {
-      handleAutoSave(optimizedData);
+      handleAutoSave();
     }
     trackEvent('job_matcher_optimize', { cv_id: cvId });
   };
@@ -480,7 +482,7 @@ export default function Builder() {
   const handleOptimizerUpdate = (optimizedData: CVData) => {
     setCVData(optimizedData);
     if (autoSaveEnabled) {
-      handleAutoSave(optimizedData);
+      handleAutoSave();
     }
     trackEvent('cv_optimizer_update', { cv_id: cvId });
   };
@@ -488,7 +490,7 @@ export default function Builder() {
   const handleEnhancerUpdate = (enhancedData: CVData) => {
     setCVData(enhancedData);
     if (autoSaveEnabled) {
-      handleAutoSave(enhancedData);
+      handleAutoSave();
     }
     trackEvent('cv_enhancer_update', { cv_id: cvId });
   };
@@ -555,7 +557,6 @@ export default function Builder() {
                       <CVSection
                         key={section}
                         title={getSectionTitle(section)}
-                        description={getSectionDescription(section)}
                         icon={getSectionIcon(section)}
                         active={activeSections.includes(section)}
                         onToggle={() => handleSectionToggle(section)}
@@ -690,7 +691,11 @@ export default function Builder() {
             </div>
           </div>
           <div className="p-4">
-            <CVTemplateRenderer templateId={selectedTemplate} cvData={currentData} />
+            <CVTemplateRenderer 
+              templateId={selectedTemplate} 
+              cvData={currentData} 
+              sections={activeSections}
+            />
           </div>
         </div>
       </div>
@@ -701,13 +706,16 @@ export default function Builder() {
         onClose={() => setEditingSection(null)}
         section={editingSection || 'personalInfo'}
         data={sectionData}
-        onSave={handleSaveSection}
+        onSave={(updatedData) => {
+          if (editingSection) {
+            handleSaveSection(editingSection, updatedData);
+          }
+        }}
       />
 
       <DesignOptionsModal
         isOpen={isDesignModalOpen}
         onClose={() => setIsDesignModalOpen(false)}
-        designOptions={cvData?.designOptions}
         onDesignUpdate={handleDesignUpdate}
       />
 
@@ -721,7 +729,6 @@ export default function Builder() {
       <CVSettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
-        onAutoSaveToggle={setAutoSaveEnabled}
       />
 
       <AISmartAssistant
@@ -732,8 +739,8 @@ export default function Builder() {
       />
 
       <JobMatcherModal
-        open={isJobMatcherOpen}
-        setOpen={setIsJobMatcherOpen}
+        isOpen={isJobMatcherOpen}
+        onClose={() => setIsJobMatcherOpen(false)}
         cvData={currentData}
         onOptimize={handleJobMatcherOptimize}
       />
@@ -742,14 +749,12 @@ export default function Builder() {
         open={isOptimizerOpen}
         setOpen={setIsOptimizerOpen}
         cvData={currentData}
-        onUpdate={handleOptimizerUpdate}
       />
 
       <AIResumeEnhancer
         open={isEnhancerOpen}
         setOpen={setIsEnhancerOpen}
         cvData={currentData}
-        onUpdate={handleEnhancerUpdate}
       />
 
       <Toaster />
