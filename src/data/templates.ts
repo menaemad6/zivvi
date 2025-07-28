@@ -4,7 +4,7 @@ import { CVTemplate } from '@/types/cv';
 export const cvTemplates: CVTemplate[] = [
   {
     id: 'classicTemp',
-    name: 'Classic Template',
+    name: 'Classic',
     description: 'A timeless, professional layout with clearly separated sections and traditional formatting. Ideal for formal job applications.',
     thumbnail: '/templates/classic-template.png',
     category: 'classic',
@@ -17,7 +17,7 @@ export const cvTemplates: CVTemplate[] = [
     name: 'Visionary Pro',
     description: 'Bold orange header design with structured sections and achievement highlights. Perfect for showcasing leadership and innovation.',
     thumbnail: '/templates/visionary-pro-template.png',
-    category: 'creative',
+    category: 'modern',
     options: {
       hasFont: true,
       hasPrimaryColor: true,
@@ -39,7 +39,7 @@ export const cvTemplates: CVTemplate[] = [
     name: 'High Performer',
     description: 'Clean blue-accented design with emphasis on achievements and project highlights. Great for project managers and directors.',
     thumbnail: '/templates/high-performer-template.png',
-    category: 'modern',
+    category: 'creative',
     options: {
       hasFont: true,
       hasPrimaryColor: true,
@@ -47,7 +47,7 @@ export const cvTemplates: CVTemplate[] = [
   },
   {
     id: 'elegantTemp',
-    name: 'Elegant Template',
+    name: 'Elegant',
     description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
     thumbnail: '/templates/elegant-template.png',
     category: 'modern',
@@ -58,7 +58,7 @@ export const cvTemplates: CVTemplate[] = [
   },
   {
     id: 'timelineTemp',
-    name: 'Timeline Template',
+    name: 'Timeline',
     description: 'Showcases your career path using a visual timeline. Perfect for emphasizing growth and progression over time.',
     thumbnail: '/templates/timeline-template.png',
     category: 'minimal',
@@ -69,7 +69,7 @@ export const cvTemplates: CVTemplate[] = [
   },
   {
     id: 'compactTemp',
-    name: 'Compact Template',
+    name: 'Compact',
     description: 'A space-efficient layout that fits all essential information on a single page without clutter. Great for experienced professionals.',
     thumbnail: '/templates/compact-template.png',
     category: 'modern',
@@ -80,7 +80,7 @@ export const cvTemplates: CVTemplate[] = [
   },
   {
     id: 'headerTemp',
-    name: 'Header Template',
+    name: 'Header',
     description: 'Features a bold, modern header section that highlights your name and title. Ideal for personal branding and standout resumes.',
     thumbnail: '/templates/header-template.png',
     category: 'creative',

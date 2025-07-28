@@ -283,6 +283,442 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   const DesignFontFamily = getFontFamily(cvData.designOptions?.font);
   const designColors = getColorStyles(cvData.designOptions?.primaryColor || 'orange', cvData.designOptions?.secondaryColor);
 
+  // Background shapes rendering
+  const renderBackgroundShapes = () => (
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      overflow: 'hidden',
+      zIndex: 0,
+      pointerEvents: 'none',
+    }}>
+      {/* Original shapes */}
+      {/* Small circle in top-left */}
+      <div style={{
+        position: 'absolute',
+        top: '15mm',
+        left: '10mm',
+        width: '12mm',
+        height: '12mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.4,
+      }} />
+      
+      {/* Small rectangle in top-right */}
+      <div style={{
+        position: 'absolute',
+        top: '25mm',
+        right: '15mm',
+        width: '10mm',
+        height: '10mm',
+        transform: 'rotate(15deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      {/* Small circle in middle-left */}
+      <div style={{
+        position: 'absolute',
+        top: '80mm',
+        left: '20mm',
+        width: '8mm',
+        height: '8mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.25,
+      }} />
+      
+      {/* Small triangle in middle-right (using border trick) */}
+      <div style={{
+        position: 'absolute',
+        top: '100mm',
+        right: '25mm',
+        width: 0,
+        height: 0,
+        borderLeft: '6mm solid transparent',
+        borderRight: '6mm solid transparent',
+        borderBottom: '10mm solid ' + designColors.primary.bg,
+        opacity: 0.2,
+      }} />
+      
+      {/* Small square in middle */}
+      <div style={{
+        position: 'absolute',
+        top: '150mm',
+        left: '50%',
+        marginLeft: '-5mm',
+        width: '10mm',
+        height: '10mm',
+        transform: 'rotate(45deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.15,
+      }} />
+      
+      {/* Small circle in bottom-left */}
+      <div style={{
+        position: 'absolute',
+        bottom: '70mm',
+        left: '15mm',
+        width: '7mm',
+        height: '7mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      {/* Small rectangle in bottom-center */}
+      <div style={{
+        position: 'absolute',
+        bottom: '40mm',
+        left: '50%',
+        marginLeft: '-4mm',
+        width: '8mm',
+        height: '8mm',
+        transform: 'rotate(30deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.25,
+      }} />
+      
+      {/* Small rectangle in bottom-right */}
+      <div style={{
+        position: 'absolute',
+        bottom: '30mm',
+        right: '20mm',
+        width: '15mm',
+        height: '15mm',
+        transform: 'rotate(30deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      {/* Extra small dots scattered around */}
+      <div style={{
+        position: 'absolute',
+        top: '200mm',
+        left: '30mm',
+        width: '5mm',
+        height: '5mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.2,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '120mm',
+        left: '70mm',
+        width: '4mm',
+        height: '4mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '100mm',
+        right: '40mm',
+        width: '6mm',
+        height: '6mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.25,
+      }} />
+      
+      {/* ADDITIONAL SHAPES */}
+      
+      {/* Tiny dots cluster top-right */}
+      <div style={{
+        position: 'absolute',
+        top: '40mm',
+        right: '35mm',
+        width: '3mm',
+        height: '3mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.35,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '38mm',
+        right: '30mm',
+        width: '2mm',
+        height: '2mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.4,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '43mm',
+        right: '32mm',
+        width: '1.5mm',
+        height: '1.5mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.45,
+      }} />
+      
+      {/* Tiny dots cluster bottom-left */}
+      <div style={{
+        position: 'absolute',
+        bottom: '50mm',
+        left: '25mm',
+        width: '2.5mm',
+        height: '2.5mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.35,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '53mm',
+        left: '28mm',
+        width: '1.8mm',
+        height: '1.8mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.4,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '48mm',
+        left: '30mm',
+        width: '1.2mm',
+        height: '1.2mm',
+        borderRadius: '50%',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.45,
+      }} />
+      
+      {/* Small hexagon (approximated with rotated square) */}
+      <div style={{
+        position: 'absolute',
+        top: '60mm',
+        right: '50mm',
+        width: '8mm',
+        height: '8mm',
+        transform: 'rotate(30deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.2,
+      }} />
+      
+      {/* Small pentagon (approximated with rotated square and clip-path) */}
+      <div style={{
+        position: 'absolute',
+        top: '170mm',
+        left: '35mm',
+        width: '9mm',
+        height: '9mm',
+        clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.25,
+      }} />
+      
+      {/* Small star (approximated with clip-path) */}
+      <div style={{
+        position: 'absolute',
+        bottom: '130mm',
+        right: '60mm',
+        width: '10mm',
+        height: '10mm',
+        clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.2,
+      }} />
+      
+      {/* Diagonal line (thin rectangle) */}
+      <div style={{
+        position: 'absolute',
+        top: '90mm',
+        left: '40mm',
+        width: '20mm',
+        height: '1mm',
+        transform: 'rotate(45deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      {/* Diagonal line (thin rectangle) opposite direction */}
+      <div style={{
+        position: 'absolute',
+        bottom: '90mm',
+        right: '45mm',
+        width: '15mm',
+        height: '0.8mm',
+        transform: 'rotate(-30deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.25,
+      }} />
+      
+      {/* Small cross (using two rectangles) */}
+      <div style={{
+        position: 'absolute',
+        top: '130mm',
+        right: '30mm',
+      }}>
+        <div style={{
+          width: '8mm',
+          height: '2mm',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.3,
+          position: 'absolute',
+          top: '3mm',
+          left: 0,
+        }} />
+        <div style={{
+          width: '2mm',
+          height: '8mm',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.3,
+          position: 'absolute',
+          top: 0,
+          left: '3mm',
+        }} />
+      </div>
+      
+      {/* Tiny triangles scattered */}
+      <div style={{
+        position: 'absolute',
+        top: '220mm',
+        left: '60mm',
+        width: 0,
+        height: 0,
+        borderLeft: '3mm solid transparent',
+        borderRight: '3mm solid transparent',
+        borderBottom: '5mm solid ' + designColors.primary.bg,
+        opacity: 0.3,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '70mm',
+        right: '70mm',
+        width: 0,
+        height: 0,
+        borderLeft: '2mm solid transparent',
+        borderRight: '2mm solid transparent',
+        borderBottom: '4mm solid ' + designColors.primary.bg,
+        opacity: 0.25,
+        transform: 'rotate(30deg)',
+      }} />
+      
+      {/* Curved line (arc) approximated with a partial circle */}
+      <div style={{
+        position: 'absolute',
+        bottom: '150mm',
+        left: '80mm',
+        width: '20mm',
+        height: '20mm',
+        borderRadius: '50%',
+        border: `1mm solid ${designColors.primary.bg}`,
+        borderTop: 'none',
+        borderLeft: 'none',
+        opacity: 0.2,
+      }} />
+      
+      {/* Curved line (arc) opposite direction */}
+      <div style={{
+        position: 'absolute',
+        top: '180mm',
+        right: '75mm',
+        width: '15mm',
+        height: '15mm',
+        borderRadius: '50%',
+        border: `0.8mm solid ${designColors.primary.bg}`,
+        borderBottom: 'none',
+        borderRight: 'none',
+        opacity: 0.25,
+      }} />
+      
+      {/* Diamond shapes */}
+      <div style={{
+        position: 'absolute',
+        top: '50mm',
+        left: '50mm',
+        width: '6mm',
+        height: '6mm',
+        transform: 'rotate(45deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.2,
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '60mm',
+        right: '55mm',
+        width: '4mm',
+        height: '4mm',
+        transform: 'rotate(45deg)',
+        backgroundColor: `${designColors.primary.bg}`,
+        opacity: 0.3,
+      }} />
+      
+      {/* Dotted line (series of tiny dots) */}
+      {[...Array(8)].map((_, i) => (
+        <div key={`dotted-line-1-${i}`} style={{
+          position: 'absolute',
+          top: '240mm',
+          left: `${45 + i * 5}mm`,
+          width: '1mm',
+          height: '1mm',
+          borderRadius: '50%',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.35,
+        }} />
+      ))}
+      
+      {/* Dotted line (series of tiny dots) - vertical */}
+      {[...Array(6)].map((_, i) => (
+        <div key={`dotted-line-2-${i}`} style={{
+          position: 'absolute',
+          top: `${100 + i * 5}mm`,
+          right: '15mm',
+          width: '1mm',
+          height: '1mm',
+          borderRadius: '50%',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.3,
+        }} />
+      ))}
+      
+      {/* Dotted line (series of tiny dots) - diagonal */}
+      {[...Array(5)].map((_, i) => (
+        <div key={`dotted-line-3-${i}`} style={{
+          position: 'absolute',
+          top: `${30 + i * 5}mm`,
+          left: `${80 + i * 5}mm`,
+          width: '1mm',
+          height: '1mm',
+          borderRadius: '50%',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.25,
+        }} />
+      ))}
+      
+      {/* Wave pattern (series of circles with varying positions) */}
+      {[...Array(6)].map((_, i) => (
+        <div key={`wave-${i}`} style={{
+          position: 'absolute',
+          bottom: `${80 + Math.sin(i) * 5}mm`,
+          left: `${100 + i * 8}mm`,
+          width: '3mm',
+          height: '3mm',
+          borderRadius: '50%',
+          backgroundColor: `${designColors.primary.bg}`,
+          opacity: 0.2 + (i * 0.02),
+        }} />
+      ))}
+    </div>
+  );
   
   const renderSectionTitle = (title: string) => (
     <div style={{
@@ -460,49 +896,71 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
   // Layout: Two columns
   return (
     <div className="cv-page" style={{
-      ...CV_PAGE_STYLE ,
-      
+      ...CV_PAGE_STYLE,
       padding: '0',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: DesignFontFamily,
+      position: 'relative', // Ensure this is set for absolute positioning of shapes
+      overflow: 'hidden', // Ensure shapes don't get cut off
     }}>
-      <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
-
+      {/* Add background shapes */}
+      {renderBackgroundShapes()}
       
-      {/* Header (Top) */}
-      <div>
-        {sectionMap["personalInfo"] && renderHeader()}
-      </div>
-
       <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      gap: '3mm'
-    }}>
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative', // For proper stacking
+        zIndex: 1, // Ensure content is above background shapes
+      }}>
+        {/* Header (Top) */}
+        <div>
+          {sectionMap["personalInfo"] && renderHeader()}
+        </div>
 
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '3mm',
+          position: 'relative', // Important for z-index to work
+          zIndex: 1, // Ensure this content is above background shapes
+          backgroundColor: 'transparent', // Make sure background is transparent
+        }}>
+          {/* Main (left) */}
+          <div style={{ 
+            flex: 1, 
+            paddingLeft: '6mm', 
+            paddingRight: '7mm', 
+            minHeight: '297mm', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0',
+            position: 'relative', // Important for z-index to work
+            zIndex: 1, // Ensure content is above background shapes
+            backgroundColor: 'transparent', // Make sure background is transparent
+          }}>
+            {cvData.personalInfo?.summary && renderSummary()}
+            {sectionMap["experience"] && renderExperience()}
+            {sectionMap["projects"] && renderProjects()}
+          </div>
+          {/* Main (left) */}
 
-      {/* Main (left) */}
-      <div style={{ flex: 1, paddingLeft: '6mm', paddingRight: '7mm', minHeight: '297mm', display: 'flex', flexDirection: 'column', gap: '0' }}>
-        {cvData.personalInfo?.summary && renderSummary()}
-        {sectionMap["experience"] && renderExperience()}
-        {sectionMap["projects"] && renderProjects()}
-      </div>
-      {/* Main (left) */}
-
-      {/* Sidebar (right) */}
-      <div style={{ width: '80mm', paddingRight: '6mm', display: 'flex', flexDirection: 'column', minHeight: '297mm' }}>
-        {sectionMap["education"] && renderEducation()}
-        {sectionMap["skills"] && renderSkills()}
-      </div>
-      {/* Sidebar (right) */}
-
-      </div>
-
-
+          {/* Sidebar (right) */}
+          <div style={{ 
+            width: '80mm', 
+            paddingRight: '6mm', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            minHeight: '297mm',
+            position: 'relative', // Important for z-index to work
+            zIndex: 1, // Ensure content is above background shapes
+            backgroundColor: 'transparent', // Make sure background is transparent
+          }}>
+            {sectionMap["education"] && renderEducation()}
+            {sectionMap["skills"] && renderSkills()}
+          </div>
+          {/* Sidebar (right) */}
+        </div>
       </div>
     </div>
   );
@@ -697,16 +1155,18 @@ const renderSectionTitle = (title: string , rightSidebar?: boolean) => {
   const renderSkills = () => (
     <section style={{ marginBottom: '4mm', overflow: 'hidden' }}>
       {renderSectionTitle("SKILLS" , true)}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'flex',flexWrap: 'wrap', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
           <div key={idx} style={{ 
             backgroundColor: 'white',
             color: designColors.primary.secondary,
-            padding: '2mm',
+            padding: '1mm',
+            paddingBottom: '3mm',
             textAlign: 'center',
             fontSize: '10pt',
             borderRadius: '2mm',
-            fontWeight: 600
+            fontWeight: 600,
+            width: 'fit-content'
           }}>
             {skill}
           </div>
@@ -972,12 +1432,13 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         SKILLS
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
           <div key={idx} style={{ 
             backgroundColor: '#ededed',
             color: designColors.primary.primary,
             padding: '2mm',
+            paddingBottom: '3mm',
             textAlign: 'center',
             fontSize: '10pt',
             borderRadius: '2mm',
@@ -1220,9 +1681,9 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Skills
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'flex',flexWrap: 'wrap', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <div key={idx} style={{ fontSize: '10pt', color: designColors.primary.primary, textAlign: 'center', padding: '2mm', backgroundColor: '#f5f5f5', borderRadius: '2mm' }}>
+          <div key={idx} style={{ fontSize: '10pt', color: designColors.primary.primary, textAlign: 'center', padding: '2mm', paddingBottom:'3mm',backgroundColor: '#f5f5f5', borderRadius: '2mm' }}>
             {skill}
           </div>
         )) : (
@@ -1432,9 +1893,9 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Skills
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '3mm' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <div key={idx} style={{ fontSize: '10pt', color: '#333', textAlign: 'center', padding: '2mm', backgroundColor: '#f5f5f5', borderRadius: '2mm' }}>
+          <div key={idx} style={{ fontSize: '10pt', color: '#333', textAlign: 'center', padding: '2mm',paddingBottom:'3mm', backgroundColor: '#f5f5f5', borderRadius: '2mm' }}>
             {skill}
           </div>
         )) : (
@@ -1623,10 +2084,10 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const renderSkills = () => (
     <section style={{ marginBottom: '5mm' }}>
       {renderSectionTitle("Skills", true)}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
+      <div style={{ display: 'flex',flexWrap:'wrap', gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? (
           cvData.skills.map((skill, idx) => (
-            <span key={idx} style={{ backgroundColor: '#fff', color: designColors.primary.secondary, padding: '2mm 4mm', borderRadius: '10pt', fontSize: '9pt', textAlign: 'center', fontWeight: 600 }}>
+            <span key={idx} style={{ backgroundColor: '#fff', color: designColors.primary.secondary, padding: '2mm',paddingBottom: '3mm', borderRadius: '10pt', fontSize: '9pt', textAlign: 'center', fontWeight: 600 }}>
               {skill}
             </span>
           ))
@@ -2020,9 +2481,9 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
   const renderSkills = () => (
     <section style={{ marginBottom: '5mm' }}>
       {renderTitle("SKILLS")}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2mm' }}>
+      <div style={{ display: 'flex',flexWrap: 'wrap' , gap: '2mm' }}>
         {cvData.skills && cvData.skills.length > 0 ? cvData.skills.map((skill, idx) => (
-          <span key={idx} style={{ backgroundColor: '#ededed', color: designColors.primary.primary, fontWeight: 700, padding: '2mm 3mm', borderRadius: '2mm', fontSize: '9pt', textAlign: 'center' }}>
+          <span key={idx} style={{ backgroundColor: '#ededed', color: designColors.primary.primary, fontWeight: 700, padding: '2mm' ,paddingBottom:'3mm', borderRadius: '2mm', fontSize: '9pt', textAlign: 'center' }}>
             {skill}
           </span>
         )) : <span style={{ color: '#dbeafe', fontStyle: 'italic' }}>No skills added yet</span>}

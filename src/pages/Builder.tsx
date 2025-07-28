@@ -1300,8 +1300,8 @@ const handleExport = () => {
                     <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-red-50 to-blue-50 py-3 sm:py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
-                            <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-lg">
+                            <Palette className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                           </div>
                           <div>
                             <CardTitle className="text-base sm:text-lg font-bold text-gray-900">CV Design Options</CardTitle>
