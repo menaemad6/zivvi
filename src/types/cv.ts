@@ -63,29 +63,6 @@ export interface CVData {
     startDate: string;
     endDate: string;
   }>;
-  courses: Array<{
-    id: string;
-    name: string;
-    institution: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-  }>;
-  certificates: Array<{
-    id: string;
-    name: string;
-    issuer: string;
-    issueDate: string;
-    expiryDate: string;
-    credentialId: string;
-    description: string;
-  }>;
-  languages: Array<{
-    id: string;
-    name: string;
-    proficiency: string;
-    description: string;
-  }>;
   references: Array<{
     id: string;
     name: string;

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,10 +18,7 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  Crosshair,
-  BookOpen,
-  Award,
-  Globe
+  Crosshair
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -32,7 +28,6 @@ interface BuilderSidebarProps {
     title: string;
     icon: React.ReactNode;
     description: string;
-    count?: number;
   }>;
   onDragStart?: (e: React.DragEvent, sectionId: string) => void;
   collapsed?: boolean;
@@ -43,7 +38,7 @@ interface BuilderSidebarProps {
   onJobMatcher: () => void;
   onTemplateNavigation: () => void;
   onSave: () => void;
-  onDuplicate?: () => void;
+  onDuplicate?: () => void; // Add this new prop
 }
 
 const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
@@ -87,66 +82,6 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
             ? 'p-1 sm:p-2 md:px-2 lg:px-2 xl:px-2 space-y-1 sm:space-y-2 md:space-y-2 lg:space-y-2 xl:space-y-2'
             : 'p-2 sm:p-3 md:px-4 lg:px-5 xl:px-6 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-4 xl:space-y-5'}
         `}>
-          {/* Available Sections */}
-          {availableSections && availableSections.length > 0 && (
-            <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <CardHeader className={`bg-gradient-to-r from-blue-50 to-indigo-50 ${collapsed ? 'pb-2 px-2 sm:px-2' : 'pb-4 px-2 sm:px-3'}`}>
-                <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2 sm:gap-3'}`}>
-                  <div className={`rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg ${
-                    collapsed ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-10 sm:h-10'
-                  }`}>
-                    <Scan className={`text-white ${collapsed ? 'h-4 w-4' : 'h-5 w-5'}`} />
-                  </div>
-                  {!collapsed && (
-                    <div>
-                      <CardTitle className="text-base sm:text-lg font-bold text-gray-900">CV Sections</CardTitle>
-                      <p className="text-xs sm:text-sm text-gray-600">Drag to add</p>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className={`p-2 sm:p-3 space-y-2 sm:space-y-3 ${collapsed ? 'p-1 sm:p-2' : ''}`}>
-                {availableSections.map((section) => (
-                  <div
-                    key={section.id}
-                    draggable
-                    onDragStart={(e) => onDragStart?.(e, section.id)}
-                    className={`
-                      bg-gradient-to-r from-gray-50 to-gray-100 
-                      hover:from-blue-50 hover:to-indigo-50 
-                      border border-gray-200 hover:border-blue-300 
-                      rounded-xl cursor-move transition-all duration-200 
-                      hover:shadow-lg hover:scale-[1.02] group
-                      ${collapsed ? 'p-1 sm:p-2' : 'p-2 sm:p-3'}
-                    `}
-                    title={collapsed ? section.title : undefined}
-                  >
-                    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2 sm:gap-3'}`}>
-                      <div className={`rounded-lg bg-blue-100 flex items-center justify-center ${
-                        collapsed ? 'w-5 h-5 sm:w-6 sm:h-6' : 'w-6 h-6 sm:w-8 sm:h-8'
-                      }`}>
-                        {section.icon}
-                      </div>
-                      {!collapsed && (
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-xs sm:text-sm text-gray-900">{section.title}</span>
-                            {section.count !== undefined && (
-                              <Badge variant="secondary" className="text-xs">
-                                {section.count}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-600 mt-1">{section.description}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
           {/* AI Tools Section */}
           <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
             <CardHeader className={`bg-gradient-to-r from-purple-50 to-pink-50 ${collapsed ? 'pb-2 px-2 sm:px-2' : 'pb-4 px-2 sm:px-3'}`}>
