@@ -26,6 +26,9 @@ const getStarterData = (): CVData => ({
   education: [],
   skills: [],
   projects: [],
+  courses: [],
+  certificates: [],
+  languages: [],
   references: [],
   customSections: []
 });
@@ -62,6 +65,9 @@ export const useCV = (cvId: string | undefined) => {
         education: [],
         skills: [],
         projects: [],
+        courses: [],
+        certificates: [],
+        languages: [],
         references: []
       };
       setCVData(newCVData);
@@ -122,6 +128,9 @@ export const useCV = (cvId: string | undefined) => {
           education: Array.isArray(parsedData.education) ? parsedData.education : [],
           skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
           projects: Array.isArray(parsedData.projects) ? parsedData.projects : [],
+          courses: Array.isArray(parsedData.courses) ? parsedData.courses : [],
+          certificates: Array.isArray(parsedData.certificates) ? parsedData.certificates : [],
+          languages: Array.isArray(parsedData.languages) ? parsedData.languages : [],
           references: Array.isArray(parsedData.references) ? parsedData.references : [],
           customSections: Array.isArray(parsedData.customSections) ? parsedData.customSections : []
         };
@@ -161,6 +170,9 @@ export const useCV = (cvId: string | undefined) => {
         education?: CVData['education'];
         skills?: CVData['skills'];
         projects?: CVData['projects'];
+        courses?: CVData['courses'];
+        certificates?: CVData['certificates'];
+        languages?: CVData['languages'];
         references?: CVData['references'];
         _deletedSections?: string[];
         _sections?: string[];
@@ -181,6 +193,15 @@ export const useCV = (cvId: string | undefined) => {
       }
       if (sectionsToSave.includes('projects') && data.projects.length > 0) {
         contentToSave.projects = data.projects;
+      }
+      if (sectionsToSave.includes('courses') && data.courses.length > 0) {
+        contentToSave.courses = data.courses;
+      }
+      if (sectionsToSave.includes('certificates') && data.certificates.length > 0) {
+        contentToSave.certificates = data.certificates;
+      }
+      if (sectionsToSave.includes('languages') && data.languages.length > 0) {
+        contentToSave.languages = data.languages;
       }
       if (sectionsToSave.includes('references') && data.references.length > 0) {
         contentToSave.references = data.references;
