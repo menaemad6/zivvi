@@ -759,6 +759,320 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     // Add custom sections here
   };
 
+    const renderCoursesSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Courses</h3>
+        <Button
+          onClick={() => {
+            const newCourse = {
+              id: uuidv4(),
+              name: '',
+              institution: '',
+              date: '',
+              description: ''
+            };
+            setLocalData({
+              ...localData,
+              courses: [...(localData.courses || []), newCourse]
+            });
+          }}
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Course
+        </Button>
+      </div>
+      
+      {localData.courses?.map((course, index) => (
+        <Card key={course.id} className="relative">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Course {index + 1}</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newCourses = localData.courses?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, courses: newCourses });
+                }}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Course Name</Label>
+                <Input
+                  value={course.name}
+                  onChange={(e) => {
+                    const newCourses = [...(localData.courses || [])];
+                    newCourses[index] = { ...course, name: e.target.value };
+                    setLocalData({ ...localData, courses: newCourses });
+                  }}
+                  placeholder="e.g., Advanced JavaScript"
+                />
+              </div>
+              <div>
+                <Label>Institution</Label>
+                <Input
+                  value={course.institution}
+                  onChange={(e) => {
+                    const newCourses = [...(localData.courses || [])];
+                    newCourses[index] = { ...course, institution: e.target.value };
+                    setLocalData({ ...localData, courses: newCourses });
+                  }}
+                  placeholder="e.g., Udemy"
+                />
+              </div>
+              <div>
+                <Label>Completion Date</Label>
+                <Input
+                  type="month"
+                  value={course.date}
+                  onChange={(e) => {
+                    const newCourses = [...(localData.courses || [])];
+                    newCourses[index] = { ...course, date: e.target.value };
+                    setLocalData({ ...localData, courses: newCourses });
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Description (Optional)</Label>
+              <Textarea
+                value={course.description}
+                onChange={(e) => {
+                  const newCourses = [...(localData.courses || [])];
+                  newCourses[index] = { ...course, description: e.target.value };
+                  setLocalData({ ...localData, courses: newCourses });
+                }}
+                rows={3}
+                placeholder="Describe what you learned..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.courses || localData.courses.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No courses added yet.</p>
+          <p className="text-sm">Click "Add Course" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderCertificatesSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Certificates</h3>
+        <Button
+          onClick={() => {
+            const newCertificate = {
+              id: uuidv4(),
+              name: '',
+              issuer: '',
+              date: '',
+              description: '',
+              link: ''
+            };
+            setLocalData({
+              ...localData,
+              certificates: [...(localData.certificates || []), newCertificate]
+            });
+          }}
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Certificate
+        </Button>
+      </div>
+      
+      {localData.certificates?.map((cert, index) => (
+        <Card key={cert.id} className="relative">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Certificate {index + 1}</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newCertificates = localData.certificates?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, certificates: newCertificates });
+                }}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Certificate Name</Label>
+                <Input
+                  value={cert.name}
+                  onChange={(e) => {
+                    const newCertificates = [...(localData.certificates || [])];
+                    newCertificates[index] = { ...cert, name: e.target.value };
+                    setLocalData({ ...localData, certificates: newCertificates });
+                  }}
+                  placeholder="e.g., AWS Certified Solutions Architect"
+                />
+              </div>
+              <div>
+                <Label>Issuing Organization</Label>
+                <Input
+                  value={cert.issuer}
+                  onChange={(e) => {
+                    const newCertificates = [...(localData.certificates || [])];
+                    newCertificates[index] = { ...cert, issuer: e.target.value };
+                    setLocalData({ ...localData, certificates: newCertificates });
+                  }}
+                  placeholder="e.g., Amazon Web Services"
+                />
+              </div>
+              <div>
+                <Label>Issue Date</Label>
+                <Input
+                  type="month"
+                  value={cert.date}
+                  onChange={(e) => {
+                    const newCertificates = [...(localData.certificates || [])];
+                    newCertificates[index] = { ...cert, date: e.target.value };
+                    setLocalData({ ...localData, certificates: newCertificates });
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Certificate Link (Optional)</Label>
+              <Input
+                type="url"
+                value={cert.link}
+                onChange={(e) => {
+                  const newCertificates = [...(localData.certificates || [])];
+                  newCertificates[index] = { ...cert, link: e.target.value };
+                  setLocalData({ ...localData, certificates: newCertificates });
+                }}
+                placeholder="https://credential.net/your-certificate"
+              />
+            </div>
+            
+            <div>
+              <Label>Description (Optional)</Label>
+              <Textarea
+                value={cert.description}
+                onChange={(e) => {
+                  const newCertificates = [...(localData.certificates || [])];
+                  newCertificates[index] = { ...cert, description: e.target.value };
+                  setLocalData({ ...localData, certificates: newCertificates });
+                }}
+                rows={3}
+                placeholder="Describe what this certification represents..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.certificates || localData.certificates.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No certificates added yet.</p>
+          <p className="text-sm">Click "Add Certificate" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderLanguagesSection = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Languages</h3>
+        <Button
+          onClick={() => {
+            const newLanguage = {
+              id: uuidv4(),
+              name: '',
+              proficiency: ''
+            };
+            setLocalData({
+              ...localData,
+              languages: [...(localData.languages || []), newLanguage]
+            });
+          }}
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Language
+        </Button>
+      </div>
+      
+      {localData.languages?.map((lang, index) => (
+        <Card key={lang.id} className="relative">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-base">Language {index + 1}</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newLanguages = localData.languages?.filter((_, i) => i !== index) || [];
+                  setLocalData({ ...localData, languages: newLanguages });
+                }}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Language</Label>
+                <Input
+                  value={lang.name}
+                  onChange={(e) => {
+                    const newLanguages = [...(localData.languages || [])];
+                    newLanguages[index] = { ...lang, name: e.target.value };
+                    setLocalData({ ...localData, languages: newLanguages });
+                  }}
+                  placeholder="e.g., English"
+                />
+              </div>
+              <div>
+                <Label>Proficiency</Label>
+                <Input
+                  value={lang.proficiency}
+                  onChange={(e) => {
+                    const newLanguages = [...(localData.languages || [])];
+                    newLanguages[index] = { ...lang, proficiency: e.target.value };
+                    setLocalData({ ...localData, languages: newLanguages });
+                  }}
+                  placeholder="e.g., Native, Fluent, Intermediate, Basic"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      
+      {(!localData.languages || localData.languages.length === 0) && (
+        <div className="text-center py-8 text-gray-500">
+          <p>No languages added yet.</p>
+          <p className="text-sm">Click "Add Language" to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+
   const renderContent = () => {
     switch (sectionType) {
       case 'personalInfo':
@@ -771,6 +1085,12 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
         return renderSkillsSection();
       case 'projects':
         return renderProjectsSection();
+      case 'courses':
+        return renderCoursesSection();
+      case 'certificates':
+        return renderCertificatesSection();
+      case 'languages':
+        return renderLanguagesSection();
       case 'references':
         return renderReferencesSection();
       default:
@@ -804,3 +1124,5 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     </Dialog>
   );
 };
+
+

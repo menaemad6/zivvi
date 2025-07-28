@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star, Type, Palette } from 'lucide-react';
+import { ArrowLeft, Save, Plus, User, Briefcase, GraduationCap, Award, FileText, Users, Eye, Zap, Undo, Redo, Settings, Layout, Sparkles, Star, Type, Palette, BookOpen, Globe } from 'lucide-react';
 import BuilderSidebar from '@/components/builder/BuilderSidebar';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
@@ -175,6 +175,16 @@ const { duplicateCv } = useDuplicateCV();
         }
         if (cvData.references && cvData.references.length > 0) {
           activeSections.push('references');
+        }
+        // Add checks for new sections
+        if (cvData.courses && cvData.courses.length > 0) {
+          activeSections.push('courses');
+        }
+        if (cvData.certificates && cvData.certificates.length > 0) {
+          activeSections.push('certificates');
+        }
+        if (cvData.languages && cvData.languages.length > 0) {
+          activeSections.push('languages');
         }
         
         setCVSections(activeSections);
@@ -532,7 +542,10 @@ const handleExport = () => {
         education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
         skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
-        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : []
+        references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
+        courses: Array.isArray(updatedCVData.courses) ? updatedCVData.courses : [],
+        certificates: Array.isArray(updatedCVData.certificates) ? updatedCVData.certificates : [],
+        languages: Array.isArray(updatedCVData.languages) ? updatedCVData.languages : [],
       };
       
       // Update CV data
@@ -629,6 +642,9 @@ const handleExport = () => {
     { id: 'education', title: 'Education', icon: <GraduationCap className="h-5 w-5" />, description: 'Academic background' },
     { id: 'skills', title: 'Skills', icon: <Award className="h-5 w-5" />, description: 'Technical and soft skills' },
     { id: 'projects', title: 'Projects', icon: <FileText className="h-5 w-5" />, description: 'Portfolio and projects' },
+    { id: 'courses', title: 'Courses', icon: <BookOpen className="h-5 w-5" />, description: 'Courses and training' },
+    { id: 'certificates', title: 'Certificates', icon: <Award className="h-5 w-5" />, description: 'Professional certifications' },
+    { id: 'languages', title: 'Languages', icon: <Globe className="h-5 w-5" />, description: 'Language proficiencies' },
     { id: 'references', title: 'References', icon: <Users className="h-5 w-5" />, description: 'Professional references' }
   ];
 
@@ -798,7 +814,10 @@ const handleExport = () => {
       education: Array.isArray(cvData.education) ? cvData.education : [],
       skills: Array.isArray(cvData.skills) ? cvData.skills : [],
       projects: Array.isArray(cvData.projects) ? cvData.projects : [],
-      references: Array.isArray(cvData.references) ? cvData.references : []
+      references: Array.isArray(cvData.references) ? cvData.references : [],
+      courses: Array.isArray(cvData.courses) ? cvData.courses : [],
+      certificates: Array.isArray(cvData.certificates) ? cvData.certificates : [],
+      languages: Array.isArray(cvData.languages) ? cvData.languages : [],
     };
     
     try {
@@ -860,7 +879,10 @@ const handleExport = () => {
       education: Array.isArray(updatedData.education) ? updatedData.education : [],
       skills: Array.isArray(updatedData.skills) ? updatedData.skills : [],
       projects: Array.isArray(updatedData.projects) ? updatedData.projects : [],
-      references: Array.isArray(updatedData.references) ? updatedData.references : []
+      references: Array.isArray(updatedData.references) ? updatedData.references : [],
+      courses: Array.isArray(updatedData.courses) ? updatedData.courses : [],
+      certificates: Array.isArray(updatedData.certificates) ? updatedData.certificates : [],
+      languages: Array.isArray(updatedData.languages) ? updatedData.languages : [],
     };
     
     setCVData(sanitizedData);
@@ -1071,6 +1093,64 @@ const handleExport = () => {
             )}
           </div>
         );
+
+        case 'courses':
+        return (
+          <div className="space-y-3">
+            {cvData.courses && cvData.courses.length > 0 ? (
+              cvData.courses.map((course) => (
+                <div key={course.id} className="p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium">{course.name}</h4>
+                  <p className="text-sm text-gray-600">{course.institution}</p>
+                  <p className="text-xs text-gray-500">
+                    {course.date || 'Present'}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No courses added yet</p>
+            )}
+          </div>
+        );
+
+        case 'certificates':
+        return (
+          <div className="space-y-3">
+            {cvData.certificates && cvData.certificates.length > 0 ? (
+              cvData.certificates.map((cer) => (
+                <div key={cer.id} className="p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium">{cer.name}</h4>
+                  <p className="text-sm text-gray-600">{cer.issuer}</p>
+                  <p className="text-xs text-gray-500">
+                    {cer.date || 'Present'}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No Certificates added yet</p>
+            )}
+          </div>
+        );
+
+        case 'languages':
+        return (
+          <div className="space-y-3">
+            {cvData.languages && cvData.languages.length > 0 ? (
+              cvData.languages.map((lan) => (
+                <div key={lan.id} className="p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium">{lan.name}</h4>
+                  <p className="text-sm text-gray-600">{lan.proficiency}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No Languages added yet</p>
+            )}
+          </div>
+        );
+
+
+
+
       
       default:
         return <p className="text-sm text-gray-500">Section content</p>;

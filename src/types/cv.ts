@@ -71,5 +71,25 @@ export interface CVData {
     email: string;
     phone: string;
   }>;
+  courses: Array<{
+    id: string;
+    name: string;
+    institution: string;
+    date: string;
+    description: string;
+  }>;
+  certificates: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    description: string;
+    link: string;
+  }>;
+  languages: Array<{
+    id: string;
+    name: string;
+    proficiency: string;
+  }>;
   customSections?: CustomSection[];
 }
