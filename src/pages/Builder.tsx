@@ -1,18 +1,19 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCV } from '@/hooks/useCV';
 import { CVData } from '@/types/cv';
-import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
+import BuilderSidebar from '@/components/builder/BuilderSidebar';
 import { ScrollableSidebar } from '@/components/builder/ScrollableSidebar';
 import { CVTemplateRenderer } from '@/components/cv/CVTemplateRenderer';
 import { CVSection } from '@/components/builder/CVSection';
 import { SectionEditModal } from '@/components/builder/SectionEditModal';
 import { AISmartAssistant } from '@/components/builder/AISmartAssistant';
-import { JobMatcherModal } from '@/components/builder/JobMatcherModal';
+import JobMatcherModal from '@/components/builder/JobMatcherModal';
 import { AICVOptimizer } from '@/components/builder/AICVOptimizer';
 import { AIResumeEnhancer } from '@/components/builder/AIResumeEnhancer';
 import { DesignOptionsModal } from '@/components/modals/DesignOptionsModal';
-import { TemplateSelectionModal } from '@/components/modals/TemplateSelectionModal';
+import TemplateSelectionModal from '@/components/modals/TemplateSelectionModal';
 import { CVSettingsModal } from '@/components/modals/CVSettingsModal';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
-import { Plus, Edit2, Trash2, Eye, Download, Share2, Settings, Palette, Layout, Save, Loader2, Sparkles, Target, Zap, ArrowLeft, FileText, User, Briefcase, GraduationCap, Award, FolderOpen, Users, Clock, BookOpen, Certificate, Languages } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Download, Share2, Settings, Palette, Layout, Save, Loader2, Sparkles, Target, Zap, ArrowLeft, FileText, User, Briefcase, GraduationCap, Award, FolderOpen, Users, Clock, BookOpen, Languages } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePDFGeneration } from '@/hooks/usePDFGeneration';
@@ -51,7 +52,7 @@ export default function Builder() {
   const [isEnhancerOpen, setIsEnhancerOpen] = useState(false);
   const [deletedSections, setDeletedSections] = useState<string[]>([]);
   const { trackEvent } = useAnalytics();
-  const { generatePDF, isGeneratingPDF } = usePDFGeneration();
+  const { isGenerating, generateAndDownloadPDF } = usePDFGeneration();
 
   useEffect(() => {
     if (cvId && cvId !== 'new') {
@@ -285,7 +286,7 @@ export default function Builder() {
     trackEvent('design_update', { cv_id: cvId });
   };
 
-  const handleTemplateChange = (templateId: string) => {
+  const handleTemplateChange = (templateId: string, templateName: string) => {
     setSelectedTemplate(templateId);
     trackEvent('template_change', { template_id: templateId, cv_id: cvId });
   };
@@ -296,8 +297,10 @@ export default function Builder() {
   };
 
   const handleDownload = async () => {
-    await generatePDF(cvId, selectedTemplate, cvName);
-    trackEvent('download_cv', { cv_id: cvId, template_id: selectedTemplate });
+    if (cvData) {
+      await generateAndDownloadPDF(cvData, selectedTemplate, activeSections, cvName);
+      trackEvent('download_cv', { cv_id: cvId, template_id: selectedTemplate });
+    }
   };
 
   const handleShare = () => {
@@ -351,7 +354,7 @@ export default function Builder() {
       case 'courses':
         return <BookOpen className="h-4 w-4" />;
       case 'certificates':
-        return <Certificate className="h-4 w-4" />;
+        return <Award className="h-4 w-4" />;
       case 'languages':
         return <Languages className="h-4 w-4" />;
       case 'references':
@@ -551,12 +554,11 @@ export default function Builder() {
                     {['personalInfo', 'experience', 'education', 'skills', 'projects', 'courses', 'certificates', 'languages', 'references'].map((section) => (
                       <CVSection
                         key={section}
-                        id={section}
                         title={getSectionTitle(section)}
                         description={getSectionDescription(section)}
                         icon={getSectionIcon(section)}
                         active={activeSections.includes(section)}
-                        onToggle={handleSectionToggle}
+                        onToggle={() => handleSectionToggle(section)}
                         onEdit={() => handleEditSection(section)}
                         onDelete={() => handleDeleteSection(section)}
                       />
@@ -670,8 +672,8 @@ export default function Builder() {
                 <Eye className="mr-2 h-4 w-4" />
                 Preview
               </Button>
-              <Button onClick={handleDownload} disabled={isGeneratingPDF}>
-                {isGeneratingPDF ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+              <Button onClick={handleDownload} disabled={isGenerating}>
+                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 Download
               </Button>
               <Button variant="outline" onClick={handleShare}>
@@ -688,7 +690,7 @@ export default function Builder() {
             </div>
           </div>
           <div className="p-4">
-            <CVTemplateRenderer templateId={selectedTemplate} cvData={currentData} activeSections={activeSections} />
+            <CVTemplateRenderer templateId={selectedTemplate} cvData={currentData} />
           </div>
         </div>
       </div>
@@ -705,21 +707,20 @@ export default function Builder() {
       <DesignOptionsModal
         isOpen={isDesignModalOpen}
         onClose={() => setIsDesignModalOpen(false)}
-        initialDesignOptions={cvData?.designOptions}
+        designOptions={cvData?.designOptions}
         onDesignUpdate={handleDesignUpdate}
       />
 
       <TemplateSelectionModal
-        isOpen={isTemplateModalOpen}
+        open={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        selectedTemplate={selectedTemplate}
+        currentTemplate={selectedTemplate}
         onTemplateChange={handleTemplateChange}
       />
 
       <CVSettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
-        autoSaveEnabled={autoSaveEnabled}
         onAutoSaveToggle={setAutoSaveEnabled}
       />
 
@@ -731,21 +732,21 @@ export default function Builder() {
       />
 
       <JobMatcherModal
-        isOpen={isJobMatcherOpen}
+        open={isJobMatcherOpen}
         setOpen={setIsJobMatcherOpen}
         cvData={currentData}
         onOptimize={handleJobMatcherOptimize}
       />
 
       <AICVOptimizer
-        isOpen={isOptimizerOpen}
+        open={isOptimizerOpen}
         setOpen={setIsOptimizerOpen}
         cvData={currentData}
         onUpdate={handleOptimizerUpdate}
       />
 
       <AIResumeEnhancer
-        isOpen={isEnhancerOpen}
+        open={isEnhancerOpen}
         setOpen={setIsEnhancerOpen}
         cvData={currentData}
         onUpdate={handleEnhancerUpdate}
