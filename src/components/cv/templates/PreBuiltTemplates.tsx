@@ -805,7 +805,8 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
           <div key={idx} style={{
             backgroundColor: '#f3f4f6',
             color: '#374151',
-            padding: '2mm 6mm',
+            padding: '2mm',
+            paddingBottom: '4mm',
             textAlign: 'center',
             fontSize: '9pt',
             borderRadius: '1mm',
@@ -1581,6 +1582,15 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
                 </>
               }
             </ul>
+            {/* Add dashed line separator between experience items except for the last one */}
+            {idx < (cvData.experience?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                paddingTop:'3mm'
+              }} />
+            )}
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No experience added yet</div>}
       </div>
@@ -1619,6 +1629,16 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
                 </>
               }
             </ul>
+            {/* Add dashed line separator between experience items except for the last one */}
+            {idx < (cvData.experience?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                // padding: '1mm 0mm', 
+                paddingTop: '3mm'
+              }} />
+            )}
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No Projects added yet</div>}
       </div>
@@ -1806,7 +1826,17 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
                 </>
               }
             </ul>
+            {/* Add dashed line separator between experience items except for the last one */}
+            {idx < (cvData.experience?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                padding: '2mm 0mm' 
+              }} />
+            )}
           </div>
+          
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No experience added yet</div>}
       </div>
     </section>
@@ -1841,6 +1871,16 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
                 </>
               }
             </ul>
+            {/* Add dashed line separator between experience items except for the last one */}
+            {idx < (cvData.experience?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                padding: '2mm 0mm' 
+              }} />
+            )}
+
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No Projects added yet</div>}
       </div>
@@ -1864,6 +1904,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
             <div style={{ fontSize: '9pt', color: '#666' }}>
               📅 {edu.startDate || "2008"} - {edu.endDate || "2010"}
             </div>
+            
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
@@ -2192,12 +2233,35 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
   const renderExperience = () => (
     <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Experience</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm', position: 'relative' }}>
+        {/* Timeline vertical line */}
+        <div style={{ 
+          position: 'absolute',
+          left: '36mm', /* Positioned after the date column (40mm) plus half of the gap (6mm) */
+          top: '10px',
+          bottom: '10px',
+          width: '2px',
+          backgroundColor: designColors.primary.primary,
+          opacity: 0.5,
+          zIndex: 1
+        }}></div>
+        
         {cvData.experience && cvData.experience.length > 0 ? cvData.experience.map((exp, idx) => (
-          <div key={exp.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm' }}>
+          <div key={exp.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm', position: 'relative' }}>
             <div style={{ width: '40mm', fontSize: '9pt', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
               {exp.startDate || "MM/YYYY"} - {exp.endDate || "MM/YYYY"}
             </div>
+            {/* Timeline dot for each experience item */}
+            <div style={{
+              position: 'absolute',
+              left: '35.3mm',
+              top: '5px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: designColors.primary.primary,
+              zIndex: 2
+            }}></div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '0.5mm' }}>
                 {exp.title || "Data Scientist"}
