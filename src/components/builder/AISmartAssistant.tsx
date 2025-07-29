@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, User, Briefcase, GraduationCap, Award, Check, RefreshCw, Settings } from "lucide-react";
+import { Loader2, Sparkles, User, Briefcase, GraduationCap, Award, Check, RefreshCw, Settings, Globe, BookOpen } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { CVData } from "@/types/cv";
@@ -131,7 +131,28 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         Profile: ${JSON.stringify(profileData)}
         Current summary: ${existingData?.personalInfo?.summary || "None"}
         
-        Generate a compelling 2-3 sentence professional summary that highlights key strengths and career focus.`
+        Generate a compelling 2-3 sentence professional summary that highlights key strengths and career focus.`,
+
+      languages: `Based on this profile data, generate language proficiency entries in JSON format:
+        Profile: ${JSON.stringify(profileData)}
+        Existing CV data: ${JSON.stringify(existingData?.languages || [])}
+        
+        Generate 2-4 language entries. Format as:
+        [{"id": "uuid", "name": "Language Name", "proficiency": "Proficiency Level (e.g., Native, Fluent, Intermediate, Basic)"}]`,
+      
+      courses: `Based on this profile data, generate relevant course entries in JSON format:
+        Profile: ${JSON.stringify(profileData)}
+        Existing CV data: ${JSON.stringify(existingData?.courses || [])}
+        
+        Generate 2-3 relevant courses. Format as:
+        [{"id": "uuid", "name": "Course Name", "institution": "Institution Name", "date": "YYYY-MM", "description": "Brief description of the course and skills acquired"}]`,
+      
+      certificates: `Based on this profile data, generate certification entries in JSON format:
+        Profile: ${JSON.stringify(profileData)}
+        Existing CV data: ${JSON.stringify(existingData?.certificates || [])}
+        
+        Generate 2-3 relevant certifications. Format as:
+        [{"id": "uuid", "name": "Certification Name", "issuer": "Issuing Organization", "date": "YYYY-MM", "description": "Brief description of the certification", "link": "https://example.com"}]`
     };
 
     return prompts[sectionType as keyof typeof prompts] || '';
@@ -189,6 +210,44 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
               endDate: (projItem.endDate as string) || 'Present'
             };
           }).filter((item: Record<string, unknown>) => item.name);
+
+        case 'languages':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const langItem = item as Record<string, unknown>;
+            return {
+              id: (langItem.id as string) || uuidv4(),
+              name: (langItem.name as string) || 'Unknown Language',
+              proficiency: (langItem.proficiency as string) || 'Intermediate'
+            };
+          }).filter((item: Record<string, unknown>) => item.name && item.proficiency);
+
+        case 'courses':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const courseItem = item as Record<string, unknown>;
+            return {
+              id: (courseItem.id as string) || uuidv4(),
+              name: (courseItem.name as string) || 'Unknown Course',
+              institution: (courseItem.institution as string) || 'Unknown Institution',
+              date: (courseItem.date as string) || '2020-01',
+              description: (courseItem.description as string) || 'Course description...'
+            };
+          }).filter((item: Record<string, unknown>) => item.name && item.institution);
+
+        case 'certificates':
+          if (!Array.isArray(data)) return null;
+          return data.map((item: unknown) => {
+            const certItem = item as Record<string, unknown>;
+            return {
+              id: (certItem.id as string) || uuidv4(),
+              name: (certItem.name as string) || 'Unknown Certificate',
+              issuer: (certItem.issuer as string) || 'Unknown Issuer',
+              date: (certItem.date as string) || '2020-01',
+              description: (certItem.description as string) || 'Certificate description...',
+              link: (certItem.link as string) || ''
+            };
+          }).filter((item: Record<string, unknown>) => item.name && item.issuer);
 
         case 'summary':
           if (typeof data === 'string') {
@@ -251,7 +310,10 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         { type: 'education', title: 'Education', icon: <GraduationCap className="h-4 w-4" /> },
         { type: 'skills', title: 'Skills', icon: <Award className="h-4 w-4" /> },
         { type: 'projects', title: 'Projects', icon: <Award className="h-4 w-4" /> },
-        { type: 'summary', title: 'Professional Summary', icon: <User className="h-4 w-4" /> }
+        { type: 'summary', title: 'Professional Summary', icon: <User className="h-4 w-4" /> },
+        { type: 'languages', title: 'Languages', icon: <Globe className="h-4 w-4" /> },
+        { type: 'courses', title: 'Courses', icon: <BookOpen className="h-4 w-4" /> },
+        { type: 'certificates', title: 'Certificates', icon: <Award className="h-4 w-4" /> }
       ];
 
       const results: GeneratedSection[] = [];
@@ -340,6 +402,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         skills: [...(cvData.skills || [])],
         projects: [...(cvData.projects || [])],
         references: [...(cvData.references || [])],
+        courses: [...(cvData.courses || [])],
+        certificates: [...(cvData.certificates || [])],
+        languages: [...(cvData.languages || [])],
         designOptions: {
           primaryColor: cvData.designOptions?.primaryColor || '',
           secondaryColor: cvData.designOptions?.secondaryColor || '',
@@ -384,6 +449,27 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
               }
               break;
 
+            case 'languages':
+              if (Array.isArray(section.data)) {
+                updatedCVData.languages = [...updatedCVData.languages, ...section.data];
+                if (!newSectionIds.includes('languages')) newSectionIds.push('languages');
+              }
+              break;
+
+            case 'courses':
+              if (Array.isArray(section.data)) {
+                updatedCVData.courses = [...updatedCVData.courses, ...section.data];
+                if (!newSectionIds.includes('courses')) newSectionIds.push('courses');
+              }
+              break;
+
+            case 'certificates':
+              if (Array.isArray(section.data)) {
+                updatedCVData.certificates = [...updatedCVData.certificates, ...section.data];
+                if (!newSectionIds.includes('certificates')) newSectionIds.push('certificates');
+              }
+              break;
+
             case 'summary':
               if (typeof section.data === 'string') {
                 updatedCVData.personalInfo = {
@@ -419,6 +505,9 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         skills: Array.isArray(updatedCVData.skills) ? updatedCVData.skills : [],
         projects: Array.isArray(updatedCVData.projects) ? updatedCVData.projects : [],
         references: Array.isArray(updatedCVData.references) ? updatedCVData.references : [],
+        courses: Array.isArray(updatedCVData.courses) ? updatedCVData.courses : [],
+        certificates: Array.isArray(updatedCVData.certificates) ? updatedCVData.certificates : [],
+        languages: Array.isArray(updatedCVData.languages) ? updatedCVData.languages : [],
         designOptions: {
           primaryColor: updatedCVData.designOptions?.primaryColor || '',
           secondaryColor: updatedCVData.designOptions?.secondaryColor || '',
