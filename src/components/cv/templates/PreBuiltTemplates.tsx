@@ -2905,17 +2905,20 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
         {cvData.personalInfo?.title || ""}
       </div>
         }
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm', alignItems: 'center', fontSize: '9pt', color: '#555' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span></span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
+      <div style={{ display: 'flex', flexDirection: 'column' , flexWrap: 'wrap', gap: '4mm', alignItems: 'start', fontSize: '9pt', color: '#555', marginBottom: '0mm' }}>
+        <div style={{display:'flex' , flexDirection:'row' , flexWrap: 'wrap', gap: '4mm', alignItems: 'start'}}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+          {cvData.personalInfo?.phone || "+44 20 7123 4567"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span></span> {cvData.personalInfo?.email || "help@enhancv.com"}
+          {cvData.personalInfo?.email || "help@enhancv.com"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span></span> {cvData.personalInfo?.location || "Reading, UK"}
+          {cvData.personalInfo?.location || "Reading, UK"}
         </span>
-        <div style={{marginBottom: '2.5mm' }}>
+        </div>
+        
+        <div style={{display:'flex' , flexDirection:'row' , flexWrap: 'wrap', gap: '4mm', alignItems: 'start' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
       {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
