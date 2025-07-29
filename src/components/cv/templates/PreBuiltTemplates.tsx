@@ -284,6 +284,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
         {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
           <div key={idx} style={{ marginBottom: '2mm' , paddingBottom: '1mm' }}>
             <span style={{ fontWeight: 600 }}>{ref.name || "Reference Name"}</span><br />
+            <span style={{ fontWeight: 500 }}>{ref.position || "Position"}, {ref.company || "Company"}</span><br />
             <span style={{ color: '#555' }}>{ref.email || "email@example.com"}</span> {ref.phone && `- ${ref.phone}`}
           </div>
         )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
@@ -329,8 +330,8 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       {sectionMap["courses"] && renderCourses()}
       {sectionMap["certificates"] && renderCertificates()}
       {sectionMap["languages"] && renderLanguages()}
-      {sectionMap["skills"] && renderSkills()}
       {sectionMap["references"] && renderReferences()}
+      {sectionMap["skills"] && renderSkills()}
     </div>
   );
 };
@@ -821,24 +822,24 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       }
 
       <div style={{ fontSize: '9.5pt', display: 'flex', flexDirection: 'row' }}>
-        <span>📞 {cvData.personalInfo?.phone || "+1-000-000"}</span>
-        &nbsp;&nbsp; <span>📧 {cvData.personalInfo?.email || "alicia@enhancv.com"}</span>
-        &nbsp;&nbsp; <span>📍 {cvData.personalInfo?.location || "New York City, NY"}</span>
+        <span>{cvData.personalInfo?.phone || "+1-000-000"}</span>
+&nbsp;&nbsp; <span>{cvData.personalInfo?.email || "alicia@enhancv.com"}</span>
+&nbsp;&nbsp; <span>{cvData.personalInfo?.location || "New York City, NY"}</span>
       </div>
       <div style={{ fontSize: '9.5pt', display: 'flex', flexDirection: 'row' }}>
       {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -889,6 +890,23 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     </section>
   );
 
+  // References
+  const renderReferences = () => (
+    <section style={{ marginBottom: '2mm', padding : '0mm' }}>
+      {renderSectionTitle("References")}
+      <div>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx} style={{ marginBottom: '2mm', backgroundColor: '#fff', borderRadius: '2mm', padding: '0mm', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: designColors.primary.secondary, marginBottom: '1mm' }}>{ref.name || "Reference Name"}</div>
+            <div style={{ fontSize: '10pt', color: designColors.primary.primary, fontWeight: 600, marginBottom: '1mm' }}>{ref.position || "Position"}, {ref.company || "Company"}</div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>{ref.email || "email@example.com"}</div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>{ref.phone || "(123) 456-7890"}</div>
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   // Experience
   const renderExperience = () => (
     <section style={{ marginBottom: '3mm', }}>
@@ -903,7 +921,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {exp.company || "Lab Services"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {exp.startDate || "02/2010"} - {exp.endDate || "04/2012"} 📍 {cvData.personalInfo?.location || "San Francisco, CA"}
+              {exp.startDate || "02/2010"} - {exp.endDate || "04/2012"} {cvData.personalInfo?.location || "San Francisco, CA"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm', fontStyle: 'italic' }}>
               {exp.description?.split('\n')[0] || 'Description...'}
@@ -1080,6 +1098,7 @@ const VisionaryProTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
             {sectionMap["languages"] && renderLanguages()}
             {sectionMap["certificates"] && renderCertificates()}
             {sectionMap["courses"] && renderCourses()}
+            {sectionMap["references"] && renderReferences()}
             {sectionMap["skills"] && renderSkills()}
           </div>
           {/* Sidebar (right) */}
@@ -1132,19 +1151,19 @@ const renderSectionTitle = (title: string , rightSidebar?: boolean) => {
         </div>
         }
         <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
-          📞 {cvData.personalInfo?.phone || "+1-000-000"} 
-          📧 {cvData.personalInfo?.email || "james.moore@enhancv.com"}
-          📍 {cvData.personalInfo?.location || "New York City, NY"}
+          {cvData.personalInfo?.phone || "+1-000-000"}
+{cvData.personalInfo?.email || "james.moore@enhancv.com"}
+{cvData.personalInfo?.location || "New York City, NY"}
         </div>
         <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
         </div>
@@ -1152,7 +1171,7 @@ const renderSectionTitle = (title: string , rightSidebar?: boolean) => {
         <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
       {cvData.personalInfo?.github &&
       <span>
-      🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
         </div>
@@ -1387,6 +1406,34 @@ const renderSectionTitle = (title: string , rightSidebar?: boolean) => {
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '3mm' }}>
+      {renderSectionTitle("References" , true)}
+      <div>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx} style={{ marginBottom: '1mm' }}>
+            <div style={{ display: 'flex', flexDirection:"column", alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '11pt', color: 'white', marginBottom: '1mm' }}>
+                  {ref.name || ""}
+                </div>
+                <div style={{ fontSize: '10pt', color: 'white', fontWeight: 500 }}>
+                  {ref.position || ""}, {ref.company || ""}
+                </div>
+                <div style={{ fontSize: '9pt', color: 'white', fontWeight: 500 }}>
+                  {ref.email || ""}
+                </div>
+              </div>
+              <div style={{ fontSize: '9pt', color: 'white' }}>
+                <div>{ref.phone || ""}</div>
+              </div>
+            </div>
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
 
 
   const renderProfileImage = () => ( 
@@ -1437,6 +1484,7 @@ const renderSectionTitle = (title: string , rightSidebar?: boolean) => {
         {sectionMap["languages"] && renderLanguages()}
         {sectionMap["certificates"] && renderCertificates()}
         {sectionMap["courses"] && renderCourses()}
+        {sectionMap["references"] && renderReferences()}
         {sectionMap["skills"] && renderSkills()}
       </div>
       {/* Sidebar (right) */}
@@ -1469,25 +1517,25 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       }
 
       <div style={{ fontSize: '10pt', color: '#666', display: 'flex', flexWrap: 'wrap', gap: '6mm' }}>
-        <span>📞 {cvData.personalInfo?.phone || "+1-(234)-555-1234"}</span>
-        <span>📧 {cvData.personalInfo?.email || "help@enhancv.com"}</span>
-        <span>📍 {cvData.personalInfo?.location || "Seattle, Washington"}</span>
+        <span>{cvData.personalInfo?.phone || "+1-(234)-555-1234"}</span>
+<span>{cvData.personalInfo?.email || "help@enhancv.com"}</span>
+<span>{cvData.personalInfo?.location || "Seattle, Washington"}</span>
       </div>
 
       <div style={{ fontSize: '10pt', color: '#666', display: 'flex', flexWrap: 'wrap', gap: '6mm' }}>
       {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -1511,7 +1559,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
                 {exp.company || "Global Health Initiative"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {exp.startDate || "01/2017"} - {exp.endDate || "Present"} 📍 {cvData.personalInfo?.location || "Seattle, Washington"}
+              {exp.startDate || "01/2017"} - {exp.endDate || "Present"} {cvData.personalInfo?.location || "Seattle, Washington"}
             </div>
             <ul style={{ fontSize: '10pt', color: '#333', paddingLeft: '5mm', lineHeight: 1.5 }}>
               {exp.description ? exp.description.split('\n').map((line, i) => <li key={i}>{line}</li>) : (
@@ -1552,7 +1600,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
               {proj.startDate && proj.endDate && (
-                <span>📅 {proj.startDate} - {proj.endDate}</span>
+                <span>{proj.startDate} - {proj.endDate}</span>
               )}
             </div>
             <div style={{ fontSize: '10pt', color: designColors.primary.primary, fontWeight: 600, marginBottom: '1mm' , paddingLeft: '4mm', fontStyle: 'italic' }}>
@@ -1575,7 +1623,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6mm' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
-            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}>✓</span>
+            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}></span>
             <div>
               <div style={{ fontWeight: 700, color: '#fff', fontSize: '10pt', marginBottom: '1mm' }}>Led Policy Development Initiatives</div>
               <div style={{ fontSize: '9pt', color: '#f0fdf4', lineHeight: 1.4 }}>Spearheaded health governance reforms in six countries, influencing policies and improving healthcare outcomes.</div>
@@ -1610,7 +1658,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
               {edu.school || "Johns Hopkins University"}
             </div>
             <div style={{ fontSize: '9pt', color: '#333' }}>
-              📅 {edu.startDate || "01/2003"} - {edu.endDate || "01/2005"}
+              {edu.startDate || "01/2003"} - {edu.endDate || "01/2005"}
             </div>
           </div>
         )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No education added yet</div>}
@@ -1636,7 +1684,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
               {cer.link || ""}
             </div>
             <div style={{ fontSize: '9pt', color: '#333' }}>
-              📅 {cer.date || ""}
+              {cer.date || ""}
             </div>
             <div style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
               {cer.description || ""}
@@ -1648,8 +1696,35 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
   );
 
 
+    const renderReferences = () => (
+    <section style={{ marginBottom: '4mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '1mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
+        References
+      </h2>
+      <div>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx} style={{ marginBottom: '2mm' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
+              {ref.name || ""}
+            </div>
+            <div style={{ fontSize: '10pt', color: designColors.primary.primary, fontWeight: 600 }}>
+              {ref.position || ""}, {ref.company || ""}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#333' }}>
+              {ref.email || ""}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#333' }}>
+              {ref.phone || ""}
+            </div>
+          </div>
+        )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
     const renderCourses = () => (
     <section style={{ marginBottom: '4mm' }}>
+
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '1mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
         Courses
       </h2>
@@ -1663,7 +1738,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
               {course.institution || "Johns Hopkins University"}
             </div>
             <div style={{ fontSize: '9pt', color: '#333' }}>
-              📅 {course.date || ""}
+              {course.date || ""}
             </div>
             <div style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
               {course.description || ""}
@@ -1756,6 +1831,7 @@ const HighPerformerTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; 
               {sectionMap["languages"] && renderLanguages()}
               {sectionMap["certificates"] && renderCertificates()}
               {sectionMap["courses"] && renderCourses()}
+              {sectionMap["references"] && renderReferences()}
               {sectionMap["skills"] && renderSkills()}
               {/* {sectionMap["achievements"] && renderKeyAchievements()} */}
             </div>
@@ -1792,25 +1868,25 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       </div>
       }
       <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
-        📞 {cvData.personalInfo?.phone || "+1-(234)-555-1234"} &nbsp;&nbsp;
-        📧 {cvData.personalInfo?.email || "help@enhancv.com"} &nbsp;&nbsp;
-        📍 {cvData.personalInfo?.location || "Denver, Colorado"}
-        {/* 🔗 linkedin.com */}
+        {cvData.personalInfo?.phone || "+1-(234)-555-1234"} &nbsp;&nbsp;
+{cvData.personalInfo?.email || "help@enhancv.com"} &nbsp;&nbsp;
+{cvData.personalInfo?.location || "Denver, Colorado"}
+        {/* linkedin.com */}
       </div>
       <div style={{ fontSize: '10pt', color: '#666' }}>
       {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -1843,7 +1919,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {exp.company || "TechSolutions Inc."}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {exp.startDate || "01/2020"} - {exp.endDate || "Present"}
+              {exp.startDate || "01/2020"} - {exp.endDate || "Present"}
             </div>
             <ul style={{ fontSize: '10pt', color: '#333', paddingLeft: '5mm', lineHeight: 1.5 }}>
               {exp.description ? exp.description.split('\n').map((line, i) => <li key={i} style={{ marginBottom: '1mm' }}>{line}</li>) : 
@@ -1883,7 +1959,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {prj.company || "TechSolutions Inc."}
             </div> */}
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {prj.startDate || "01/2020"} - {prj.endDate || "Present"}
+              {prj.startDate || "01/2020"} - {prj.endDate || "Present"}
             </div>
             <div style={{ fontSize: '9pt', color: designColors.primary.primary,paddingLeft: '5mm', marginBottom: '2mm', fontStyle: 'italic' }}>
             {prj.technologies && (
@@ -1931,7 +2007,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {edu.school || "University of Denver"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666' }}>
-              📅 {edu.startDate || "01/2011"} - {edu.endDate || "01/2013"} 📍 {cvData.personalInfo?.location || "Denver, Colorado"}
+              {edu.startDate || "01/2011"} - {edu.endDate || "01/2013"} {cvData.personalInfo?.location || "Denver, Colorado"}
             </div>
             {/* Add dashed line separator between experience items except for the last one */}
             {idx < (cvData.education?.length || 0) - 1 && (
@@ -1966,7 +2042,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {cer.link || "TechSolutions Inc."}
             </div>
             <div style={{ fontSize: '8pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {cer.date || ""}
+              {cer.date || ""}
             </div>
             <ul style={{ fontSize: '10pt', color: '#333', lineHeight: 1.5 }}>
               {cer.description.split('\n').map((line, i) => <li key={i}>{line}</li>)} 
@@ -2001,7 +2077,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
               {course.institution || "TechSolutions Inc."}
             </div>
             <div style={{ fontSize: '8pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {course.date || ""}
+              {course.date || ""}
             </div>
             <ul style={{ fontSize: '10pt', color: '#333',lineHeight: 1.5 }}>
               {course.description.split('\n').map((line, i) => <li key={i}>{line}</li>)} 
@@ -2051,6 +2127,41 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '4mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
+        References
+      </h2>
+      <div>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx} style={{ marginBottom: '2mm' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#333', marginBottom: '1mm' }}>
+              {ref.name || ""}
+            </div>
+            <div style={{ fontSize: '10pt', color: designColors.primary.primary, fontWeight: 600 }}>
+              {ref.position || ""}, {ref.company || ""}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>
+              {ref.email || ""}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>
+              {ref.phone || ""}
+            </div>
+            {/* Add dashed line separator between reference items except for the last one */}
+            {idx < (cvData.references?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                paddingTop:'3mm'
+              }} />
+            )}
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   const renderAchievements = () => (
     <section style={{ marginBottom: '4mm' }}>
       <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #333', paddingBottom: '2mm' }}>
@@ -2059,7 +2170,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
-            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}>📈</span>
+            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}></span>
             <div>
               <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '1mm' }}>Maximized Referral Business</div>
               <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Initiated a client referral program that resulted in a sustained 10% YoY increase in business for Innov8.</div>
@@ -2068,7 +2179,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm', marginBottom: '3mm' }}>
-            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}>✏️</span>
+            <span style={{ color: designColors.primary.primary, fontSize: '12pt' }}></span>
             <div>
               <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '1mm' }}>Strategic Account Growth</div>
               <div style={{ fontSize: '9pt', color: '#666', lineHeight: 1.4 }}>Successfully expanded key account portfolio by 40% within 12 months at Global Logistics Solutions.</div>
@@ -2123,6 +2234,7 @@ const SingleColumnTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; s
       {sectionMap["certificates"] && renderCertificates()}
       {sectionMap["courses"] && renderCourses()}
       {/* {sectionMap["achievements"] && renderAchievements()} */}
+      {sectionMap["references"] && renderReferences()}
       {sectionMap["skills"] && renderSkills()}
     </div>
   );
@@ -2149,24 +2261,24 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       </div>
       }
       <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
-        📞 {cvData.personalInfo?.phone || "000-123-456"} &nbsp;&nbsp;
-        📧 {cvData.personalInfo?.email || "todd@enhancv.com"} &nbsp;&nbsp;
-        📍 {cvData.personalInfo?.location || "New York City, NY"} &nbsp;&nbsp;
+        {cvData.personalInfo?.phone || "000-123-456"} &nbsp;&nbsp;
+{cvData.personalInfo?.email || "todd@enhancv.com"} &nbsp;&nbsp;
+{cvData.personalInfo?.location || "New York City, NY"} &nbsp;&nbsp;
       </div>
       <div style={{ fontSize: '10pt', color: '#666', marginBottom: '2mm', }}>
       {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -2199,7 +2311,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
               {exp.company || "Rover Games"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {exp.startDate || "2019"} - {exp.endDate || "Present"} 
+              {exp.startDate || "2019"} - {exp.endDate || "Present"} 
             </div>
             {/* <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm', fontStyle: 'italic' }}>
               Tesla is an electric vehicle manufacturer that is revolutionizing the automobile industry
@@ -2240,7 +2352,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
               {prj.name || "Unit Director"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {prj.startDate || "2019"} - {prj.endDate || "Present"}
+              {prj.startDate || "2019"} - {prj.endDate || "Present"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666',paddingLeft: '5mm', marginBottom: '2mm', fontStyle: 'italic' }}>
             {prj.technologies && (
@@ -2288,7 +2400,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
               {edu.school || "Van Hall Larenstein University"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666' }}>
-              📅 {edu.startDate || "2008"} - {edu.endDate || "2010"}
+              {edu.startDate || "2008"} - {edu.endDate || "2010"}
             </div>
 
             {/* Add dashed line separator between experience items except for the last one */}
@@ -2325,7 +2437,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
               {cer.link || "Rover Games"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {cer.date || ""} 
+              {cer.date || ""} 
             </div>
               {cer.description.split('\n').map((line, i) => <div key={i}>{line}</div>)}
             {/* Add dashed line separator between experience items except for the last one */}
@@ -2359,7 +2471,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
               {course.institution || "Rover Games"}
             </div>
             <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
-              📅 {course.date || ""} 
+              {course.date || ""} 
             </div>
               {course.description.split('\n').map((line, i) => <div key={i}>{line}</div>)}
             {/* Add dashed line separator between experience items except for the last one */}
@@ -2439,6 +2551,41 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '5mm' }}>
+      <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#000', textTransform: 'uppercase', marginBottom: '3mm', borderBottom: '2px solid #000', paddingBottom: '2mm' }}>
+        References
+      </h2>
+      <div>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx} style={{ marginBottom: '1mm' }}>
+            <div style={{ fontWeight: 700, fontSize: '11pt', color: '#000', marginBottom: '1mm' }}>
+              {ref.name || "John Smith"}
+            </div>
+            <div style={{ fontSize: '10pt', color: '#666', fontWeight: 600, marginBottom: '1mm' }}>
+              {ref.position || "Manager"} at {ref.company || "Company"}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#666', marginBottom: '1mm' }}>
+              {ref.email || "email@example.com"}
+            </div>
+            <div style={{ fontSize: '9pt', color: '#666', marginBottom: '2mm' }}>
+              {ref.phone || "+1 234 567 890"}
+            </div>
+            {/* Add dashed line separator between reference items except for the last one */}
+            {idx < (cvData.references?.length || 0) - 1 && (
+              <div style={{ 
+                borderBottom: '1px dashed #ccc', 
+                margin: '0 0 3mm 0',
+                width: '100%',
+                padding: '2mm 0mm' 
+              }} />
+            )}
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   return (
     <div className="cv-page" style={{
       ...CV_PAGE_STYLE,
@@ -2456,6 +2603,7 @@ const MonochromeTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sec
       {sectionMap["languages"] && renderLanguages()}
       {sectionMap["certificates"] && renderCertificates()}
       {sectionMap["courses"] && renderCourses()}
+      {sectionMap["references"] && renderReferences()}
       {sectionMap["skills"] && renderSkills()}
     </div>
   );
@@ -2505,30 +2653,30 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       </h2>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
+          <span></span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}
+          <span></span> {cvData.personalInfo?.email || "help@enhancv.com"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>📍</span> {cvData.personalInfo?.location || "Manchester"}
+          <span></span> {cvData.personalInfo?.location || "Manchester"}
         </span>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0mm', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -2683,6 +2831,25 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '5mm' }}>
+      {renderSectionTitle("References", true)}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+              <div style={{ fontWeight: 700, color: '#fff', fontSize: '11pt' }}>{ref.name || "Reference Name"}</div>
+              <div style={{ color: '#fff', fontWeight: 600, fontSize: '10pt' }}>{ref.position || ""}</div>
+              <div style={{ fontSize: '9pt', color: '#fff' }}>{ref.company || ""}</div>
+              {ref.email && <div style={{ fontSize: '9pt', color: '#fff' }}>{ref.email}</div>}
+              {ref.phone && <div style={{ fontSize: '9pt', color: '#fff' }}>{ref.phone}</div>}
+            </div>
+          </div>
+        )) : <div style={{ color: '#fff', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   return (
     <div className="cv-page" style={{
       ...CV_PAGE_STYLE,
@@ -2707,6 +2874,7 @@ const ElegantTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
         {sectionMap["languages"] && renderLanguages()}
         {sectionMap["certificates"] && renderCertificates()}
         {sectionMap["courses"] && renderCourses()}
+        {sectionMap["references"] && renderReferences()}
         {sectionMap["skills"] && renderSkills()}
       </div>
       {/* Sidebar (right) */}
@@ -2739,28 +2907,28 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
         }
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4mm', alignItems: 'center', fontSize: '9pt', color: '#555' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
+          <span></span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span>✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}
+          <span></span> {cvData.personalInfo?.email || "help@enhancv.com"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-          <span>📍</span> {cvData.personalInfo?.location || "Reading, UK"}
+          <span></span> {cvData.personalInfo?.location || "Reading, UK"}
         </span>
         <div style={{marginBottom: '2.5mm' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
         </div>
@@ -2931,6 +3099,33 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
       </div>
     </section>
   );
+  const renderReferences = () => (
+    <section style={{ marginBottom: '4mm' }}>
+      <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>References</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6mm' }}>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={ref.id || idx} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '6mm' }}>
+            <div style={{ width: '40mm', fontSize: '9pt', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+              {ref.company || ""}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#333', fontSize: '10pt', marginBottom: '0.5mm' }}>
+                {ref.name || "Reference Name"}
+              </div>
+              <div style={{ fontWeight: 600, color: designColors.primary.primary, fontSize: '9pt' }}>
+                {ref.position}
+              </div>
+              <div style={{ fontSize: '9pt', color: '#333', marginTop: '1mm', lineHeight: 1.4 }}>
+                {ref.email && <div>{ref.email}</div>}
+                {ref.phone && <div>{ref.phone}</div>}
+              </div>
+            </div>
+          </div>
+        )) : <div style={{ color: '#777', fontStyle: 'italic', fontSize: '9pt' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
     const renderLanguages = () => (
     <section style={{ marginBottom: '4mm' }}>
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Languages</div>
@@ -2956,14 +3151,14 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
       <div style={{ fontSize: '11pt', fontWeight: 700, color: '#333', textTransform: 'uppercase', marginBottom: '2mm' }}>Achievements</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4mm' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm' }}>
-          <span style={{ color: designColors.primary.primary, fontSize: '12pt', marginTop: '0.5mm' }}>✔️</span>
+          <span style={{ color: designColors.primary.primary, fontSize: '12pt', marginTop: '0.5mm' }}></span>
           <div>
             <div style={{ fontWeight: 700, color: '#333', fontSize: '9pt' }}>Team Leadership</div>
             <div style={{ color: '#555', fontSize: '9pt', lineHeight: 1.4 }}>Successfully led a team of data scientists to improve productivity by 30% through strategic project management and mentoring.</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2mm' }}>
-          <span style={{ color: designColors.primary.primary, fontSize: '12pt', marginTop: '0.5mm' }}>🏳️</span>
+          <span style={{ color: designColors.primary.primary, fontSize: '12pt', marginTop: '0.5mm' }}></span>
           <div>
             <div style={{ fontWeight: 700, color: '#333', fontSize: '9pt' }}>Machine Downtime Reduction</div>
             <div style={{ color: '#555', fontSize: '9pt', lineHeight: 1.4 }}>Developed a predictive maintenance model that reduced machine downtime by 20% and enhanced manufacturing efficiency.</div>
@@ -3008,6 +3203,7 @@ const TimelineTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; secti
       {sectionMap["certificates"] && renderCertificates()}
       {sectionMap["courses"] && renderCourses()}
       {sectionMap["achievements"] && renderAchievements()}
+      {sectionMap["references"] && renderReferences()}
       {sectionMap["skills"] && renderSkills()}
     </div>
   );
@@ -3041,30 +3237,30 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
       }
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>📞</span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
+          <span></span> {cvData.personalInfo?.phone || "+44 20 7123 4567"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>✉️</span> {cvData.personalInfo?.email || "help@enhancv.com"}
+          <span></span> {cvData.personalInfo?.email || "help@enhancv.com"}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '2mm' }}>
-          <span>📍</span> {cvData.personalInfo?.location || "Reading, UK"}
+          <span></span> {cvData.personalInfo?.location || "Reading, UK"}
         </span>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10mm', alignItems: 'center', fontSize: '10pt', color: '#666', marginBottom: '2mm' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
       </div>
@@ -3151,7 +3347,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             <div style={{ color: designColors.primary.primary, fontWeight: 600, fontSize: '10pt' }}>{cer.issuer || "University College London"}</div>
             <div style={{ fontSize: '9pt', color: '#666' }}>{cer.link || ""}</div>
             <div style={{ fontSize: '9pt', color: '#666' }}>{cer.date || ""}</div>
-            <div style={{ fontSize: '7pt', color: '#666' }}>{cer.description || ""}</div>
+            <div style={{ fontSize: '8pt', color: '#666' }}>{cer.description || ""}</div>
           </div>
         )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No education added yet</div>}
       </div>
@@ -3167,7 +3363,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt' }}>{course.name || "MSc in Data Science"}</div>
             <div style={{ color: designColors.primary.primary, fontWeight: 600, fontSize: '10pt' }}>{course.institution || "University College London"}</div>
             <div style={{ fontSize: '9pt', color: '#666' }}>{course.date || ""}</div>
-            <div style={{ fontSize: '7pt', color: '#666' }}>{course.description || ""}</div>
+            <div style={{ fontSize: '8pt', color: '#666' }}>{course.description || ""}</div>
           </div>
         )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No courses added yet</div>}
       </div>
@@ -3226,6 +3422,23 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '5mm' }}>
+      {renderTitle("REFERENCES")}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2mm' }}>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx}>
+            <div style={{ fontWeight: 700, color: '#000', fontSize: '10pt' }}>{ref.name || "Reference Name"}</div>
+            <div style={{ color: designColors.primary.primary, fontWeight: 600, fontSize: '10pt' }}>{ref.position || ""}</div>
+            <div style={{ fontSize: '9pt', color: '#666' }}>{ref.company || ""}</div>
+            {ref.email && <div style={{ fontSize: '9pt', color: '#666' }}>{ref.email}</div>}
+            {ref.phone && <div style={{ fontSize: '9pt', color: '#666' }}>{ref.phone}</div>}
+          </div>
+        )) : <div style={{ color: '#000', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   const renderPassions = () => (
     <section style={{ marginBottom: '6mm' }}>
       <div style={{ textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '1.5px', color: '#fff', fontWeight: 600, marginBottom: '1mm' }}>Passions</div>
@@ -3274,6 +3487,7 @@ const CompactTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             {sectionMap["languages"] && renderLanguages()}
             {sectionMap["certificates"] && renderCertificates()}
             {sectionMap["courses"] && renderCourses()}
+            {sectionMap["references"] && renderReferences()}
             {sectionMap["skills"] && renderSkills()}
             {/* {sectionMap["achievements"] && renderAchievements()} */}
             {/* {sectionMap["courses"] && renderCourses()} */}
@@ -3328,17 +3542,17 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
         <div style={{ fontSize: '10pt', color: '#555' }}>
         {cvData.personalInfo?.linkedin && 
       <span>
-      🔗 {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
+      {cvData.personalInfo?.linkedin?.includes("https://") ? cvData.personalInfo?.linkedin?.split('https://')[1] : cvData.personalInfo?.linkedin}
       </span>
       }
       {cvData.personalInfo?.personal_website &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
+      &nbsp;&nbsp; {cvData.personalInfo?.personal_website?.includes("https://") ? cvData.personalInfo?.personal_website?.split('https://')[1] : cvData.personalInfo?.personal_website}
       </span>
       }
       {cvData.personalInfo?.github &&
       <span>
-      &nbsp;&nbsp; 🔗 {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
+      &nbsp;&nbsp; {cvData.personalInfo?.github?.includes("https://") ? cvData.personalInfo?.github?.split('https://')[1] : cvData.personalInfo?.github}
       </span>
       }
         </div>
@@ -3502,6 +3716,27 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
     </section>
   );
 
+  const renderReferences = () => (
+    <section style={{ marginBottom: '4mm' }}>
+      <div style={{ fontSize: '12pt', fontWeight: 600, color: designColors.primary.secondary, marginBottom: '2mm' }}>References</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3mm' }}>
+        {cvData.references && cvData.references.length > 0 ? cvData.references.map((ref, idx) => (
+          <div key={idx}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+              <div style={{ fontWeight: 600, color: '#333', fontSize: '10pt' }}>{ref.name || "Reference Name"}</div>
+              <div style={{ fontWeight: 600, color: designColors.primary.secondary, fontSize: '9pt' }}>
+                {ref.position}
+              </div>
+              <div style={{ color: '#666', fontSize: '9pt' }}>{ref.company || ""}</div>
+              {ref.email && <div style={{ color: '#666', fontSize: '9pt' }}>{ref.email}</div>}
+              {ref.phone && <div style={{ color: '#666', fontSize: '9pt' }}>{ref.phone}</div>}
+            </div>
+          </div>
+        )) : <div style={{ color: '#aaa', fontStyle: 'italic' }}>No references added yet</div>}
+      </div>
+    </section>
+  );
+
   return (
     <div className="cv-page" style={{
       ...CV_PAGE_STYLE,
@@ -3523,6 +3758,7 @@ const HeaderTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; section
         {sectionMap["languages"] && renderLanguages()}
         {sectionMap["certificates"] && renderCertificates()}
         {sectionMap["courses"] && renderCourses()}
+        {sectionMap["references"] && renderReferences()}
         {sectionMap["skills"] && renderSkills()}
       </div>
     </div>

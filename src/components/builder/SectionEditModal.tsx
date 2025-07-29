@@ -62,6 +62,32 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
     return prompt;
   };
 
+  const generateCourseDescription = (course: {name:string, institution:string, date:string}) => {
+    const prompt = `Generate a professional course description:
+    
+    Course Name: ${course.name || 'Not specified'}
+    Institution: ${course.institution || 'Not specified'}
+    Completion Date: ${course.date || 'Not specified'}
+    
+    Write a compelling 2-3 sentence description highlighting what you learned in this course, key skills acquired, and how it has benefited your professional development.`;
+    
+    return prompt;
+  };
+
+  const generateCertificateDescription = (cert: {name:string, issuer:string, date:string}) => {
+    const prompt = `Generate a professional certificate description:
+    
+    Certificate Name: ${cert.name || 'Not specified'}
+    Issuing Organization: ${cert.issuer || 'Not specified'}
+    Issue Date: ${cert.date || 'Not specified'}
+    
+    Write a compelling 2-3 sentence description explaining what this certification represents, the skills it validates, and its relevance to your professional field.`;
+    
+    return prompt;
+  };
+
+
+
   const generatePersonalSummary = () => {
     const prompt = `Generate a professional summary based on the following information:
     
@@ -843,7 +869,19 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
             
             <div>
-              <Label>Description (Optional)</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Description (Optional)</Label>
+                <AIGenerateButton
+                  onGenerated={(text) => {
+                    const newCourses = [...(localData.courses || [])];
+                    newCourses[index] = { ...course, description: text };
+                    setLocalData({ ...localData, courses: newCourses });
+                  }}
+                  prompt={generateCourseDescription(course)}
+                  type="description"
+                  disabled={!course.name || !course.institution}
+                />
+              </div>
               <Textarea
                 value={course.description}
                 onChange={(e) => {
@@ -967,7 +1005,19 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
             
             <div>
-              <Label>Description (Optional)</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Description (Optional)</Label>
+                <AIGenerateButton
+                  onGenerated={(text) => {
+                    const newCertificates = [...(localData.certificates || [])];
+                    newCertificates[index] = { ...cert, description: text };
+                    setLocalData({ ...localData, certificates: newCertificates });
+                  }}
+                  prompt={generateCertificateDescription(cert)}
+                  type="description"
+                  disabled={!cert.name || !cert.issuer}
+                />
+              </div>
               <Textarea
                 value={cert.description}
                 onChange={(e) => {
@@ -1048,7 +1098,9 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
                 />
               </div>
               <div>
-                <Label>Proficiency</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Proficiency</Label>
+                </div>
                 <Input
                   value={lang.proficiency}
                   onChange={(e) => {

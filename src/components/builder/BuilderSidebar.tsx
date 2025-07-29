@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,8 @@ interface BuilderSidebarProps {
   onTemplateNavigation: () => void;
   onSave: () => void;
   onDuplicate?: () => void; // Add this new prop
+  builderDemo?: boolean;
+  onBuilderDemo?: () => void;
 }
 
 const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
@@ -52,13 +54,15 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   onJobMatcher,
   onTemplateNavigation,
   onSave,
-  onDuplicate
+  onDuplicate,
+  builderDemo,
 }) => {
+
   return (
     <div className={`h-full bg-white/90 backdrop-blur-2xl border-r border-gray-200/50 shadow-xl transition-all duration-300 ease-in-out
-      ${collapsed
-        ? 'w-10 sm:w-12 md:w-14 lg:w-16 xl:w-16'
-        : 'w-36 sm:w-44 md:w-52 lg:w-60 xl:w-64'}
+      ${builderDemo ? 'w-36 sm:w-44 md:w-52 lg:w-60 xl:w-60' : collapsed
+        ? 'w-14 sm:w-20 md:w-20'
+        : 'w-36 sm:w-44 md:w-52 lg:w-60 xl:w-60'}
     `}>
       {/* Toggle Button */}
       <div className="absolute -right-3 top-8 z-10">
@@ -99,7 +103,7 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                 )}
               </div>
             </CardHeader>
-            <CardContent className={`p-2 sm:p-3 space-y-2 sm:space-y-3 ${collapsed ? 'p-1 sm:p-2' : ''}`}>
+            <CardContent className={`p-2 sm:p-3 space-y-2 sm:space-y-3 ${collapsed ? 'p-2 sm:p-2' : ''}`}>
               {[
                 { 
                   icon: Wand2, 
@@ -109,35 +113,38 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   className: 'btn-smart-generator',
                 },
                 { 
-                  icon: Target, 
-                  label: 'CV Optimizer', 
-                  action: onAIOptimizer, 
-                  gradient: 'from-orange-600 to-pink-600'
-                },
-                { 
                   icon: Sparkles, 
                   label: 'Content Enhancer', 
                   action: onAIEnhancer, 
-                  gradient: 'from-pink-600 to-red-600'
+                  gradient: 'from-pink-600 to-red-600',
+                  className: 'btn-content-enhancer'
                 },
                 { 
                   icon: Crosshair, 
                   label: 'Job Matcher', 
                   action: onJobMatcher, 
-                  gradient: 'from-blue-600 to-cyan-600'
+                  gradient: 'from-blue-600 to-cyan-600',
+                  className: 'btn-job-matcher',
                 },
                 { 
-                  icon: Lightbulb, 
-                  label: 'Smart Tips', 
-                  action: () => toast({ title: "Coming Soon!", description: "Smart tips feature is in development." }), 
-                  gradient: 'from-yellow-600 to-orange-600'
+                  icon: Target, 
+                  label: 'CV Optimizer', 
+                  action: onAIOptimizer, 
+                  gradient: 'from-orange-600 to-pink-600',
+                  className: 'btn-cv-optimizer',
                 },
-                { 
-                  icon: Languages, 
-                  label: 'Multi-Language', 
-                  action: () => toast({ title: "Coming Soon!", description: "Multi-language support is in development." }), 
-                  gradient: 'from-blue-600 to-purple-600'
-                }
+                // { 
+                //   icon: Lightbulb, 
+                //   label: 'Smart Tips', 
+                //   action: () => toast({ title: "Coming Soon!", description: "Smart tips feature is in development." }), 
+                //   gradient: 'from-yellow-600 to-orange-600'
+                // },
+                // { 
+                //   icon: Languages, 
+                //   label: 'Multi-Language', 
+                //   action: () => toast({ title: "Coming Soon!", description: "Multi-language support is in development." }), 
+                //   gradient: 'from-blue-600 to-purple-600'
+                // }
               ].map((tool, index) => (
                 <button
                   key={index}
@@ -197,12 +204,12 @@ const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   action: onDuplicate || (() => toast({ title: "Coming Soon!", description: "CV duplication feature is in development." })),
                   color: 'from-green-500 to-emerald-500'
                 },
-                { 
-                  icon: Camera, 
-                  label: 'Photos', 
-                  action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
-                  color: 'from-purple-500 to-pink-500'
-                },
+                // { 
+                //   icon: Camera, 
+                //   label: 'Photos', 
+                //   action: () => toast({ title: "Coming Soon!", description: "Photo manager feature is in development." }),
+                //   color: 'from-purple-500 to-pink-500'
+                // },
                 
               ].map((tool, index) => (
                 <button

@@ -24,6 +24,7 @@ interface AICVOptimizerProps {
 interface OptimizationSuggestion {
   type: 'improvement' | 'missing' | 'strength';
   category: string;
+  section?: 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'languages' | 'courses' | 'certificates';
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low';
@@ -42,6 +43,9 @@ export function AICVOptimizer({ open, setOpen, cvData }: AICVOptimizerProps) {
       educationCount: cvData.education?.length || 0,
       skillsCount: cvData.skills?.length || 0,
       projectsCount: cvData.projects?.length || 0,
+      languagesCount: cvData.languages?.length || 0,
+      coursesCount: cvData.courses?.length || 0,
+      certificatesCount: cvData.certificates?.length || 0,
       hasDescriptions: cvData.experience?.some(exp => exp.description && exp.description.length > 50) || false,
       avgDescriptionLength: cvData.experience?.reduce((acc, exp) => acc + (exp.description?.length || 0), 0) / Math.max(cvData.experience?.length || 1, 1) || 0
     };
@@ -59,6 +63,9 @@ export function AICVOptimizer({ open, setOpen, cvData }: AICVOptimizerProps) {
     - Education Entries: ${analysis.educationCount}
     - Skills Listed: ${analysis.skillsCount}
     - Projects Listed: ${analysis.projectsCount}
+    - Languages Listed: ${analysis.languagesCount}
+    - Courses Listed: ${analysis.coursesCount}
+    - Certificates Listed: ${analysis.certificatesCount}
     - Has Detailed Descriptions: ${analysis.hasDescriptions}
     - Average Description Length: ${Math.round(analysis.avgDescriptionLength)}
     
@@ -82,7 +89,9 @@ export function AICVOptimizer({ open, setOpen, cvData }: AICVOptimizerProps) {
     4. Industry-specific keywords
     5. Professional summary quality
     6. Skills organization
-    7. Overall structure and flow`;
+    7. Language proficiency descriptions
+    8. Course and certificate relevance
+    9. Overall structure and flow`;
   };
 
   const parseOptimizationResponse = (response: string): OptimizationSuggestion[] => {

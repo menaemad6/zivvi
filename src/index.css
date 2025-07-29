@@ -3,6 +3,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix for toast blocking touch events on mobile */
+/* @media (max-width: 640px) {
+  [role="status"],
+  [role="alert"],
+  [role="dialog"],
+  .toaster,
+  .toast-container,
+  .toast {
+    pointer-events: none !important;
+  }
+  
+  .toast button,
+  .toast a,
+  .toast [role="button"],
+  .toast-close,
+  .toast-action {
+    pointer-events: auto !important;
+  }
+} */
+
 @layer base {
   :root {
     --background: 0 0% 100%;

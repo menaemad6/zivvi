@@ -412,7 +412,12 @@ const Templates = () => {
         showSkipButton
         showProgress
         callback={handleJoyrideCallback}
-        styles={{ options: { zIndex: 10000 } }}
+        styles={{ 
+          options: { zIndex: 10000 },
+          buttonNext: { backgroundColor: 'hsl(var(--primary))', color: 'white' },
+          buttonBack: { backgroundColor: 'hsl(var(--primary))', color: 'white' },
+          buttonSkip: { color: 'hsl(var(--primary))' }
+        }}
       />
     </>
   );

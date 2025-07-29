@@ -19,7 +19,7 @@ interface JobMatcherModalProps {
 }
 
 interface JobMatchSuggestion {
-  type: 'experience' | 'skills' | 'summary' | 'projects' | 'education';
+  type: 'experience' | 'skills' | 'summary' | 'projects' | 'education' | 'languages' | 'courses' | 'certificates';
   title: string;
   originalText: string;
   enhancedText: string;
@@ -55,7 +55,7 @@ Provide a detailed analysis in JSON format:
   "missingSkills": ["skill1", "skill2"],
   "suggestions": [
     {
-      "type": "experience|skills|summary|projects|education",
+      "type": "experience|skills|summary|projects|education|languages|courses|certificates",
       "title": "Job title or section name",
       "originalText": "Current text from CV",
       "enhancedText": "Optimized version with job-specific keywords and achievements",
@@ -65,10 +65,11 @@ Provide a detailed analysis in JSON format:
   ]
 }
 
-For education suggestions specifically:
-- Use the degree name as the "title" field
-- Use the degree name again as the "originalText" field
-- Provide an enhanced degree name in the "enhancedText" field
+Specific guidance for different sections:
+- For education suggestions: Use the degree name as the "title" field and "originalText" field, provide an enhanced degree name in the "enhancedText" field
+- For languages suggestions: Use the language name as the "title" field, the proficiency level as the "originalText" field, and an enhanced description in the "enhancedText" field
+- For courses suggestions: Use the course name as the "title" field, the current description as the "originalText" field, and an enhanced description in the "enhancedText" field
+- For certificates suggestions: Use the certificate name as the "title" field, the current description as the "originalText" field, and an enhanced description in the "enhancedText" field
 
 Focus on:
 1. Adding job-specific keywords naturally
@@ -76,8 +77,9 @@ Focus on:
 3. Emphasizing transferable skills
 4. Using industry terminology from the job description
 5. Quantifying results where possible
+6. Highlighting relevant languages, courses, and certificates that match job requirements
 
-Provide 5-8 specific suggestions covering different CV sections.`;
+Provide 5-8 specific suggestions covering different CV sections, including the new sections (languages, courses, certificates) if they are relevant to the job.`;
   };
 
   const parseJobMatchResponse = (response: string) => {
@@ -209,6 +211,36 @@ Provide 5-8 specific suggestions covering different CV sections.`;
           }
         }
         break;
+      case 'languages':
+        if (updatedCV.languages) {
+          const langIndex = updatedCV.languages.findIndex(lang => 
+            lang.name === suggestion.title || lang.proficiency === suggestion.originalText
+          );
+          if (langIndex !== -1) {
+            updatedCV.languages[langIndex].proficiency = suggestion.enhancedText;
+          }
+        }
+        break;
+      case 'courses':
+        if (updatedCV.courses) {
+          const courseIndex = updatedCV.courses.findIndex(course => 
+            course.name === suggestion.title || course.description === suggestion.originalText
+          );
+          if (courseIndex !== -1) {
+            updatedCV.courses[courseIndex].description = suggestion.enhancedText;
+          }
+        }
+        break;
+      case 'certificates':
+        if (updatedCV.certificates) {
+          const certIndex = updatedCV.certificates.findIndex(cert => 
+            cert.name === suggestion.title || cert.description === suggestion.originalText
+          );
+          if (certIndex !== -1) {
+            updatedCV.certificates[certIndex].description = suggestion.enhancedText;
+          }
+        }
+        break;
     }
     
     onUpdateCV(updatedCV);
@@ -264,6 +296,36 @@ Provide 5-8 specific suggestions covering different CV sections.`;
             if (eduIndex !== -1) {
               // Update the degree field with the enhanced text
               updatedCV.education[eduIndex].degree = suggestion.enhancedText;
+            }
+          }
+          break;
+        case 'languages':
+          if (updatedCV.languages) {
+            const langIndex = updatedCV.languages.findIndex(lang => 
+              lang.name === suggestion.title || lang.proficiency === suggestion.originalText
+            );
+            if (langIndex !== -1) {
+              updatedCV.languages[langIndex].proficiency = suggestion.enhancedText;
+            }
+          }
+          break;
+        case 'courses':
+          if (updatedCV.courses) {
+            const courseIndex = updatedCV.courses.findIndex(course => 
+              course.name === suggestion.title || course.description === suggestion.originalText
+            );
+            if (courseIndex !== -1) {
+              updatedCV.courses[courseIndex].description = suggestion.enhancedText;
+            }
+          }
+          break;
+        case 'certificates':
+          if (updatedCV.certificates) {
+            const certIndex = updatedCV.certificates.findIndex(cert => 
+              cert.name === suggestion.title || cert.description === suggestion.originalText
+            );
+            if (certIndex !== -1) {
+              updatedCV.certificates[certIndex].description = suggestion.enhancedText;
             }
           }
           break;

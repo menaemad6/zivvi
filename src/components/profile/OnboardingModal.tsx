@@ -269,7 +269,7 @@ export const OnboardingModal = ({ isOpen, onClose, onComplete, initialData , con
               ))}
           </div>
           {loadingRecommendations && (
-            <div className="text-xs text-gray-500">Fetching recommendations...</div>
+            <div className="text-xs text-gray-500">Loading recommendations...</div>
           )}
           <div>
             <Label htmlFor="custom_skills">Additional Skills (comma separated)</Label>

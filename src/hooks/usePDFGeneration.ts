@@ -129,8 +129,23 @@ export const usePDFGeneration = () => {
               
               // Add image to PDF - adjust position to account for overlap
               // For pages after the first, position the image slightly higher to account for overlap
-              const yOffset = pageNum > 0 ? -5 : 0; // Increased offset from -3mm to -5mm to prevent cutting off text
+              // and add padding to the top of subsequent pages
+              const yOffset = pageNum > 0 ? -8 : 0; // Increased offset to prevent cutting off text
+              
+              // Add the image to the PDF
               pdf.addImage(imgData, 'PNG', 0, yOffset, pdfWidth, pdfHeight);
+              
+              // For pages after the first, add a small padding at the top to ensure content isn't cut off
+              if (pageNum > 0) {
+                // Save the current state
+                pdf.saveGraphicsState();
+                // Set fill color to white
+                pdf.setFillColor(255, 255, 255);
+                // Draw a small white rectangle at the top of the page to create padding
+                pdf.rect(0, 0, pdfWidth, 3, 'F');
+                // Restore the state
+                pdf.restoreGraphicsState();
+              }
               
               // Process next page or finish
               if (pageNum < totalPages - 1) {

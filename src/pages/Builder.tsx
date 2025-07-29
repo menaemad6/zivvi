@@ -59,10 +59,12 @@ const { duplicateCv } = useDuplicateCV();
 
   const location = useLocation();
   const [joyrideRun, setJoyrideRun] = useState(false);
+  const [builderDemo, setBuilderDemo] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get('startBuilderDemo')) {
+      setBuilderDemo(true);
       setJoyrideRun(true);
     }
   }, [location]);
@@ -73,18 +75,27 @@ const { duplicateCv } = useDuplicateCV();
       content: 'Start by using the Smart Generator to help build your CV!',
       disableBeacon: true,
     },
-    // {
-    //   target: '.btn-generate-sections',
-    //   content: 'Click here to generate recommended sections for your CV.',
-    // },
-    // {
-    //   target: '.btn-apply-sections',
-    //   content: 'Apply the generated sections to your CV.',
-    // },
-    // {
-    //   target: '.btn-preview',
-    //   content: 'Preview your CV here.',
-    // },
+    {
+      target: '.btn-content-enhancer',
+      content: 'Use Content Enhancer to improve your CV text with AI suggestions.',
+    },
+    {
+      target: '.btn-job-matcher',
+      content: 'Job Matcher helps tailor your CV for specific job descriptions.',
+    },
+    {
+      target: '.btn-cv-optimizer',
+      content: 'CV Optimizer analyzes your CV and suggests improvements.',
+    },
+    {
+      target: '.btn-preview',
+      content: 'Preview your CV to see how it will look when finished.',
+    },
+        {
+      target: '.btn-smart-generator',
+      content: 'Start from the AI Generation and let the magic begin!',
+      disableBeacon: true,
+    },
   ];
 
   const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
@@ -1315,6 +1326,7 @@ const handleExport = () => {
                 onTemplateNavigation={handleTemplateNavigation}
                 onSave={handleSave}
                 onDuplicate={handleDuplicate}
+                builderDemo={builderDemo}
               />
             </div>
 
@@ -1668,7 +1680,13 @@ const handleExport = () => {
         showSkipButton
         showProgress
         callback={handleJoyrideCallback}
-        styles={{ options: { zIndex: 10000 } }}
+        styles={{ 
+          options: { zIndex: 10000 },
+          buttonNext: { backgroundColor: 'hsl(var(--primary))', color: 'white' },
+          buttonBack: { backgroundColor: 'hsl(var(--primary))', color: 'white' },
+          buttonSkip: { color: 'hsl(var(--primary))' }
+        }}
+        disableScrolling={true}
       />
     </>
   );

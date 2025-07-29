@@ -24,7 +24,7 @@ interface AIResumeEnhancerProps {
 }
 
 interface Enhancement {
-  type: 'experience' | 'skills' | 'summary' | 'projects';
+  type: 'experience' | 'skills' | 'summary' | 'projects' | 'languages' | 'courses' | 'certificates';
   title: string;
   originalText: string;
   enhancedText: string;
@@ -44,7 +44,7 @@ export function AIResumeEnhancer({ open, setOpen, cvData, onEnhance }: AIResumeE
     Provide enhanced versions of the content with improvements in this JSON format:
     [
       {
-        "type": "experience|skills|summary|projects",
+        "type": "experience|skills|summary|projects|languages|courses|certificates",
         "title": "Section title or job title",
         "originalText": "Current text content",
         "enhancedText": "Improved version with action verbs, metrics, and impact",
@@ -59,8 +59,10 @@ export function AIResumeEnhancer({ open, setOpen, cvData, onEnhance }: AIResumeE
     4. Using industry-specific keywords
     5. Improving clarity and readability
     6. Making content more compelling and professional
+    7. Enhancing language proficiency descriptions
+    8. Improving course and certificate descriptions with relevant skills gained
     
-    Provide 3-6 enhancements covering different sections.`;
+    Provide 3-6 enhancements covering different sections, including the new sections (languages, courses, certificates) if they exist.`;
   };
 
   const parseEnhancementResponse = (response: string): Enhancement[] => {
@@ -135,6 +137,36 @@ export function AIResumeEnhancer({ open, setOpen, cvData, onEnhance }: AIResumeE
           }
         }
         break;
+      case 'languages':
+        if (updatedCVData.languages) {
+          const langIndex = updatedCVData.languages.findIndex(lang => 
+            lang.name === enhancement.title || lang.proficiency === enhancement.originalText
+          );
+          if (langIndex !== -1) {
+            updatedCVData.languages[langIndex].proficiency = enhancement.enhancedText;
+          }
+        }
+        break;
+      case 'courses':
+        if (updatedCVData.courses) {
+          const courseIndex = updatedCVData.courses.findIndex(course => 
+            course.name === enhancement.title || course.description === enhancement.originalText
+          );
+          if (courseIndex !== -1) {
+            updatedCVData.courses[courseIndex].description = enhancement.enhancedText;
+          }
+        }
+        break;
+      case 'certificates':
+        if (updatedCVData.certificates) {
+          const certIndex = updatedCVData.certificates.findIndex(cert => 
+            cert.name === enhancement.title || cert.description === enhancement.originalText
+          );
+          if (certIndex !== -1) {
+            updatedCVData.certificates[certIndex].description = enhancement.enhancedText;
+          }
+        }
+        break;
     }
     
     onEnhance(updatedCVData);
@@ -145,7 +177,7 @@ export function AIResumeEnhancer({ open, setOpen, cvData, onEnhance }: AIResumeE
   };
 
   const applyAllEnhancements = () => {
-    let updatedCVData = { ...cvData };
+    const updatedCVData = { ...cvData };
     
     enhancements.forEach(enhancement => {
       switch (enhancement.type) {
@@ -171,6 +203,36 @@ export function AIResumeEnhancer({ open, setOpen, cvData, onEnhance }: AIResumeE
             );
             if (projIndex !== -1) {
               updatedCVData.projects[projIndex].description = enhancement.enhancedText;
+            }
+          }
+          break;
+        case 'languages':
+          if (updatedCVData.languages) {
+            const langIndex = updatedCVData.languages.findIndex(lang => 
+              lang.name === enhancement.title || lang.proficiency === enhancement.originalText
+            );
+            if (langIndex !== -1) {
+              updatedCVData.languages[langIndex].proficiency = enhancement.enhancedText;
+            }
+          }
+          break;
+        case 'courses':
+          if (updatedCVData.courses) {
+            const courseIndex = updatedCVData.courses.findIndex(course => 
+              course.name === enhancement.title || course.description === enhancement.originalText
+            );
+            if (courseIndex !== -1) {
+              updatedCVData.courses[courseIndex].description = enhancement.enhancedText;
+            }
+          }
+          break;
+        case 'certificates':
+          if (updatedCVData.certificates) {
+            const certIndex = updatedCVData.certificates.findIndex(cert => 
+              cert.name === enhancement.title || cert.description === enhancement.originalText
+            );
+            if (certIndex !== -1) {
+              updatedCVData.certificates[certIndex].description = enhancement.enhancedText;
             }
           }
           break;

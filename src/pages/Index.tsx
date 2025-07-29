@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Star, Users, Download, ArrowRight, Zap, Layout, FileText, Play, Shield, Clock, Sparkles, ChevronRight, Check, Globe, Award, TrendingUp } from 'lucide-react';
+import { Star, Users, Download, ArrowRight, Zap, Layout, FileText, Play, Shield, Clock, Sparkles, ChevronRight, Check, Globe, Award, TrendingUp, Brain } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
 
@@ -29,50 +29,57 @@ const Index = () => {
   }, []);
 
   const stats = [
-    { label: "Active Users", value: "50K+", growth: "+12%", icon: Users },
-    { label: "CVs Created", value: "2M+", growth: "+18%", icon: FileText },
+    { label: "Active Users", value: "200+", growth: "+12%", icon: Users },
+    { label: "CVs Created", value: "10k+", growth: "+18%", icon: FileText },
     { label: "Success Rate", value: "94%", growth: "+5%", icon: Award },
-    { label: "Countries", value: "180+", growth: "+23%", icon: Globe }
+    { label: "Countries", value: "15+", growth: "+23%", icon: Globe }
   ];
 
   const features = [
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Lightning Fast",
-      description: "Create professional CVs in under 5 minutes with our AI-powered builder",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "ATS Optimized",
-      description: "All templates are optimized for Applicant Tracking Systems",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: <Layout className="w-6 h-6" />,
-      title: "50+ Templates",
-      description: "Choose from our extensive collection of professional designs",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      icon: <Sparkles className="w-6 h-6" />,
-      title: "AI Assistant",
-      description: "Get intelligent suggestions to improve your CV content",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: <Download className="w-6 h-6" />,
-      title: "Export Options",
-      description: "Download your CV in PDF, Word, or other formats",
-      color: "from-indigo-500 to-purple-500"
-    },
-    {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: "Analytics",
-      description: "Track views and engagement on your CV",
-      color: "from-red-500 to-orange-500"
-    }
-  ];
+  {
+    icon: <Sparkles className="w-6 h-6" />,
+    title: "AI Assistant",
+    description:
+      "Let AI generate and refine your CV content with smart, personalized suggestions.",
+    color: "from-green-500 to-emerald-500",
+  },
+  {
+    icon: <Shield className="w-6 h-6" />,
+    title: "ATS Optimized",
+    description:
+      "Our templates are crafted to pass Applicant Tracking Systems and get noticed by recruiters.",
+    color: "from-purple-500 to-pink-500",
+  },
+  {
+    icon: <Zap className="w-6 h-6" />,
+    title: "Lightning Fast",
+    description:
+      "Build a polished, job-ready CV in minutes using our powerful AI-driven builder.",
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    icon: <Layout className="w-6 h-6" />,
+    title: "10+ Templates",
+    description:
+      "Access a handpicked collection of sleek, professional, and modern CV templates.",
+    color: "from-orange-500 to-red-500",
+  },
+  {
+    icon: <Brain className="w-6 h-6" />, // Use any appropriate icon here
+    title: "AI Job Matcher",
+    description:
+      "Match your skills and experience with tailored job opportunities using AI insights.",
+    color: "from-indigo-500 to-purple-500",
+  },
+  {
+    icon: <TrendingUp className="w-6 h-6" />,
+    title: "Analytics",
+    description:
+      "Track how many times your CV was viewed and discover which sections engage most.",
+    color: "from-red-500 to-orange-500",
+  },
+];
+
 
   const testimonials = [
     {
@@ -181,7 +188,7 @@ const Index = () => {
               <div className="fade-in-up">
                 <Badge variant="secondary" className="mb-6 bg-blue-50 text-blue-700 border-blue-200 backdrop-blur-sm hover:bg-blue-100 transition-colors">
                   <Star className="w-4 h-4 mr-2" />
-                  Trusted by 50,000+ professionals worldwide
+                  Trusted by 10,000+ professionals worldwide
                 </Badge>
               </div>
               
@@ -206,10 +213,12 @@ const Index = () => {
                     <ArrowRight className="w-6 h-6 ml-3" />
                   </Button>
                 </Link>
+                <Link to="/templates?startDemo=true">
                 <Button variant="outline" size="lg" className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-10 py-6 text-xl h-16 backdrop-blur-sm hover:border-gray-400 transition-all duration-300">
                   <Play className="w-6 h-6 mr-3" />
-                  Watch Demo
+                  Start Demo
                 </Button>
+                </Link>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 fade-in-up stagger-4">

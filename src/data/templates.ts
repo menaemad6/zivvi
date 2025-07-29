@@ -12,11 +12,44 @@ export const cvTemplates: CVTemplate[] = [
       hasFont: true,
     }
   },
+    {
+    id: 'timelineTemp',
+    name: 'Timeline',
+    description: 'Showcases your career path using a visual timeline. Perfect for emphasizing growth and progression over time.',
+    thumbnail: '/templates/timeline-template.png',
+    category: 'minimal',
+    options: {
+      hasFont: true,
+      hasPrimaryColor: true,
+    }
+  },
   {
     id: 'visionaryProTemp',
     name: 'Visionary Pro',
     description: 'Bold orange header design with structured sections and achievement highlights. Perfect for showcasing leadership and innovation.',
     thumbnail: '/templates/visionary-pro-template.png',
+    category: 'modern',
+    options: {
+      hasFont: true,
+      hasPrimaryColor: true,
+    }
+  },
+    {
+    id: 'elegantTemp',
+    name: 'Elegant',
+    description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
+    thumbnail: '/templates/elegant-template.png',
+    category: 'modern',
+    options: {
+      hasFont: true,
+      hasPrimaryColor: true,
+    }
+  },
+    {
+    id: 'compactTemp',
+    name: 'Compact',
+    description: 'A space-efficient layout that fits all essential information on a single page without clutter. Great for experienced professionals.',
+    thumbnail: '/templates/compact-template.png',
     category: 'modern',
     options: {
       hasFont: true,
@@ -45,39 +78,7 @@ export const cvTemplates: CVTemplate[] = [
       hasPrimaryColor: true,
     }
   },
-  {
-    id: 'elegantTemp',
-    name: 'Elegant',
-    description: 'A clean and refined design with subtle typography and spacious layout. Best suited for creative and corporate roles.',
-    thumbnail: '/templates/elegant-template.png',
-    category: 'modern',
-    options: {
-      hasFont: true,
-      hasPrimaryColor: true,
-    }
-  },
-  {
-    id: 'timelineTemp',
-    name: 'Timeline',
-    description: 'Showcases your career path using a visual timeline. Perfect for emphasizing growth and progression over time.',
-    thumbnail: '/templates/timeline-template.png',
-    category: 'minimal',
-    options: {
-      hasFont: true,
-      hasPrimaryColor: true,
-    }
-  },
-  {
-    id: 'compactTemp',
-    name: 'Compact',
-    description: 'A space-efficient layout that fits all essential information on a single page without clutter. Great for experienced professionals.',
-    thumbnail: '/templates/compact-template.png',
-    category: 'modern',
-    options: {
-      hasFont: true,
-      hasPrimaryColor: true,
-    }
-  },
+
   {
     id: 'headerTemp',
     name: 'Header',
