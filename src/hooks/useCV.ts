@@ -20,7 +20,7 @@ const getStarterData = (): CVData => ({
   designOptions: {
     primaryColor: '',
     secondaryColor: '',
-    font: 'inter',
+    font: 'montserrat',
   },
   experience: [],
   education: [],
@@ -59,7 +59,7 @@ export const useCV = (cvId: string | undefined) => {
         designOptions: {
           primaryColor: '',
           secondaryColor: '',
-          font: 'inter',
+          font: 'montserrat',
         },
         experience: [],
         education: [],

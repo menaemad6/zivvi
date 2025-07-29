@@ -174,7 +174,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             <div style={{ float: 'left', width: '40mm', fontSize: '10pt', color: '#555', marginBottom: '1mm', whiteSpace: 'nowrap', }}>{exp.startDate || ""} — {exp.endDate || ""}</div>
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{exp.title || "Job Title"}, {exp.company || "Company"}</div>
-              <ul style={{ paddingLeft: '5mm', fontSize: '10pt', color: '#333', marginTop: '1mm', }}>
+              <ul style={{ fontSize: '10pt', color: '#333', marginTop: '1mm', }}>
                 {exp.description && <li>{exp.description}</li>}
               </ul>
             </div>
@@ -232,7 +232,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
             <div style={{ marginLeft: '45mm' }}>
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{course.name}</div>
               <div style={{ fontWeight: 500, color: '#666', fontSize: '9pt' }}>{course.institution}</div>
-              <div style={{ fontWeight: 400, color: '#333', fontSize: '7pt' }}>{course.description}</div>
+              <div style={{ fontWeight: 400, color: '#333', fontSize: '9pt' }}>{course.description}</div>
             </div>
             <div style={{ clear: 'both' }}></div>
           </div>
@@ -253,7 +253,7 @@ const ClassicTemplate = ({ cvData, sections }: { cvData: Partial<CVData>; sectio
               <div style={{ fontWeight: 600, color: '#222', fontSize: '11pt' }}>{cer.name}</div>
               <div style={{ fontWeight: 500, color: '#666', fontSize: '9pt' }}>{cer.issuer}</div>
               <div style={{ fontWeight: 500, color: '#666', fontSize: '8pt' }}>{cer.link}</div>
-              <div style={{ fontWeight: 400, color: '#333', fontSize: '7pt' }}>{cer.description}</div>
+              <div style={{ fontWeight: 400, color: '#333', fontSize: '9pt' }}>{cer.description}</div>
             </div>
             <div style={{ clear: 'both' }}></div>
           </div>

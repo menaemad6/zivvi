@@ -16,12 +16,12 @@ interface DesignOptionsModalProps {
 }
 
 const FONT_OPTIONS = [
+  { value: 'montserrat', label: 'Montserrat', preview: 'Montserrat' },
   { value: 'inter', label: 'Inter', preview: 'Inter' },
   { value: 'roboto', label: 'Roboto', preview: 'Roboto' },
   { value: 'open-sans', label: 'Open Sans', preview: 'Open Sans' },
   { value: 'lato', label: 'Lato', preview: 'Lato' },
   { value: 'poppins', label: 'Poppins', preview: 'Poppins' },
-  { value: 'montserrat', label: 'Montserrat', preview: 'Montserrat' },
   { value: 'raleway', label: 'Raleway', preview: 'Raleway' },
   { value: 'source-sans-pro', label: 'Source Sans Pro', preview: 'Source Sans Pro' },
 ];

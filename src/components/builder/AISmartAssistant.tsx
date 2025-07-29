@@ -408,7 +408,7 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         designOptions: {
           primaryColor: cvData.designOptions?.primaryColor || '',
           secondaryColor: cvData.designOptions?.secondaryColor || '',
-          font: cvData.designOptions?.font || 'inter'
+          font: cvData.designOptions?.font || 'montserrat'
         }
       };
 
@@ -511,7 +511,7 @@ export function AISmartAssistant({ open, setOpen, onSectionsGenerated, cvData }:
         designOptions: {
           primaryColor: updatedCVData.designOptions?.primaryColor || '',
           secondaryColor: updatedCVData.designOptions?.secondaryColor || '',
-          font: updatedCVData.designOptions?.font || 'inter'
+          font: updatedCVData.designOptions?.font || 'montserrat'
         }
       };
 

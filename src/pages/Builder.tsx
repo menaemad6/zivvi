@@ -547,7 +547,7 @@ const handleExport = () => {
         designOptions: updatedCVData.designOptions || {
           primaryColor: '',
           secondaryColor: '',
-          font: 'inter'
+          font: 'montserrat'
         },
         experience: Array.isArray(updatedCVData.experience) ? updatedCVData.experience : [],
         education: Array.isArray(updatedCVData.education) ? updatedCVData.education : [],
@@ -819,7 +819,7 @@ const handleExport = () => {
       designOptions: cvData.designOptions || {
         primaryColor: 'blue',
         secondaryColor: 'purple',
-        font: 'inter'
+        font: 'montserrat'
       },
       experience: Array.isArray(cvData.experience) ? cvData.experience : [],
       education: Array.isArray(cvData.education) ? cvData.education : [],
@@ -884,7 +884,7 @@ const handleExport = () => {
       designOptions: updatedData.designOptions || {
         primaryColor: 'blue',
         secondaryColor: 'purple',
-        font: 'inter'
+        font: 'montserrat'
       },
       experience: Array.isArray(updatedData.experience) ? updatedData.experience : [],
       education: Array.isArray(updatedData.education) ? updatedData.education : [],
