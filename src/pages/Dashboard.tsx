@@ -217,31 +217,40 @@ const Dashboard = () => {
       </Helmet>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-16">
-        <div className="container mx-auto py-12 px-6">
-          {/* Enhanced Hero Section */}
-          <div className="text-center mb-12 sm:mb-16 relative">
+
+                  {/* Hero Section - Using the same style as Templates */}
+          <div className="relative overflow-hidden py-16">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 lg:p-12 border border-white/20 shadow-xl">
-              <div className="flex items-center justify-center mb-4 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                  <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+            <div className="text-center max-w-4xl mx-auto py-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-2xl">
+                  <Sparkles className="h-8 w-8 text-white" />
                 </div>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                Welcome back, {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
+              
+              <h1 className="text-4xl font-bold mb-4">
+                Welcome back,
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                   {user?.user_metadata?.full_name || user?.email?.split('@')[0]}!
+                </span>
               </h1>
-              <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
+              <p className="text-xl text-gray-600 leading-relaxed mb-6 max-w-3xl mx-auto">
                 Ready to create something amazing? Your professional journey continues here.
               </p>
+              
               <Button 
                 onClick={() => navigate('/templates')} 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 w-full sm:w-auto"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <Plus className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
+                <Plus className="mr-2 h-5 w-5" />
                 Create New CV
               </Button>
             </div>
           </div>
+
+
+        <div className="container mx-auto py-8 px-6">
+
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">

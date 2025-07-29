@@ -192,31 +192,30 @@ const Templates = () => {
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl blur-3xl"></div>
-          <div className="container mx-auto py-8 px-6 relative">
+          <div className="container mx-auto py-6 px-6 relative">
             <Button
               variant="outline"
               onClick={() => navigate('/dashboard')}
-              className="mb-12 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
+              className="mb-8 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all duration-300"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
             
             <div className="text-center max-w-4xl mx-auto">
-              <div className="flex items-center justify-center mb-8">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-2xl">
-                  <Sparkles className="h-10 w-10 text-white" />
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-2xl">
+                  <Sparkles className="h-8 w-8 text-white" />
                 </div>
               </div>
               
-              <h1 className="text-6xl font-bold mb-8">
+              <h1 className="text-4xl font-bold mb-4">
                 Choose Your Perfect
-                <br />
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ml-2">
                   Template
                 </span>
               </h1>
-              <p className="text-2xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 leading-relaxed mb-6 max-w-3xl mx-auto">
                 Professionally designed templates crafted for different industries and career stages. 
                 Start with a template and customize it to match your unique style.
               </p>
