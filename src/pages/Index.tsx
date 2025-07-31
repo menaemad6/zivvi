@@ -84,21 +84,21 @@ const Index = () => {
   const testimonials = [
     {
       name: "Layla Hassan",
-      role: "Frontend Developer at STC",
+      role: "Frontend Developer",
       content: "CVBuilder made my CV look so professional. The modern layouts and smart tips gave me a real edge.",
       avatar: "LH",
       rating: 5
     },
     {
       name: "Omar Khaled",
-      role: "Product Manager at Talabat",
+      role: "Product Manager",
       content: "Super easy to use and very flexible. I created a standout CV in minutes that got me interviews fast.",
       avatar: "OK",
       rating: 5
     },
     {
       name: "Nour Al-Masri",
-      role: "UI/UX Designer at Noon",
+      role: "UI/UX Designer",
       content: "The templates are visually stunning and perfect for creative roles. I got several callbacks thanks to it.",
       avatar: "NM",
       rating: 5
@@ -326,7 +326,7 @@ const Index = () => {
                 </span>
               </h2>
               <p className="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-                Join over 50,000 professionals who have successfully created stunning CVs with our platform.
+                Join over 10,000 professionals who have successfully created stunning CVs with our platform.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6">
                 <Link to="/signup">
