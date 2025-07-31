@@ -157,7 +157,7 @@ export const useCV = (cvId: string | undefined) => {
 
     try {
       setIsSaving(true);
-      console.log('Saving CV data:', data);
+
       
       // Only save sections that actually have content or are in activeSections
       const sectionsToSave = activeSections || [];

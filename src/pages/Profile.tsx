@@ -31,7 +31,7 @@ const Profile = () => {
   
   const { profile, isLoading: profileLoading, updateProfile } = useProfile();
 
-  console.log('Profile page - user:', user?.id, 'shouldShowOnboarding:', shouldShowOnboarding, 'profile:', profile);
+ 
 
   useEffect(() => {
     if (shouldShowOnboarding && profile && profile.onboarding_completed === false) {
@@ -101,7 +101,7 @@ const Profile = () => {
   };
 
   if (!authLoading && !user) {
-    console.log('No user, redirecting to login');
+
     return <Navigate to="/login" />;
   }
 
@@ -123,7 +123,6 @@ const Profile = () => {
   }
 
   const handleOnboardingComplete = async (data: Record<string, unknown>) => {
-    console.log('Onboarding completed with data:', data);
     await updateProfile({
       profile_data: data,
       onboarding_completed: true,

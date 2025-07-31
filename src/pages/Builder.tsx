@@ -690,7 +690,7 @@ const handleExport = () => {
   };
 
   const handleDragStart = (e: React.DragEvent, sectionId: string) => {
-    console.log('Drag start:', sectionId);
+
     setDraggedSection(sectionId);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', sectionId);
@@ -711,7 +711,6 @@ const handleExport = () => {
 
   const handleDrop = (e: React.DragEvent, targetIndex?: number) => {
     e.preventDefault();
-    console.log('Drop event:', { draggedSection, targetIndex });
     setDragOverIndex(null);
     
     if (!draggedSection) return;
@@ -720,7 +719,7 @@ const handleExport = () => {
       // Reordering existing sections
       const currentIndex = cvSections.indexOf(draggedSection);
       if (currentIndex !== -1 && currentIndex !== targetIndex) {
-        console.log('Reordering sections from', currentIndex, 'to', targetIndex);
+       
         const newSections = [...cvSections];
         newSections.splice(currentIndex, 1);
         newSections.splice(targetIndex, 0, draggedSection);
@@ -733,7 +732,7 @@ const handleExport = () => {
     } else {
       // Adding new section from sidebar
       if (!cvSections.includes(draggedSection)) {
-        console.log('Adding new section:', draggedSection);
+
         setCVSections([...cvSections, draggedSection]);
         // Remove from deleted sections if it was there
         setDeletedSections(prev => prev.filter(s => s !== draggedSection));
@@ -866,7 +865,7 @@ const handleExport = () => {
   };
 
   const handleModalSave = (updatedData: CVData) => {
-    console.log('Modal save:', updatedData);
+
     
     // Ensure all array fields exist and are properly structured
     const sanitizedData: CVData = {

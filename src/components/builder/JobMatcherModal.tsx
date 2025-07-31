@@ -183,9 +183,7 @@ Provide 5-8 specific suggestions covering different CV sections, including the n
         break;
       case 'education':
         if (updatedCV.education) {
-          // Log for debugging
-          console.log('Education suggestion:', suggestion);
-          console.log('Current education data:', updatedCV.education);
+
           
           // More flexible matching - try to find any education entry that might match
           const eduIndex = updatedCV.education.findIndex(edu => {
@@ -198,15 +196,14 @@ Provide 5-8 specific suggestions covering different CV sections, including the n
             );
           });
           
-          console.log('Found education index:', eduIndex);
+
           
           if (eduIndex !== -1) {
             // Update the degree field with the enhanced text
-            console.log('Updating education degree from:', updatedCV.education[eduIndex].degree, 'to:', suggestion.enhancedText);
+            
             updatedCV.education[eduIndex].degree = suggestion.enhancedText;
           } else if (updatedCV.education.length > 0) {
             // If no match found but education entries exist, update the first one
-            console.log('No exact match found, updating first education entry');
             updatedCV.education[0].degree = suggestion.enhancedText;
           }
         }

@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up auth listener');
+
     
     // Get initial session
     const getInitialSession = async () => {
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error) {
           console.error('Error getting initial session:', error);
         } else {
-          console.log('Initial session:', currentSession?.user?.id || 'No session');
+          
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
         }
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log('Auth state change:', event, newSession?.user?.id || 'No user');
+        
         
         setSession(newSession);
         setUser(newSession?.user ?? null);
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       setIsLoading(true);
-      console.log('Signing up user:', email);
+
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      console.log('Signing in user:', email);
+
       
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) throw error;
       
-      console.log('Sign in successful:', data.user?.id);
+
       // Navigation will be handled by the auth state change listener
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       setIsLoading(true);
-      console.log('Signing out user');
+
       
       const { error } = await supabase.auth.signOut();
       

@@ -75,7 +75,6 @@ export const usePDFGeneration = () => {
             const pxPerPage = a4Height / scale * 2.83; // Page height in pixels
             const totalPages = Math.ceil(contentHeight / pxPerPage);
             
-            console.log(`Content height: ${contentHeight}px, pages needed: ${totalPages}`);
             
             // Function to add a page to the PDF
             const addPage = async (pageNum: number) => {

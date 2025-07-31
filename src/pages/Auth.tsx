@@ -30,7 +30,7 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   
-  console.log('Auth page - user:', user?.id, 'isLoading:', isLoading);
+  
   
   // Redirect if user is already logged in
   useEffect(() => {
@@ -47,7 +47,7 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsFormLoading(true);
-      console.log('Starting Google sign in');
+
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -58,7 +58,7 @@ const Auth = () => {
 
       if (error) throw error;
       
-      console.log('Google sign in initiated:', data);
+
     } catch (error: any) {
       console.error('Google sign in error:', error);
       setIsFormLoading(false);
