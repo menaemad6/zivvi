@@ -1335,56 +1335,7 @@ const handleExport = () => {
               <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
                 {/* CV Builder Area */}
                 <div className="xl:col-span-2">
-                  {/* Add Sections Section - Moved from sidebar */}
-                  <Card className="add-section bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
-                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 py-3 sm:py-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
-                            <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                          </div>
-                          <div>
-                            <CardTitle className="text-base sm:text-lg font-bold text-gray-900">Add Sections</CardTitle>
-                            <p className="text-xs sm:text-sm text-gray-600">Drag to CV structure</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-0 px-2 sm:px-3 py-1 text-xs font-semibold">
-                          {availableSections.length} available
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-4">
-                      {availableSections.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                          {availableSections.map((section) => (
-                            <div
-                              key={section.id}
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, section.id)}
-                              className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 cursor-grab active:cursor-grabbing transition-all duration-200 group"
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center shadow-sm">
-                                  {React.cloneElement(section.icon as React.ReactElement, { className: "h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" })}
-                                </div>
-                                <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-indigo-700 truncate">
-                                  {section.title}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-3 sm:py-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
-                            <Star className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                          </div>
-                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-1">All sections added!</h3>
-                          <p className="text-gray-600 text-xs">Your CV is complete ✨</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+
 
                   {/* CV Design Options */}
                   {currentTemplateInfo?.options && 
@@ -1483,6 +1434,61 @@ const handleExport = () => {
                     </CardContent>
                   </Card>
                 }
+
+
+                
+                  {/* Add Sections Section - Moved from sidebar */}
+                  <Card className="add-section bg-white/90 backdrop-blur-2xl border-0 shadow-2xl rounded-2xl overflow-hidden mb-4 sm:mb-6">
+                    <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 py-3 sm:py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shadow-lg">
+                            <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base sm:text-lg font-bold text-gray-900">Add Sections</CardTitle>
+                            <p className="text-xs sm:text-sm text-gray-600">Drag to CV structure</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-0 px-2 sm:px-3 py-1 text-xs font-semibold">
+                          {availableSections.length} available
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-4">
+                      {availableSections.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                          {availableSections.map((section) => (
+                            <div
+                              key={section.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, section.id)}
+                              className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 cursor-grab active:cursor-grabbing transition-all duration-200 group"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center shadow-sm">
+                                  {React.cloneElement(section.icon as React.ReactElement, { className: "h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" })}
+                                </div>
+                                <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-indigo-700 truncate">
+                                  {section.title}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-3 sm:py-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg">
+                            <Star className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                          </div>
+                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-1">All sections added!</h3>
+                          <p className="text-gray-600 text-xs">Your CV is complete ✨</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  
 
 
 

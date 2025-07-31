@@ -110,8 +110,8 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
   const renderPersonalInfoSection = () => (
     <div className="space-y-4">
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className='col-span-2 sm:col-span-1'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className='col-span-1'>
           <Label htmlFor="fullName">Full Name</Label>
           <Input
             id="fullName"
@@ -122,7 +122,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div className='col-span-2 sm:col-span-1'>
+        <div className='col-span-1'>
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
@@ -134,7 +134,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div className='col-span-2 sm:col-span-1'>
+        <div className='col-span-1'>
           <Label htmlFor="phone">Phone</Label>
           <Input
             id="phone"
@@ -145,7 +145,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div className='col-span-2 sm:col-span-1'>
+        <div className='col-span-1'>
           <Label htmlFor="location">Location</Label>
           <Input
             id="location"
@@ -156,7 +156,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             })}
           />
         </div>
-        <div className='col-span-2'>
+        <div className='col-span-full'>
           <Label htmlFor="title">Title</Label>
           <Input
             id="title"
@@ -194,7 +194,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
           <Label htmlFor="linkedin">Linkedin Account</Label>
           <Input
@@ -280,7 +280,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Job Title</Label>
                 <Input
@@ -416,7 +416,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Project Name</Label>
                 <Input
@@ -564,7 +564,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Degree</Label>
                 <Input
@@ -705,7 +705,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Full Name</Label>
                 <Input
@@ -829,7 +829,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Course Name</Label>
                 <Input
@@ -951,7 +951,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Certificate Name</Label>
                 <Input
@@ -1084,7 +1084,7 @@ export const SectionEditModal = ({ isOpen, onClose, sectionType, sectionTitle, c
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label>Language</Label>
                 <Input
