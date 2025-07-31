@@ -199,8 +199,8 @@ const Auth = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
                   <div>
-                    <p className="font-semibold text-sm text-gray-800">Sarah Johnson</p>
-                    <p className="text-xs text-gray-600">Software Engineer at Google</p>
+                    <p className="font-semibold text-sm text-gray-800">Yehia Azzam</p>
+                    <p className="text-xs text-gray-600">Software Engineer</p>
                   </div>
                 </div>
               </div>
