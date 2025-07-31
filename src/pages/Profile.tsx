@@ -12,15 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Mail, Calendar, MapPin, Briefcase, Shield, Settings, Edit3, Camera } from 'lucide-react';
+import { User, Mail, Calendar, MapPin, Briefcase, Shield, Settings, Edit3, Camera, Eye, Download, FileText } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { LOGO_NAME, WEBSITE_URL } from "@/lib/constants";
+import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
   const { user, isLoading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const shouldShowOnboarding = searchParams.get('data') === 'true';
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [stats, setStats] = useState({
+    totalCVs: 0,
+    viewsThisMonth: 0,
+    downloadsThisMonth: 0
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   
   const { profile, isLoading: profileLoading, updateProfile } = useProfile();
 
@@ -35,6 +42,63 @@ const Profile = () => {
       setShowOnboarding(false);
     }
   }, [shouldShowOnboarding, profile]);
+  
+  useEffect(() => {
+    if (user) {
+      fetchUserStats();
+    }
+  }, [user]);
+
+  const fetchUserStats = async () => {
+    setIsLoadingStats(true);
+    try {
+      // Fetch user's CVs
+      const { data: cvData, error: cvError } = await supabase
+        .from('cvs')
+        .select('id')
+        .eq('user_id', user.id);
+
+      if (cvError) throw cvError;
+      
+      const totalCVs = cvData?.length || 0;
+      let viewsThisMonth = 0;
+      let downloadsThisMonth = 0;
+
+      if (cvData && cvData.length > 0) {
+        // Get the first and last day of the current month
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        
+        // Query analytics for all user's CVs
+        const { data: analytics, error: analyticsError } = await supabase
+          .from('cv_analytics')
+          .select('action_type, timestamp, cv_id')
+          .in('cv_id', cvData.map(cv => cv.id));
+          
+        if (analyticsError) throw analyticsError;
+        
+        // Filter for current month
+        const filtered = (analytics || []).filter((event) => {
+          const eventDate = new Date(event.timestamp);
+          return eventDate >= firstDay && eventDate <= lastDay;
+        });
+        
+        viewsThisMonth = filtered.filter((event) => event.action_type === 'view').length;
+        downloadsThisMonth = filtered.filter((event) => event.action_type === 'download').length;
+      }
+      
+      setStats({
+        totalCVs,
+        viewsThisMonth,
+        downloadsThisMonth
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
 
   if (!authLoading && !user) {
     console.log('No user, redirecting to login');
@@ -147,22 +211,41 @@ const Profile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <span className="text-gray-700 font-medium">CVs Created</span>
-                    <span className="text-2xl font-bold text-blue-600">12</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <span className="text-gray-700 font-medium">Profile Views</span>
-                    <span className="text-2xl font-bold text-green-600">248</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                    <span className="text-gray-700 font-medium">Downloads</span>
-                    <span className="text-2xl font-bold text-purple-600">89</span>
-                  </div>
+                  {isLoadingStats ? (
+                    <div className="space-y-4">
+                      <Skeleton className="h-12 w-full rounded-lg" />
+                      <Skeleton className="h-12 w-full rounded-lg" />
+                      <Skeleton className="h-12 w-full rounded-lg" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-600" />
+                          <span className="text-gray-700 font-medium">CVs Created</span>
+                        </div>
+                        <span className="text-2xl font-bold text-blue-600">{stats.totalCVs}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Eye className="w-4 h-4 text-green-600" />
+                          <span className="text-gray-700 font-medium">Views This Month</span>
+                        </div>
+                        <span className="text-2xl font-bold text-green-600">{stats.viewsThisMonth}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Download className="w-4 h-4 text-purple-600" />
+                          <span className="text-gray-700 font-medium">Downloads This Month</span>
+                        </div>
+                        <span className="text-2xl font-bold text-purple-600">{stats.downloadsThisMonth}</span>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
-              <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+              {/* <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-gray-900">
                     <Settings className="w-5 h-5 text-blue-600" />
@@ -183,7 +266,7 @@ const Profile = () => {
                     Export Data
                   </Button>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
 
             {/* Main Profile Form */}
